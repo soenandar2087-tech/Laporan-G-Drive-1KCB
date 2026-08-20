@@ -1,441 +1,314 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arsip Sederhana</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #fafafa;
-            color: #333;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.5;
-        }
-        h1 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .nav {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 14px;
-            background: #fff;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-        .nav button {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        .nav button:hover {
-            background: #f0f0f0;
-        }
-        .nav .path {
-            flex: 1;
-            font-size: 14px;
-            color: #666;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .btn-primary {
-            background: #2c3e50;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #34495e;
-        }
-        .btn-secondary {
-            background: #ecf0f1;
-            color: #2c3e50;
-        }
-        .btn-secondary:hover {
-            background: #d5dbdb;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 14px;
-        }
-        .card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 18px 12px 14px;
-            text-align: center;
-            position: relative;
-            transition: border-color 0.15s, box-shadow 0.15s;
-            min-height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .card:hover {
-            border-color: #c8c8c8;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-        .card .icon {
-            font-size: 42px;
-            line-height: 1;
-            margin-bottom: 10px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .card .name {
-            font-weight: 500;
-            font-size: 13px;
-            color: #2c3e50;
-            cursor: pointer;
-            word-break: break-word;
-            line-height: 1.35;
-            max-width: 100%;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .card .name:hover {
-            color: #3498db;
-        }
-        .card .meta {
-            font-size: 11px;
-            color: #999;
-            margin-top: 4px;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .card .actions-item {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            margin-top: auto;
-            padding-top: 10px;
-            opacity: 0;
-            transition: opacity 0.15s;
-            width: 100%;
-        }
-        .card:hover .actions-item {
-            opacity: 1;
-        }
-        .btn-icon {
-            background: #f4f4f4;
-            border: none;
-            cursor: pointer;
-            padding: 4px 8px;
-            font-size: 11px;
-            color: #666;
-            border-radius: 4px;
-        }
-        .btn-icon:hover {
-            background: #e8e8e8;
-            color: #333;
-        }
-        .btn-icon.danger:hover {
-            background: #fdecea;
-            color: #e74c3c;
-        }
-        .empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 50px 20px;
-            color: #999;
-            font-size: 14px;
-            background: #fff;
-            border: 1px dashed #ddd;
-            border-radius: 10px;
-        }
-        @media (max-width: 600px) {
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 10px;
-            }
-            .card .actions-item {
-                opacity: 1;
-            }
-            .card {
-                min-height: 130px;
-                padding: 14px 10px 12px;
-            }
-            .card .icon {
-                font-size: 36px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laporan Google-Drive</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:24px;
+  font-family:Arial,sans-serif;
+  background:#f1f3f4;
+}
+.wrap{max-width:720px;margin:0 auto}
+.box{width:100%;border:1px solid #dadce0;border-radius:12px;overflow:hidden;background:#f8f9fa}
+.btn-main{width:100%;border:0;background:#f8f9fa;color:#1a73e8;font-weight:700;font-size:16px;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.btn-main:hover{background:#f1f3f4}
+.btn-main:after{content:"⌄";color:#666}
+.btn-main.active:after{content:"⌃"}
+.panel{max-height:0;overflow:hidden;transition:max-height .15s ease;padding:0 18px;background:#f8f9fa}
+.list{list-style:square;margin:0;padding:12px 0 12px 18px;font-size:14px}
+.list li{margin:8px 0}
+.title{list-style:none;margin-left:-18px;font-weight:700;color:#202124;display:flex;align-items:center;gap:8px;margin-bottom:12px !important}
+a.month{
+  display:inline-flex;align-items:center;padding:7px 12px;margin-left:-2px;
+  border-radius:10px;color:#1a73e8;cursor:pointer;text-decoration:none !important;
+  transition:background-color .15s ease,color .15s ease,transform .08s ease;
+}
+a.month:hover,a.month:focus{background:#e8f0fe;color:#174ea6}
+a.month:active{transform:scale(.97)}
+a.month.active-month{background:#d2e3fc;color:#174ea6;font-weight:700;box-shadow:inset 0 0 0 1px rgba(26,115,232,.18)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 10px;margin-left:-10px;border-radius:10px}
+.row:hover{background:#eef3fd}
+.row a{color:#1a73e8;text-decoration:none !important;word-break:break-word}
+.actions{display:flex;gap:4px;flex-shrink:0}
+.icon-btn{border:0;background:transparent;cursor:pointer;font-size:14px;padding:5px 7px;border-radius:8px}
+.icon-btn.edit:hover{background:#d2e3fc}
+.icon-btn.del:hover{background:#fce8e6}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 0 16px}
+.plus{width:36px;height:36px;border:0;border-radius:50%;background:#1a73e8;color:#fff;font-size:22px;cursor:pointer}
+.plus:hover{background:#1557b0}
+.back{color:#5f6368;font-size:13px;font-weight:700;cursor:pointer;padding:7px 10px;border-radius:8px}
+.back:hover{color:#1a73e8;background:#e8f0fe}
+.form{display:none;border-top:1px dashed #dadce0;padding:14px 0 18px}
+.form.show{display:block}
+.form label{display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px}
+.form input{width:100%;padding:10px;border:1px solid #dadce0;border-radius:8px;margin-bottom:8px;font-size:14px;outline:none}
+.form input:focus{border-color:#1a73e8;box-shadow:0 0 0 2px rgba(26,115,232,.12)}
+.form .btns{display:flex;gap:8px}
+.save,.cancel{flex:1;border:0;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}
+.save{background:#1a73e8;color:#fff}
+.save:hover{background:#1557b0}
+.cancel{background:#e8eaed;color:#3c4043}
+.status{display:none;margin:8px 0 12px;padding:9px 11px;border-radius:10px;font-size:13px;align-items:center;gap:8px}
+.status.show{display:flex}
+.status.ok{background:#e6f4ea;color:#137333}
+.status.err{background:#fce8e6;color:#c5221f}
+.status.wait{background:#fef7e0;color:#b06000}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.1);border-left-color:currentColor;border-radius:50%;animation:spin .55s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-fade{opacity:.5;pointer-events:none}
+.empty{list-style:none;margin-left:-18px;color:#5f6368;font-style:italic;padding:7px 10px;border-radius:8px;background:#f1f3f4}
+</style>
 </head>
 <body>
-    <h1>📁 Arsip Lembar Kerja</h1>
-    
-    <div class="nav">
-        <button onclick="goBack()" id="btnBack" style="display:none">← Kembali</button>
-        <span class="path" id="pathText">Beranda</span>
+<div class="wrap">
+<div class="box" id="mainBox">
+  <button type="button" class="btn-main" id="mainBtn">Laporan Google-Drive</button>
+
+  <div class="panel" id="monthPanel">
+    <ul class="list">
+      <li class="title">Select Progress Report &gt;&gt;</li>
+      <li><a class="month" onmouseover="prefetch('Januari')" onclick="openMonth('Januari')">Januari</a></li>
+      <li><a class="month" onmouseover="prefetch('Februari')" onclick="openMonth('Februari')">Februari</a></li>
+      <li><a class="month" onmouseover="prefetch('Maret')" onclick="openMonth('Maret')">Maret</a></li>
+      <li><a class="month" onmouseover="prefetch('April')" onclick="openMonth('April')">April</a></li>
+      <li><a class="month" onmouseover="prefetch('Mei')" onclick="openMonth('Mei')">Mei</a></li>
+      <li><a class="month" onmouseover="prefetch('Juni')" onclick="openMonth('Juni')">Juni</a></li>
+      <li><a class="month" onmouseover="prefetch('Juli')" onclick="openMonth('Juli')">Juli</a></li>
+      <li><a class="month" onmouseover="prefetch('Agustus')" onclick="openMonth('Agustus')">Agustus</a></li>
+      <li><a class="month" onmouseover="prefetch('September')" onclick="openMonth('September')">September</a></li>
+      <li><a class="month" onmouseover="prefetch('Oktober')" onclick="openMonth('Oktober')">Oktober</a></li>
+      <li><a class="month" onmouseover="prefetch('November')" onclick="openMonth('November')">November</a></li>
+      <li><a class="month" onmouseover="prefetch('Desember')" onclick="openMonth('Desember')">Desember</a></li>
+    </ul>
+  </div>
+
+  <div class="panel" id="reportPanel" style="display:none">
+    <div id="loadingArea">
+      <ul class="list" id="reportList"></ul>
+      <div class="status" id="status"></div>
+      <div class="nav">
+        <button type="button" class="plus" id="plusBtn" onclick="openAdd()">+</button>
+        <span class="back" onclick="backMonths()">&lt;&lt; Kembali Pilih Bulan</span>
+      </div>
+      <div class="form" id="formBox">
+        <label id="formTitle">TAMBAH PELAPORAN BARU</label>
+        <input type="text" id="nameInput" placeholder="Nama laporan">
+        <input type="text" id="urlInput" placeholder="URL https://...">
+        <div class="btns">
+          <button type="button" class="save" onclick="saveItem()">Simpan</button>
+          <button type="button" class="cancel" onclick="closeForm()">Batal</button>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+</div>
 
-    <div class="actions">
-        <button class="btn btn-secondary" onclick="newFolder()">+ Folder</button>
-        <button class="btn btn-primary" onclick="newLink()">+ Lembar Kerja</button>
-    </div>
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzDQiPDDJWCDVzbxMMuGt77k3csw1mCpTX3-kljgjsXFBcxC6u8ewbqk_qze2brQSgI/exec";
+const NEED_VERSION = 3;
+const CACHE_TTL = 30000;
 
-    <div class="grid" id="list"></div>
+let currentMonth = "", currentList = [], editIndex = null, statusTimeout = null;
+const cache = {};
 
-    <script>
-        let data = JSON.parse(localStorage.getItem('arsip_simple')) || {
-            type: 'folder',
-            name: 'Beranda',
-            children: [
-                {
-                    type: 'folder',
-                    name: 'Administrasi',
-                    children: [
-                        { type: 'link', name: 'Laporan Januari', url: 'https://google.com' }
-                    ]
-                },
-                {
-                    type: 'folder',
-                    name: 'Lapangan',
-                    children: [
-                        { type: 'link', name: 'Data Hama', url: 'https://google.com' }
-                    ]
-                }
-            ]
-        };
+const mainBox = document.getElementById("mainBox");
+const mainBtn = document.getElementById("mainBtn");
+const monthPanel = document.getElementById("monthPanel");
+const reportPanel = document.getElementById("reportPanel");
+const reportList = document.getElementById("reportList");
+const formBox = document.getElementById("formBox");
+const plusBtn = document.getElementById("plusBtn");
+const nameInput = document.getElementById("nameInput");
+const urlInput = document.getElementById("urlInput");
+const formTitle = document.getElementById("formTitle");
+const statusEl = document.getElementById("status");
+const loadingArea = document.getElementById("loadingArea");
 
-        let currentPath = [data];
-        let currentFolder = data;
+function getCached(m){ return cache[m] ? cache[m].data : null; }
+function isStale(m){ const c = cache[m]; return !c || (Date.now()-c.ts >= CACHE_TTL); }
+function setCache(m, data){ cache[m] = { data:data, ts:Date.now() }; }
+function expand(el){ el.style.maxHeight = el.scrollHeight + "px"; }
+function isOpen(){ return mainBtn.classList.contains("active"); }
 
-        function save() {
-            localStorage.setItem('arsip_simple', JSON.stringify(data));
-        }
+function closeDropdown(){
+  if (!isOpen()) return;
+  mainBtn.classList.remove("active");
+  monthPanel.style.maxHeight = null;
+  reportPanel.style.maxHeight = null;
+}
+function openDropdown(){
+  mainBtn.classList.add("active");
+  if (reportPanel.style.display === "block") expand(reportPanel);
+  else expand(monthPanel);
+}
 
-        function render() {
-            const list = document.getElementById('list');
-            const pathText = document.getElementById('pathText');
-            const btnBack = document.getElementById('btnBack');
+mainBtn.addEventListener("click", function(e){
+  e.stopPropagation();
+  isOpen() ? closeDropdown() : openDropdown();
+});
+mainBox.addEventListener("click", function(e){ e.stopPropagation(); });
+document.addEventListener("click", closeDropdown);
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeDropdown(); });
 
-            pathText.textContent = currentPath.map(f => f.name).join(' / ');
-            btnBack.style.display = currentPath.length > 1 ? 'block' : 'none';
+function setStatus(msg, type){
+  if (statusTimeout) clearTimeout(statusTimeout);
+  statusEl.innerHTML = type === "wait"
+    ? '<span class="spinner"></span><span>' + msg + '</span>'
+    : msg;
+  statusEl.className = "status show " + type;
+  expand(reportPanel);
+  if (type !== "wait") {
+    statusTimeout = setTimeout(function(){ statusEl.className = "status"; expand(reportPanel); }, 3000);
+  }
+}
+function setLoader(on){ loadingArea.classList.toggle("loading-fade", on); }
 
-            if (currentFolder.children.length === 0) {
-                list.innerHTML = '<div class="empty">Folder kosong</div>';
-                return;
-            }
+function doFetch(params, showLoader){
+  const q = Object.keys(params).map(k => encodeURIComponent(k)+"="+encodeURIComponent(params[k])).join("&");
+  if (showLoader) setLoader(true);
+  return fetch(API_URL + "?" + q + "&_ts=" + Date.now(), { method:"GET", cache:"no-store" })
+    .then(r => r.text())
+    .then(text => {
+      if (showLoader) setLoader(false);
+      let data;
+      try { data = JSON.parse(text); } catch(e){ throw new Error("Server tidak merespons dengan benar."); }
+      if (data.v !== NEED_VERSION) throw new Error("Server masih versi lama. Deploy ulang Apps Script.");
+      return data;
+    })
+    .catch(err => { if (showLoader) setLoader(false); throw err; });
+}
 
-            // Urutkan Folder dulu, baru Link/File
-            const items = [...currentFolder.children]
-                .map((item, index) => ({ item, index }))
-                .sort((a, b) => {
-                    if (a.item.type === b.item.type) return 0;
-                    return a.item.type === 'folder' ? -1 : 1;
-                });
+function prefetch(month){
+  if (getCached(month)) return;
+  doFetch({ action:"list", month }, false)
+    .then(res => { if (res.ok) setCache(month, res.data || []); })
+    .catch(()=>{});
+}
+function setActiveMonthUI(month){
+  document.querySelectorAll("a.month").forEach(a => {
+    a.classList.toggle("active-month", a.textContent.trim() === month);
+  });
+}
 
-            list.innerHTML = items.map(({ item, index }) => {
-                if (item.type === 'folder') {
-                    return `
-                        <div class="card">
-                            <div class="icon" onclick="openFolder(${index})" title="Buka folder">📁</div>
-                            <div class="name" onclick="openFolder(${index})" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</div>
-                            <div class="meta">${item.children.length} item</div>
-                            <div class="actions-item">
-                                <button class="btn-icon" onclick="editFolder(${index})">Edit</button>
-                                <button class="btn-icon" onclick="moveItem(${index})">Pindah</button>
-                                <button class="btn-icon danger" onclick="deleteItem(${index})">Hapus</button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    return `
-                        <div class="card">
-                            <div class="icon" onclick="window.open('${escapeAttr(item.url)}', '_blank')" title="Buka link">📄</div>
-                            <div class="name" onclick="window.open('${escapeAttr(item.url)}', '_blank')" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</div>
-                            <div class="meta">${escapeHTML(hostOf(item.url))}</div>
-                            <div class="actions-item">
-                                <button class="btn-icon" onclick="editLink(${index})">Edit</button>
-                                <button class="btn-icon" onclick="moveItem(${index})">Pindah</button>
-                                <button class="btn-icon danger" onclick="deleteItem(${index})">Hapus</button>
-                            </div>
-                        </div>
-                    `;
-                }
-            }).join('');
-        }
-
-        // Mengubah nama dari 'escape' ke 'escapeHTML' agar tidak bentrok dengan fungsi bawaan JS
-        function escapeHTML(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function escapeAttr(text) {
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
-
-        function hostOf(url) {
-            try {
-                return new URL(url).hostname.replace(/^www\./, '');
-            } catch (e) {
-                return String(url).replace(/^https?:\/\//, '').split('/')[0];
-            }
-        }
-
-        function goBack() {
-            if (currentPath.length > 1) {
-                currentPath.pop();
-                currentFolder = currentPath[currentPath.length - 1];
-                render();
-            }
-        }
-
-        function openFolder(index) {
-            const folder = currentFolder.children[index];
-            if (folder.type === 'folder') {
-                currentPath.push(folder);
-                currentFolder = folder;
-                render();
-            }
-        }
-
-        function newFolder() {
-            const name = prompt('Nama folder baru:');
-            if (name && name.trim()) {
-                currentFolder.children.push({
-                    type: 'folder',
-                    name: name.trim(),
-                    children: []
-                });
-                save();
-                render();
-            }
-        }
-
-        function newLink() {
-            const name = prompt('Nama lembar kerja:');
-            if (!name || !name.trim()) return;
-            const url = prompt('Alamat URL:', 'https://');
-            if (!url || !url.trim()) return;
-
-            currentFolder.children.push({
-                type: 'link',
-                name: name.trim(),
-                url: url.trim()
-            });
-            save();
-            render();
-        }
-
-        function editFolder(index) {
-            const item = currentFolder.children[index];
-            const newName = prompt('Nama folder:', item.name);
-            if (newName && newName.trim()) {
-                item.name = newName.trim();
-                save();
-                render();
-            }
-        }
-
-        function editLink(index) {
-            const item = currentFolder.children[index];
-            const newName = prompt('Nama lembar kerja:', item.name);
-            if (!newName || !newName.trim()) return;
-            const newUrl = prompt('Alamat URL:', item.url);
-            if (!newUrl || !newUrl.trim()) return;
-
-            item.name = newName.trim();
-            item.url = newUrl.trim();
-            save();
-            render();
-        }
-
-        function deleteItem(index) {
-            const item = currentFolder.children[index];
-            if (confirm(`Hapus "${item.name}"?`)) {
-                currentFolder.children.splice(index, 1);
-                save();
-                render();
-            }
-        }
-
-        function moveItem(index) {
-            const item = currentFolder.children[index];
-            const folders = [];
-
-            function scan(folder, path, depth) {
-                // Jangan masukkan folder itu sendiri atau subfolder di dalamnya jika yang dipindahkan adalah folder tersebut
-                if (item.type === 'folder' && isDescendant(item, folder)) return;
-
-                // Jangan masukkan folder asal sebagai pilihan tujuan pindah
-                if (folder !== currentFolder) {
-                    folders.push({ folder, name: path, depth });
-                }
-
-                // Tetap pindai semua subfolder di bawahnya
-                folder.children.filter(c => c.type === 'folder').forEach(f => {
-                    scan(f, path + ' / ' + f.name, depth + 1);
-                });
-            }
-
-            scan(data, data.name, 0);
-
-            if (folders.length === 0) {
-                alert('Tidak ada folder tujuan lain');
-                return;
-            }
-
-            const options = folders.map((f, i) => `${i + 1}. ${'  '.repeat(f.depth)}${f.folder.name}`).join('\n');
-            const choice = prompt(`Pindahkan "${item.name}" ke:\n\n${options}\n\nMasukkan nomor:`);
-
-            if (choice) {
-                const num = parseInt(choice, 10) - 1;
-                if (num >= 0 && num < folders.length) {
-                    currentFolder.children.splice(index, 1);
-                    folders[num].folder.children.push(item);
-                    save();
-                    render();
-                }
-            }
-        }
-
-        function isDescendant(parent, child) {
-            if (parent === child) return true;
-            if (parent.type !== 'folder') return false;
-            for (let c of parent.children) {
-                if (c.type === 'folder' && isDescendant(c, child)) return true;
-            }
-            return false;
-        }
-
-        render();
-    </script>
+function openMonth(month){
+  currentMonth = month; editIndex = null;
+  setActiveMonthUI(month);
+  monthPanel.style.display = "none"; monthPanel.style.maxHeight = null;
+  reportPanel.style.display = "block"; closeForm(true);
+  const cached = getCached(month);
+  if (cached) {
+    currentList = cached; renderList();
+    if (isStale(month)) refreshBackground(month);
+  } else {
+    reportList.innerHTML = '<li class="title"><span class="spinner" style="color:#1a73e8"></span> Memuat ' + month + '...</li>';
+    expand(reportPanel); loadList();
+  }
+}
+function refreshBackground(month){
+  doFetch({ action:"list", month }, false).then(res => {
+    if (!res.ok) return;
+    const data = res.data || [];
+    setCache(month, data);
+    if (month === currentMonth && JSON.stringify(data) !== JSON.stringify(currentList)) {
+      currentList = data; renderList();
+    }
+  }).catch(()=>{});
+}
+function backMonths(){
+  reportPanel.style.display = "none"; reportPanel.style.maxHeight = null;
+  monthPanel.style.display = "block"; expand(monthPanel);
+  currentMonth = ""; currentList = []; editIndex = null;
+  statusEl.className = "status";
+}
+function loadList(){
+  doFetch({ action:"list", month:currentMonth }, true)
+    .then(res => {
+      if (!res.ok) throw new Error(res.error || "Gagal memuat");
+      setCache(currentMonth, res.data || []);
+      currentList = res.data || [];
+      renderList();
+    })
+    .catch(err => {
+      reportList.innerHTML = '<li class="empty">Gagal memuat data</li>';
+      setStatus(err.message, "err"); expand(reportPanel);
+    });
+}
+function renderList(){
+  reportList.innerHTML = "";
+  const title = document.createElement("li");
+  title.className = "title";
+  title.textContent = "Daily Progress Report (" + currentMonth + ") >>";
+  reportList.appendChild(title);
+  if (!currentList.length) {
+    const empty = document.createElement("li");
+    empty.className = "empty";
+    empty.textContent = "Belum ada laporan. Klik + untuk menambah.";
+    reportList.appendChild(empty);
+  } else {
+    currentList.forEach((item, index) => {
+      const li = document.createElement("li");
+      const row = document.createElement("div"); row.className = "row";
+      const a = document.createElement("a");
+      a.href = item.url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = item.name;
+      const actions = document.createElement("div"); actions.className = "actions";
+      const editBtn = document.createElement("button");
+      editBtn.type = "button"; editBtn.className = "icon-btn edit"; editBtn.textContent = "✏️";
+      editBtn.onclick = () => openEdit(index);
+      const delBtn = document.createElement("button");
+      delBtn.type = "button"; delBtn.className = "icon-btn del"; delBtn.textContent = "🗑️";
+      delBtn.onclick = () => deleteItem(index);
+      actions.append(editBtn, delBtn); row.append(a, actions); li.append(row); reportList.append(li);
+    });
+  }
+  expand(reportPanel);
+}
+function openAdd(){
+  editIndex = null; formTitle.textContent = "TAMBAH PELAPORAN BARU";
+  nameInput.value = ""; urlInput.value = "";
+  formBox.classList.add("show"); plusBtn.textContent = "×"; plusBtn.style.background = "#5f6368";
+  nameInput.focus(); expand(reportPanel);
+}
+function openEdit(index){
+  const item = currentList[index]; if (!item) return;
+  editIndex = index; formTitle.textContent = "EDIT PELAPORAN";
+  nameInput.value = item.name || ""; urlInput.value = item.url || "";
+  formBox.classList.add("show"); plusBtn.textContent = "×"; plusBtn.style.background = "#5f6368";
+  nameInput.focus(); expand(reportPanel);
+}
+function closeForm(silent){
+  formBox.classList.remove("show"); plusBtn.textContent = "+"; plusBtn.style.background = "#1a73e8";
+  editIndex = null; nameInput.value = ""; urlInput.value = "";
+  if (!silent) expand(reportPanel);
+}
+function saveItem(){
+  let name = nameInput.value.trim(), url = urlInput.value.trim();
+  if (!currentMonth) { setStatus("Pilih bulan dulu.", "err"); return; }
+  if (!name || !url) { setStatus("Nama dan URL wajib diisi.", "err"); return; }
+  if (!url.startsWith("http://") && !url.startsWith("https://")) url = "https://" + url;
+  const isEdit = editIndex !== null;
+  setStatus(isEdit ? "Menyimpan perubahan..." : "Menyimpan laporan...", "wait");
+  const params = isEdit
+    ? { action:"edit", month:currentMonth, index:editIndex, name, url }
+    : { action:"add", month:currentMonth, name, url };
+  doFetch(params, true).then(res => {
+    if (!res.ok) throw new Error(res.error || "Gagal menyimpan");
+    setCache(currentMonth, res.data || []); currentList = res.data || [];
+    closeForm(true); renderList();
+    setStatus(isEdit ? "Berhasil diedit." : "Berhasil ditambah.", "ok");
+  }).catch(err => setStatus(err.message, "err"));
+}
+function deleteItem(index){
+  setStatus("Menghapus laporan...", "wait");
+  doFetch({ action:"delete", month:currentMonth, index }, true).then(res => {
+    if (!res.ok) throw new Error(res.error || "Gagal menghapus");
+    setCache(currentMonth, res.data || []); currentList = res.data || [];
+    renderList(); setStatus("Berhasil dihapus.", "ok");
+  }).catch(err => setStatus(err.message, "err"));
+}
+</script>
 </body>
 </html>
