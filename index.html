@@ -2,312 +2,333 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Laporan Google-Drive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo PDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<!-- Google API -->
+<script async defer src="https://apis.google.com/js/api.js" onload="handleGapiLoad()"></script>
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;padding:24px;
-  font-family:Arial,sans-serif;
-  background:#f1f3f4;
-}
-.wrap{max-width:720px;margin:0 auto}
-.box{width:100%;border:1px solid #dadce0;border-radius:12px;overflow:hidden;background:#f8f9fa}
-.btn-main{width:100%;border:0;background:#f8f9fa;color:#1a73e8;font-weight:700;font-size:16px;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.btn-main:hover{background:#f1f3f4}
-.btn-main:after{content:"⌄";color:#666}
-.btn-main.active:after{content:"⌃"}
-.panel{max-height:0;overflow:hidden;transition:max-height .15s ease;padding:0 18px;background:#f8f9fa}
-.list{list-style:square;margin:0;padding:12px 0 12px 18px;font-size:14px}
-.list li{margin:8px 0}
-.title{list-style:none;margin-left:-18px;font-weight:700;color:#202124;display:flex;align-items:center;gap:8px;margin-bottom:12px !important}
-a.month{
-  display:inline-flex;align-items:center;padding:7px 12px;margin-left:-2px;
-  border-radius:10px;color:#1a73e8;cursor:pointer;text-decoration:none !important;
-  transition:background-color .15s ease,color .15s ease,transform .08s ease;
-}
-a.month:hover,a.month:focus{background:#e8f0fe;color:#174ea6}
-a.month:active{transform:scale(.97)}
-a.month.active-month{background:#d2e3fc;color:#174ea6;font-weight:700;box-shadow:inset 0 0 0 1px rgba(26,115,232,.18)}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 10px;margin-left:-10px;border-radius:10px}
-.row:hover{background:#eef3fd}
-.row a{color:#1a73e8;text-decoration:none !important;word-break:break-word}
-.actions{display:flex;gap:4px;flex-shrink:0}
-.icon-btn{border:0;background:transparent;cursor:pointer;font-size:14px;padding:5px 7px;border-radius:8px}
-.icon-btn.edit:hover{background:#d2e3fc}
-.icon-btn.del:hover{background:#fce8e6}
-.nav{display:flex;justify-content:space-between;align-items:center;padding:0 0 16px}
-.plus{width:36px;height:36px;border:0;border-radius:50%;background:#1a73e8;color:#fff;font-size:22px;cursor:pointer}
-.plus:hover{background:#1557b0}
-.back{color:#5f6368;font-size:13px;font-weight:700;cursor:pointer;padding:7px 10px;border-radius:8px}
-.back:hover{color:#1a73e8;background:#e8f0fe}
-.form{display:none;border-top:1px dashed #dadce0;padding:14px 0 18px}
-.form.show{display:block}
-.form label{display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px}
-.form input{width:100%;padding:10px;border:1px solid #dadce0;border-radius:8px;margin-bottom:8px;font-size:14px;outline:none}
-.form input:focus{border-color:#1a73e8;box-shadow:0 0 0 2px rgba(26,115,232,.12)}
-.form .btns{display:flex;gap:8px}
-.save,.cancel{flex:1;border:0;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}
-.save{background:#1a73e8;color:#fff}
-.save:hover{background:#1557b0}
-.cancel{background:#e8eaed;color:#3c4043}
-.status{display:none;margin:8px 0 12px;padding:9px 11px;border-radius:10px;font-size:13px;align-items:center;gap:8px}
-.status.show{display:flex}
-.status.ok{background:#e6f4ea;color:#137333}
-.status.err{background:#fce8e6;color:#c5221f}
-.status.wait{background:#fef7e0;color:#b06000}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.1);border-left-color:currentColor;border-radius:50%;animation:spin .55s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-fade{opacity:.5;pointer-events:none}
-.empty{list-style:none;margin-left:-18px;color:#5f6368;font-style:italic;padding:7px 10px;border-radius:8px;background:#f1f3f4}
+:root{--bg:#fff;--panel:#f8fafc;--border:#c5cdd8;--strong:#94a3b8;--primary:#2563eb;--dark:#1d4ed8;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4;--radius:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:11px;overflow-x:hidden;padding:6px}
+.app-wrap{border:2px solid var(--primary);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(37,99,235,.12);overflow:hidden}
+.app-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:linear-gradient(135deg,#eff6ff 0%,#fff 100%);border-bottom:2px solid var(--primary)}
+.app-head h1{font-size:13px;font-weight:800;color:var(--dark);margin:0}
+.app-head small{font-size:10px;color:var(--muted)}
+.app-body{padding:8px}
+.container{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:600px){.container{grid-template-columns:270px 1fr}}
+.left-col{display:flex;flex-direction:column}.right-col{display:flex;flex-direction:column;min-height:0}
+.box{background:var(--panel);border:1.5px solid var(--strong);border-radius:8px;padding:8px;margin-bottom:8px}
+.label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
+#drop{border:2px dashed #93c5fd;background:#fff;border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:.2s}
+#drop:hover{border-color:var(--primary);background:#eff6ff}
+.icon{font-size:22px;display:block;margin-bottom:4px}
+.drop-text{font-weight:700;color:var(--primary);font-size:12px}
+.drop-sub{font-size:9px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.chip{padding:3px 8px;border:1.5px solid var(--border);border-radius:12px;font-size:10px;cursor:pointer;background:#fff;font-weight:600}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.slider-group{margin-bottom:6px}
+.slider-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
+input[type=range]{width:100%;height:4px}
+select,input[type=text]{width:100%;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:11px;margin-bottom:6px;font-family:inherit;outline:none;background:#fff}
+select:focus,input[type=text]:focus{border-color:var(--primary)}
+.ck{font-size:10px;display:flex;align-items:center;gap:4px}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.stat-item{background:#fff;border:1.5px solid var(--strong);border-radius:6px;padding:5px 4px;text-align:center}
+.stat-val{font-weight:800;font-size:13px}
+.c-blue{color:var(--primary)}.c-red{color:var(--danger)}.c-green{color:var(--success)}
+.preview-area{background:#fff;border:1.5px solid var(--strong);border-radius:8px;padding:8px;flex:1;min-height:200px;display:flex;flex-direction:column}
+.preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.grid-scroll{flex:1;overflow-y:auto;min-height:150px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px}
+.thumb{position:relative;aspect-ratio:3/4;border:1.5px solid var(--border);border-radius:5px;overflow:hidden;background:#f3f4f6;cursor:grab}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb-num{position:absolute;top:2px;left:2px;background:var(--primary);color:#fff;font-size:9px;padding:1px 4px;border-radius:4px;font-weight:700}
+.thumb-del{position:absolute;top:2px;right:2px;width:16px;height:16px;background:rgba(239,68,68,.92);color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer}
+.thumb-size{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.72);color:#fff;font-size:8px;text-align:center;padding:1px}
+#emptyMsg{min-height:120px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:10px;text-align:center}
+.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn{flex:1;min-width:80px;padding:7px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;text-align:center}
+.btn-pri{background:var(--primary);color:#fff}.btn-suc{background:var(--success);color:#fff}
+.btn-cam{background:#f59e0b;color:#fff}.btn-drive{background:var(--drive);color:#fff}
+.btn-out{background:#fff;border:1.5px solid var(--strong);color:var(--text)}.btn-sm{padding:2px 8px;font-size:9px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.progress-container{height:4px;background:#e5e7eb;border-radius:2px;margin-top:8px;overflow:hidden;display:none}
+.progress-bar{height:100%;background:var(--primary);width:0%;transition:width .2s}
+.status-text{font-size:9px;color:var(--muted);margin-top:4px;text-align:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none;align-items:center;justify-content:center;padding:12px}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;padding:16px;border-radius:10px;width:320px;max-width:100%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.22);border:2px solid var(--strong)}
+.modal-title{font-weight:800;margin-bottom:8px;font-size:13px}
+.modal-info{font-size:10px;color:var(--muted);margin:8px 0;line-height:1.4}
+.modal-btns{display:flex;gap:8px;margin-top:12px}
+.modal-btn{flex:1;padding:7px;border-radius:5px;border:none;font-weight:700;cursor:pointer;font-size:11px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;font-size:11px;font-weight:700;padding:7px 14px;border-radius:6px;opacity:0;transition:.25s;pointer-events:none;z-index:1000}
+.toast.show{opacity:1}.toast.error{background:var(--danger)}
+.warn-box{background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:8px;font-size:10px;color:#92400e;margin-bottom:8px}
 </style>
 </head>
 <body>
-<div class="wrap">
-<div class="box" id="mainBox">
-  <button type="button" class="btn-main" id="mainBtn">Laporan Google-Drive</button>
 
-  <div class="panel" id="monthPanel">
-    <ul class="list">
-      <li class="title">Select Progress Report &gt;&gt;</li>
-      <li><a class="month" onmouseover="prefetch('Januari')" onclick="openMonth('Januari')">Januari</a></li>
-      <li><a class="month" onmouseover="prefetch('Februari')" onclick="openMonth('Februari')">Februari</a></li>
-      <li><a class="month" onmouseover="prefetch('Maret')" onclick="openMonth('Maret')">Maret</a></li>
-      <li><a class="month" onmouseover="prefetch('April')" onclick="openMonth('April')">April</a></li>
-      <li><a class="month" onmouseover="prefetch('Mei')" onclick="openMonth('Mei')">Mei</a></li>
-      <li><a class="month" onmouseover="prefetch('Juni')" onclick="openMonth('Juni')">Juni</a></li>
-      <li><a class="month" onmouseover="prefetch('Juli')" onclick="openMonth('Juli')">Juli</a></li>
-      <li><a class="month" onmouseover="prefetch('Agustus')" onclick="openMonth('Agustus')">Agustus</a></li>
-      <li><a class="month" onmouseover="prefetch('September')" onclick="openMonth('September')">September</a></li>
-      <li><a class="month" onmouseover="prefetch('Oktober')" onclick="openMonth('Oktober')">Oktober</a></li>
-      <li><a class="month" onmouseover="prefetch('November')" onclick="openMonth('November')">November</a></li>
-      <li><a class="month" onmouseover="prefetch('Desember')" onclick="openMonth('Desember')">Desember</a></li>
-    </ul>
-  </div>
+<div class="app-wrap">
+<div class="app-head"><h1>📄 Photo → PDF → ☁️</h1><small>Compress & Upload</small></div>
+<div class="app-body">
+<div class="container">
+<div class="left-col">
+<div class="box">
+<div id="drop"><span class="icon">📁</span><span class="drop-text">Klik / Drop Foto</span><span class="drop-sub">JPG · PNG · WEBP</span></div>
+<input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+</div>
 
-  <div class="panel" id="reportPanel" style="display:none">
-    <div id="loadingArea">
-      <ul class="list" id="reportList"></ul>
-      <div class="status" id="status"></div>
-      <div class="nav">
-        <button type="button" class="plus" id="plusBtn" onclick="openAdd()">+</button>
-        <span class="back" onclick="backMonths()">&lt;&lt; Kembali Pilih Bulan</span>
-      </div>
-      <div class="form" id="formBox">
-        <label id="formTitle">TAMBAH PELAPORAN BARU</label>
-        <input type="text" id="nameInput" placeholder="Nama laporan">
-        <input type="text" id="urlInput" placeholder="URL https://...">
-        <div class="btns">
-          <button type="button" class="save" onclick="saveItem()">Simpan</button>
-          <button type="button" class="cancel" onclick="closeForm()">Batal</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="box">
+<span class="label">Target Ukuran</span>
+<div class="chips" id="targetChips">
+<div class="chip" data-v="0.5">500KB</div><div class="chip" data-v="1">1MB</div>
+<div class="chip active" data-v="5">5MB</div><div class="chip" data-v="10">10MB</div>
+<div class="chip" data-v="0">⬇ Min</div>
 </div>
 </div>
+
+<div class="box">
+<span class="label">Mode Kompresi</span>
+<div class="chips" id="modeChips" style="margin-bottom:6px">
+<div class="chip active" data-m="bal">⚖ Seimbang</div>
+<div class="chip" data-m="size">⚡ Kecil</div>
+<div class="chip" data-m="qual">✨ Kualitas</div>
+</div>
+<div class="slider-group"><div class="slider-row"><span>Resolusi</span><span id="valRes">2000px</span></div><input type="range" id="inpRes" min="500" max="4000" step="100" value="2000"></div>
+<div class="slider-group"><div class="slider-row"><span>Kualitas</span><span id="valQual">70%</span></div><input type="range" id="inpQual" min="10" max="100" value="70"></div>
+</div>
+
+<div class="box">
+<span class="label">Output PDF</span>
+<select id="pdfSize"><option value="a4">A4</option><option value="letter">Letter</option><option value="fit">Sesuai Foto</option></select>
+<label class="ck"><input type="checkbox" id="pdfNum"> Nomor Halaman</label>
+
+<hr style="margin:8px 0;border:none;border-top:1px solid #e5e7eb">
+
+<span class="label">🔑 Google Drive <span id="driveStatus">⏳ Cek...</span></span>
+<div class="warn-box" id="driveWarn" style="display:none">
+<strong>⚠️ Mode Offline Terdeteksi!</strong><br>
+Buka via <code>https://</code> agar fitur Upload ke Drive bisa digunakan.<br>
+<small>Sekarang hanya Download saja yang tersedia.</small>
+</div>
+
+<input type="text" id="clientIdInput" placeholder="Client ID..." style="font-size:10px;padding:4px">
+<button class="btn btn-sm" style="background:var(--drive);color:white;width:100%" onclick="saveClientId()">💾 Simpan</button>
+</div>
+</div>
+
+<div class="right-col">
+<div class="stats-bar">
+<div class="stat-item"><span class="label" style="margin:0">Foto</span><div class="stat-val c-blue" id="stCount">0</div></div>
+<div class="stat-item"><span class="label" style="margin:0">Asli</span><div class="stat-val c-red" id="stOrig">-</div></div>
+<div class="stat-item"><span class="label" style="margin:0">Hasil</span><div class="stat-val c-green" id="stRes">-</div></div>
+<div class="stat-item"><span class="label" style="margin:0">Hemat</span><div class="stat-val" id="stSave">-</div></div>
+</div>
+
+<div class="preview-area">
+<div class="preview-head"><span class="label" style="margin:0">Preview</span><button class="btn btn-out btn-sm" onclick="askDeleteAll()">🗑 Hapus</button></div>
+<div class="grid-scroll"><div class="grid" id="grid"></div><div id="emptyMsg">Belum ada foto</div></div>
+</div>
+
+<div class="actions">
+<button class="btn btn-out" onclick="document.getElementById('fileInput').click()">＋ Galeri</button>
+<button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Cam</button>
+<button class="btn btn-pri" id="btnComp" disabled onclick="processCompress()">🔄 Compress</button>
+<button class="btn btn-suc" id="btnPdf" disabled onclick="askPdfName()">📄 PDF</button>
+</div>
+
+<div class="actions">
+<button class="btn btn-drive" id="btnDrive" onclick="uploadToDrive()">☁️ Upload Drive</button>
+<button class="btn btn-out" id="btnDl" onclick="downloadLocal()" style="display:none">💾 Download File</button>
+</div>
+
+<div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
+<div class="status-text" id="statusText">Siap.</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="confirmModal"><div class="modal-box"><div class="modal-title">🗑 Hapus Semua?</div><div class="modal-btns"><button class="modal-btn" onclick="closeModal('confirmModal')">Batal</button><button class="modal-btn btn-yes" onclick="doDeleteAll()">Hapus</button></div></div></div>
+<div class="modal-overlay" id="pdfModal"><div class="modal-box"><div class="modal-title">💾 Nama PDF</div><input type="text" id="modalFileName" value="hasil-foto"><div class="modal-btns"><button class="modal-btn" onclick="closeModal('pdfModal')">Batal</button><button class="modal-btn btn-go" onclick="confirmPdf()">Buat</button></div></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzDQiPDDJWCDVzbxMMuGt77k3csw1mCpTX3-kljgjsXFBcxC6u8ewbqk_qze2brQSgI/exec";
-const NEED_VERSION = 3;
-const CACHE_TTL = 30000;
+const {jsPDF}=window.jspdf;
+let photos=[], targetMB=5, mode='bal', busy=false, pdfBlob=null, pdfName='', googleReady=false;
 
-let currentMonth = "", currentList = [], editIndex = null, statusTimeout = null;
-const cache = {};
+const $=id=>document.getElementById(id);
+const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src});
 
-const mainBox = document.getElementById("mainBox");
-const mainBtn = document.getElementById("mainBtn");
-const monthPanel = document.getElementById("monthPanel");
-const reportPanel = document.getElementById("reportPanel");
-const reportList = document.getElementById("reportList");
-const formBox = document.getElementById("formBox");
-const plusBtn = document.getElementById("plusBtn");
-const nameInput = document.getElementById("nameInput");
-const urlInput = document.getElementById("urlInput");
-const formTitle = document.getElementById("formTitle");
-const statusEl = document.getElementById("status");
-const loadingArea = document.getElementById("loadingArea");
+let tT;
+function toast(m,err=false){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3000)}
 
-function getCached(m){ return cache[m] ? cache[m].data : null; }
-function isStale(m){ const c = cache[m]; return !c || (Date.now()-c.ts >= CACHE_TTL); }
-function setCache(m, data){ cache[m] = { data:data, ts:Date.now() }; }
-function expand(el){ el.style.maxHeight = el.scrollHeight + "px"; }
-function isOpen(){ return mainBtn.classList.contains("active"); }
-
-function closeDropdown(){
-  if (!isOpen()) return;
-  mainBtn.classList.remove("active");
-  monthPanel.style.maxHeight = null;
-  reportPanel.style.maxHeight = null;
-}
-function openDropdown(){
-  mainBtn.classList.add("active");
-  if (reportPanel.style.display === "block") expand(reportPanel);
-  else expand(monthPanel);
+// Cek protokol
+function checkProtocol(){
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || /^(192\.168|10|172\.(1[6-9]|2\d|3[01]))/.test(location.hostname);
+  $('driveWarn').style.display = isSecure ? 'none' : 'block';
+  $('driveStatus').textContent = isSecure ? '✅ Ready' : '❌ Need HTTPS';
+  return isSecure;
 }
 
-mainBtn.addEventListener("click", function(e){
-  e.stopPropagation();
-  isOpen() ? closeDropdown() : openDropdown();
-});
-mainBox.addEventListener("click", function(e){ e.stopPropagation(); });
-document.addEventListener("click", closeDropdown);
-document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeDropdown(); });
-
-function setStatus(msg, type){
-  if (statusTimeout) clearTimeout(statusTimeout);
-  statusEl.innerHTML = type === "wait"
-    ? '<span class="spinner"></span><span>' + msg + '</span>'
-    : msg;
-  statusEl.className = "status show " + type;
-  expand(reportPanel);
-  if (type !== "wait") {
-    statusTimeout = setTimeout(function(){ statusEl.className = "status"; expand(reportPanel); }, 3000);
-  }
-}
-function setLoader(on){ loadingArea.classList.toggle("loading-fade", on); }
-
-function doFetch(params, showLoader){
-  const q = Object.keys(params).map(k => encodeURIComponent(k)+"="+encodeURIComponent(params[k])).join("&");
-  if (showLoader) setLoader(true);
-  return fetch(API_URL + "?" + q + "&_ts=" + Date.now(), { method:"GET", cache:"no-store" })
-    .then(r => r.text())
-    .then(text => {
-      if (showLoader) setLoader(false);
-      let data;
-      try { data = JSON.parse(text); } catch(e){ throw new Error("Server tidak merespons dengan benar."); }
-      if (data.v !== NEED_VERSION) throw new Error("Server masih versi lama. Deploy ulang Apps Script.");
-      return data;
-    })
-    .catch(err => { if (showLoader) setLoader(false); throw err; });
+// Handle GAPI Load
+function handleGapiLoad(){
+  // Cek apakah gapi berhasil load (bukan di environment yang memblokir)
+  setTimeout(()=>{
+    if(typeof gapi !== 'undefined'){
+      const savedId = localStorage.getItem('drive_client_id');
+      if(savedId){
+        try{
+          gapi.load('client:auth2', ()=>{
+            gapi.client.init({
+              clientId: savedId,
+              scope: 'https://www.googleapis.com/auth/drive.file'
+            }).then(()=>{googleReady=true;$('driveStatus').textContent='✅ OK';toast('✅ Google Drive siap!');})
+            .catch(e=>console.log('Auth init skip:',e));
+          });
+        }catch(e){
+          console.log('GAPI load issue:',e);
+          $('driveStatus').textContent = '❌ Error Load';
+        }
+      } else {
+        $('driveStatus').textContent = '⚠️ No ID Set';
+      }
+    } else {
+      $('driveStatus').textContent = '❌ Blocked';
+      $('driveWarn').style.display = 'block';
+    }
+  }, 500);
 }
 
-function prefetch(month){
-  if (getCached(month)) return;
-  doFetch({ action:"list", month }, false)
-    .then(res => { if (res.ok) setCache(month, res.data || []); })
-    .catch(()=>{});
-}
-function setActiveMonthUI(month){
-  document.querySelectorAll("a.month").forEach(a => {
-    a.classList.toggle("active-month", a.textContent.trim() === month);
+// Init
+checkProtocol();
+
+// Files
+const drop=$('drop');
+drop.onclick=()=>$('fileInput').click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')}
+drop.ondragleave=()=>drop.classList.remove('over')
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)}
+$('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value=''}
+$('cameraInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';toast('📷 Ditambahkan!')}
+window.addEventListener('dragover',e=>e.preventDefault())
+window.addEventListener('drop',e=>e.preventDefault())
+
+function handleFiles(files){
+  [...files].forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload()=>{
+        photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2),name:f.name,origSize:f.size,dataUrl:ev.target.result,w:img.width,h:img.height,compData:null,compSize:null});
+        renderGrid();
+      };img.src=ev.target.result;
+    };r.readAsDataURL(f);
   });
 }
 
-function openMonth(month){
-  currentMonth = month; editIndex = null;
-  setActiveMonthUI(month);
-  monthPanel.style.display = "none"; monthPanel.style.maxHeight = null;
-  reportPanel.style.display = "block"; closeForm(true);
-  const cached = getCached(month);
-  if (cached) {
-    currentList = cached; renderList();
-    if (isStale(month)) refreshBackground(month);
-  } else {
-    reportList.innerHTML = '<li class="title"><span class="spinner" style="color:#1a73e8"></span> Memuat ' + month + '...</li>';
-    expand(reportPanel); loadList();
-  }
+function renderGrid(){
+  const g=$('grid');g.innerHTML='';
+  $('emptyMsg').style.display=photos.length?'none':'flex';
+  const tO=photos.reduce((s,p)=>s+p.origSize,0),tC=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0),done=photos.some(p=>p.compData);
+  $('stCount').textContent=photos.length;$('stOrig').textContent=tO?fmt(tO):'-';
+  $('stRes').textContent=done?fmt(tC):'-';$('stSave').textContent=(tO&&done)?'-'+Math.round((1-tC/tO)*100)+'%':'-';
+  $('btnComp').disabled=!photos.length||busy;$('btnPdf').disabled=!photos.length||busy;
+  $('btnDrive').disabled=!pdfBlob||busy&&!googleReady;
+  
+  photos.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='thumb';d.dataset.id=p.id;
+    d.innerHTML=`<span class="thumb-num">${i+1}</span><button class="thumb-del">×</button><img src="${p.compData||p.dataUrl}"><div class="thumb-size">${fmt(p.origSize)}${p.compSize?'→'+fmt(p.compSize):''}</div>`;
+    d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();photos=photos.filter(x=>x.id!==p.id);renderGrid()};
+    g.appendChild(d);
+  });
+  if(window.sortInst)window.sortInst.destroy();
+  window.sortInst=new Sortable(g,{animation:150,onEnd:()=>{const ids=[...g.children].map(el=>el.dataset.id);photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));renderGrid()}});
 }
-function refreshBackground(month){
-  doFetch({ action:"list", month }, false).then(res => {
-    if (!res.ok) return;
-    const data = res.data || [];
-    setCache(month, data);
-    if (month === currentMonth && JSON.stringify(data) !== JSON.stringify(currentList)) {
-      currentList = data; renderList();
+
+function openModal(id){$(id).classList.add('show')}
+function closeModal(id){$(id).classList.remove('show')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+function askDeleteAll(){if(photos.length)openModal('confirmModal')}
+function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');$('statusText').textContent='Dihapus.';pdfBlob=null;$('btnDl').style.display='none'}
+function askPdfName(){if(!photos.length||busy)return;openModal('pdfModal');setTimeout(()=>$('modalFileName').focus(),50)}
+$('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmPdf();if(e.key==='Escape')closeModal('pdfModal')})
+
+// Settings
+$('targetChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('targetChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');targetMB=parseFloat(c.dataset.v);autoAdjust()}
+$('modeChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('modeChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');mode=c.dataset.m;autoAdjust()}
+$('inpRes').oninput=e=>$('valRes').textContent=e.target.value+'px'
+$('inpQual').oninput=e=>$('valQual').textContent=e.target.value+'%'
+function autoAdjust(){if(mode==='qual'){$('inpRes').value=3000;$('inpQual').value=90}else if(mode==='size'){$('inpRes').value=1200;$('inpQual').value=50}else{if(targetMB<=1){$('inpRes').value=1500;$('inpQual').value=60}else if(targetMB<=5){$('inpRes').value=2000;$('inpQual').value=70}else{$('inpRes').value=2500;$('inpQual').value=80}}$('valRes').textContent=$('inpRes').value+'px';$('valQual').textContent=$('inpQual').value+'%'}autoAdjust()
+
+async function compressImage(p,maxRes,quality){const img=await loadImg(p.dataUrl);let w=img.width,h=img.height;if(Math.max(w,h)>maxRes){const r=maxRes/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r)}const cv=document.createElement('canvas');cv.width=w;cv.height=h;const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);let q=quality/100,dataUrl=cv.toDataURL('image/jpeg',q),size=Math.round(dataUrl.length*0.75),tb=targetMB>0?targetMB*1048576:Infinity,guard=0;while(size>tb&&q>0.2&&guard++<12){q=Math.max(0.2,q-0.08);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}while(size>tb&&Math.max(w,h)>600&&guard++<6){w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}return{dataUrl,size,w,h}}
+
+async function processCompress(){if(busy||!photos.length)return;busy=true;$('btnComp').disabled=$('btnPdf').disabled=true;$('progCont').style.display='block';const maxRes=+$('inpRes').value,qual=+$('inpQual').value;for(let i=0;i<photos.length;i++){$('statusText').textContent='Compress '+(i+1)+'/'+photos.length+'...';$('progBar').style.width=((i+1)/photos.length*100)+'%';await wait(20);try{const r=await compressImage(photos[i],maxRes,qual);photos[i].compData=r.dataUrl;photos[i].compSize=r.size;photos[i].w=r.w;photos[i].h=r.h}catch(e){photos[i].compData=photos[i].dataUrl;photos[i].compSize=photos[i].origSize}renderGrid()}busy=false;renderGrid();$('statusText').textContent='✅ Selesai!';setTimeout(()=>$('progCont').style.display='none',1800)}
+
+async function confirmPdf(){closeModal('pdfModal');await processPdf()}
+async function processPdf(){if(busy||!photos.length)return;if(!photos.some(p=>p.compData))await processCompress();pdfName=(($('modalFileName').value||'').trim()||'hasil-foto')+'.pdf';const pdfSize=$('pdfSize').value,showNum=$('pdfNum').checked;busy=true;$('btnComp').disabled=$('btnPdf').disabled=true;$('progCont').style.display='block';$('statusText').textContent='Membuat PDF...';const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});for(let i=0;i<photos.length;i++){const p=photos[i],W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();if(i!==0)pdf.addPage(pdfSize==='fit'?[p.w*0.2646,p.h*0.2646]:(p.w>p.h?'l':'p'),pdfSize==='fit'?undefined:pdfSize);if(pdfSize==='fit'){const pw=p.w*0.2646,ph=p.h*0.2646;pdf.addPage([pw,ph],p.w>p.h?'l':'p');pdf.addImage(p.compData,'JPEG',0,0,pw,ph,undefined,'FAST')}else{const r=Math.min(W/p.w,H/p.h),w=p.w*r,h=p.h*r;pdf.addImage(p.compData,'JPEG',(W-w)/2,(H-h)/2,w,h,undefined,'FAST');if(showNum){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+'/'+photos.length,W/2,H-4,{align:'center'})}}$('progBar').style.width=((i+1)/photos.length*100)+'%';await wait(10)}pdfBlob=pdf.output('blob');busy=false;renderGrid();$('btnDl').style.display='inline-flex';$('statusText').textContent='✅ '+pdfName+' ('+fmt(pdfBlob.size)+')';if(!checkProtocol()){$('btnDrive').style.display='none';$('btnDl').style.display='inline-flex';toast('📥 Gunakan Download (mode offline)')}else{$('btnDrive').style.display='inline-flex'}setTimeout(()=>$('progCont').style.display='none',1800)}
+
+// Google Drive
+function saveClientId(){
+  const id=$('clientIdInput').value.trim();
+  if(!id){toast('Isi Client ID!',true);return;}
+  localStorage.setItem('drive_client_id',id);
+  toast('ID disimpan! Refresh...');
+  setTimeout(()=>location.reload(),800);
+}
+
+async function uploadToDrive(){
+  if(!pdfBlob){toast('Buat PDF dulu!',true);return;}
+  if(!checkProtocol()){
+    toast('❌ Butuh HTTPS! Pakai Download.',true);
+    $('btnDl').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if(typeof gapi==='undefined'||!googleReady){
+    toast('Google API belum ready',true);
+    return;
+  }
+  
+  try{
+    const auth=gapi.auth2.getAuthInstance();
+    if(!auth.isSignedIn.get()){
+      $('statusText').textContent='Login Google...';
+      await auth.signIn({scope:'https://www.googleapis.com/auth/drive.file'});
     }
-  }).catch(()=>{});
+    const token=auth.currentUser.get().getAuthResponse().access_token;
+    $('statusText').textContent='Upload ke Drive...';
+    $('progCont').style.display='block';$('progBar').style.width='30%';
+    
+    const form=new FormData();
+    form.append('metadata', new Blob([JSON.stringify({name:pdfName,mimeType:'application/pdf'})],{type:'application/json'}));
+    form.append('file',pdfBlob);
+    
+    const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':`Bearer ${token}`},body:form});
+    $('progBar').style.width='100%';
+    if(res.ok){toast('✅ Sukses upload ke Drive!');$('statusText').textContent='Uploaded!'}
+    else throw await res.text();
+  }catch(err){console.error(err);toast('Error: '+err.message,true);$('statusText').textContent='Upload gagal'}
+  setTimeout(()=>$('progCont').style.display='none',2000);
 }
-function backMonths(){
-  reportPanel.style.display = "none"; reportPanel.style.maxHeight = null;
-  monthPanel.style.display = "block"; expand(monthPanel);
-  currentMonth = ""; currentList = []; editIndex = null;
-  statusEl.className = "status";
-}
-function loadList(){
-  doFetch({ action:"list", month:currentMonth }, true)
-    .then(res => {
-      if (!res.ok) throw new Error(res.error || "Gagal memuat");
-      setCache(currentMonth, res.data || []);
-      currentList = res.data || [];
-      renderList();
-    })
-    .catch(err => {
-      reportList.innerHTML = '<li class="empty">Gagal memuat data</li>';
-      setStatus(err.message, "err"); expand(reportPanel);
-    });
-}
-function renderList(){
-  reportList.innerHTML = "";
-  const title = document.createElement("li");
-  title.className = "title";
-  title.textContent = "Daily Progress Report (" + currentMonth + ") >>";
-  reportList.appendChild(title);
-  if (!currentList.length) {
-    const empty = document.createElement("li");
-    empty.className = "empty";
-    empty.textContent = "Belum ada laporan. Klik + untuk menambah.";
-    reportList.appendChild(empty);
-  } else {
-    currentList.forEach((item, index) => {
-      const li = document.createElement("li");
-      const row = document.createElement("div"); row.className = "row";
-      const a = document.createElement("a");
-      a.href = item.url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = item.name;
-      const actions = document.createElement("div"); actions.className = "actions";
-      const editBtn = document.createElement("button");
-      editBtn.type = "button"; editBtn.className = "icon-btn edit"; editBtn.textContent = "✏️";
-      editBtn.onclick = () => openEdit(index);
-      const delBtn = document.createElement("button");
-      delBtn.type = "button"; delBtn.className = "icon-btn del"; delBtn.textContent = "🗑️";
-      delBtn.onclick = () => deleteItem(index);
-      actions.append(editBtn, delBtn); row.append(a, actions); li.append(row); reportList.append(li);
-    });
-  }
-  expand(reportPanel);
-}
-function openAdd(){
-  editIndex = null; formTitle.textContent = "TAMBAH PELAPORAN BARU";
-  nameInput.value = ""; urlInput.value = "";
-  formBox.classList.add("show"); plusBtn.textContent = "×"; plusBtn.style.background = "#5f6368";
-  nameInput.focus(); expand(reportPanel);
-}
-function openEdit(index){
-  const item = currentList[index]; if (!item) return;
-  editIndex = index; formTitle.textContent = "EDIT PELAPORAN";
-  nameInput.value = item.name || ""; urlInput.value = item.url || "";
-  formBox.classList.add("show"); plusBtn.textContent = "×"; plusBtn.style.background = "#5f6368";
-  nameInput.focus(); expand(reportPanel);
-}
-function closeForm(silent){
-  formBox.classList.remove("show"); plusBtn.textContent = "+"; plusBtn.style.background = "#1a73e8";
-  editIndex = null; nameInput.value = ""; urlInput.value = "";
-  if (!silent) expand(reportPanel);
-}
-function saveItem(){
-  let name = nameInput.value.trim(), url = urlInput.value.trim();
-  if (!currentMonth) { setStatus("Pilih bulan dulu.", "err"); return; }
-  if (!name || !url) { setStatus("Nama dan URL wajib diisi.", "err"); return; }
-  if (!url.startsWith("http://") && !url.startsWith("https://")) url = "https://" + url;
-  const isEdit = editIndex !== null;
-  setStatus(isEdit ? "Menyimpan perubahan..." : "Menyimpan laporan...", "wait");
-  const params = isEdit
-    ? { action:"edit", month:currentMonth, index:editIndex, name, url }
-    : { action:"add", month:currentMonth, name, url };
-  doFetch(params, true).then(res => {
-    if (!res.ok) throw new Error(res.error || "Gagal menyimpan");
-    setCache(currentMonth, res.data || []); currentList = res.data || [];
-    closeForm(true); renderList();
-    setStatus(isEdit ? "Berhasil diedit." : "Berhasil ditambah.", "ok");
-  }).catch(err => setStatus(err.message, "err"));
-}
-function deleteItem(index){
-  setStatus("Menghapus laporan...", "wait");
-  doFetch({ action:"delete", month:currentMonth, index }, true).then(res => {
-    if (!res.ok) throw new Error(res.error || "Gagal menghapus");
-    setCache(currentMonth, res.data || []); currentList = res.data || [];
-    renderList(); setStatus("Berhasil dihapus.", "ok");
-  }).catch(err => setStatus(err.message, "err"));
+
+function downloadLocal(){
+  if(!pdfBlob)return;
+  const url=URL.createObjectURL(pdfBlob);
+  const a=document.createElement('a');
+  a.href=url;a.download=pdfName;a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 '+pdfName+' didownload!');
 }
 </script>
 </body>
