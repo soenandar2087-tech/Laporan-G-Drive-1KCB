@@ -3,1050 +3,530 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo PDF → Drive</title>
-
-<!-- Script extarnal harus HTTPS -->
+<title>Photo PDF ➔ Google Drive</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-
+<!-- Google Identity Services (Teknologi Login Google Terbaru) -->
+<script src="https://accounts.google.com/gsi/client" onload="initGIS()" async defer></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8fafc;color:#1f2937;font-size:12px;padding:8px;min-height:100vh}
-
-/* Header */
-.header{
-  background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
-  color:white;padding:12px 16px;border-radius:12px 12px 0 0;
-  display:flex;justify-content:space-between;align-items:center;
-  box-shadow:0 4px 6px -1px rgba(37,99,235,.2)
+:root {
+  --bg:#ffffff; --panel:#f8fafc; --border:#c5cdd8;
+  --border-strong:#94a3b8;
+  --primary:#2563eb; --primary-dark:#1d4ed8;
+  --text:#1f2937; --muted:#6b7280;
+  --danger:#ef4444; --success:#10b981;
+  --drive-color:#4285F4;
+  --radius:8px; --fs:11px;
 }
-.header h1{font-size:16px;font-weight:800;margin:0}
-.header span{font-size:11px;opacity:.9}
-
-/* Main Container */
-.main{max-width:900px;margin:0 auto;background:white;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);overflow:hidden}
-
-.grid-layout{display:grid;grid-template-columns:280px 1fr;gap:0;min-height:60vh}
-
-@media(max-width:768px){.grid-layout{grid-template-columns:1fr}}
-
-/* Sidebar */
-.sidebar{padding:16px;border-right:1px solid #e5e7eb;background:#f8fafc}
-.section{margin-bottom:20px}
-.section-title{
-  font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;
-  letter-spacing:.05em;margin-bottom:8px;display:block
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:transparent; color:var(--text); font-size:var(--fs);
+  overflow-x:hidden; padding:6px;
 }
-
-/* Dropzone */
-.dropzone{
-  border:2px dashed #93c5fd;background:white;border-radius:10px;
-  padding:24px;text-align:center;cursor:pointer;transition:all .2s;
-  position:relative;overflow:hidden
+.app-wrap {
+  border:2px solid var(--primary); border-radius:12px; background:#fff;
+  box-shadow:0 4px 14px rgba(37,99,235,.12); overflow:hidden;
 }
-.dropzone:hover{border-color:#2563eb;background:#eff6ff;transform:scale(1.01)}
-.dropzone:active{transform:scale(.98)}
-.dropzone-icon{font-size:32px;margin-bottom:8px;display:block}
-.dropzone-text{font-weight:700;color:#2563eb;font-size:13px}
-.dropzone-sub{font-size:11px;color:#9ca3af;margin-top:4px}
-.hidden-input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
-
-/* Chips */
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{
-  padding:5px 12px;border:1.5px solid #e5e7eb;border-radius:20px;
-  font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
-  background:white;color:#374151
+.app-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; background:linear-gradient(135deg,#eff6ff 0%,#fff 100%);
+  border-bottom:2px solid var(--primary);
 }
-.chip.active{background:#2563eb;color:white;border-color:#2563eb;box-shadow:0 2px 4px rgba(37,99,235,.3)}
-
-/* Sliders */
-.slider-group{margin-bottom:14px}
-.slider-header{display:flex;justify-content:space-between;font-size:11px;color:#4b5563;margin-bottom:6px;font-weight:600}
-input[type=range]{width:100%;height:6px;-webkit-appearance:none;background:#e5e7eb;border-radius:3px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#2563eb;cursor:pointer;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,.2)}
-
-/* Select */
-select{
-  width:100%;padding:10px;border:1.5px solid #e5e7eb;border-radius:8px;
-  font-size:12px;font-family:inherit;background:white;outline:none;
-  cursor:pointer
-}
-select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-
-/* Checkbox */
-.checkbox-label{
-  display:flex;align-items:center;gap:8px;font-size:11px;color:#4b5563;cursor:pointer
-}
-.checkbox-label input{width:16px;height:16px;accent-color:#2563eb}
-
-/* Content Area */
-.content{padding:16px;display:flex;flex-direction:column}
-
-/* Stats */
-.stats-row{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px
-}
-.stat-card{
-  background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;
-  padding:10px 8px;text-align:center
-}
-.stat-label{font-size:9px;color:#6b7280;text-transform:uppercase;font-weight:700;margin-bottom:4px}
-.stat-value{font-size:18px;font-weight:800}
-.blue{color:#2563eb}.red{color:#ef4444}.green{color:#10b981}.gray{color:#6b7280}
-
-/* Preview */
-.preview-area{
-  flex:1;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;
-  padding:12px;min-height:250px;position:relative;display:flex;flex-direction:column
-}
-.preview-header{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:12px
-}
-.preview-grid{
-  flex:1;overflow-y:auto;display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;
-  align-content:start
-}
-.empty-state{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  text-align:center;color:#9ca3af
-}
-.empty-icon{font-size:40px;margin-bottom:8px}
-
-/* Thumbnail */
-.thumb-item{
-  position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;
-  border:2px solid #e5e7eb;cursor:grab;background:#fff;
-  transition:all .15s
-}
-.thumb-item:hover{border-color:#2563eb;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}
-.thumb-img{width:100%;height:100%;object-fit:cover}
-.thumb-num{
-  position:absolute;top:4px;left:4px;background:#2563eb;color:white;
-  font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;z-index:2
-}
-.thumb-delete{
-  position:absolute;top:4px;right:4px;width:20px;height:20px;
-  background:rgba(239,68,68,.9);color:white;border:none;border-radius:50%;
-  font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  z-index:2;transition:background .15s
-}
-.thumb-delete:hover{background:#dc2626}
-.thumb-size{
-  position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);
-  color:white;font-size:9px;text-align:center;padding:3px
-}
-
-/* Action Buttons */
-.actions{
-  margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px
-}
-.btn-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
-.btn{
-  padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px
-}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:#2563eb;color:white}
-.btn-success{background:#10b981;color:white}
-.btn-warning{background:#f59e0b;color:white}
-.btn-outline{background:white;border:2px solid #e5e7eb;color:#374151}
-.btn-drive{background:#4285F4;color:white}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
-
-/* Progress */
-.progress-wrap{margin-top:12px;display:none}
-.progress-bar-bg{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:3px;transition:width .3s}
-.status-text{text-align:center;font-size:11px;color:#6b7280;margin-top:6px;min-height:16px}
-
-/* Modal */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.5);
-  display:none;align-items:center;justify-content:center;
-  z-index:1000;padding:20px;backdrop-filter:blur(4px)
-}
-.modal-overlay.active{display:flex}
-.modal-box{
-  background:white;border-radius:16px;padding:24px;max-width:400px;width:100%;
-  box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04)
-}
-.modal-title{font-size:18px;font-weight:800;margin-bottom:12px;color:#111827}
-.modal-text{font-size:13px;color:#4b5563;line-height:1.5;margin-bottom:20px}
-.modal-input{
-  width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;
-  font-size:14px;text-align:center;outline:none;margin-bottom:20px
-}
-.modal-input:focus{border-color:#2563eb}
-.modal-actions{display:flex;gap:10px}
-.modal-btn{
-  flex:1;padding:12px;border:none;border-radius:10px;font-weight:700;
-  cursor:pointer;font-size:13px
-}
-.modal-cancel{background:#f3f4f6;color:#4b5563}
-.modal-confirm{background:#2563eb;color:white}
-.modal-danger{background:#ef4444;color:white}
-
-/* Toast */
-.toast{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:#111827;color:white;padding:12px 20px;border-radius:10px;
-  font-size:13px;font-weight:600;box-shadow:0 10px 15px -3px rgba(0,0,0,.2);
-  opacity:0;transition:all .3s;z-index:2000;pointer-events:none
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.error{background:#ef4444}
-.toast.success{background:#10b981}
-
-/* Drive Section */
-.drive-setup{
-  background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px
-}
-.drive-id-input{
-  width:100%;padding:8px 10px;border:1.5px solid #93c5fd;border-radius:6px;
-  font-size:11px;font-family:monospace;margin:8px 0
-}
-.status-badge{
-  display:inline-block;padding:3px 8px;border-radius:4px;
-  font-size:10px;font-weight:700
-}
-.status-ok{background:#dcfce7;color:#166534}
-.status-wait{background:#fef3c7;color:#92400e}
-.status-error{background:#fee2e2;color:#991b1b}
+.app-head h1 { font-size:13px; font-weight:800; color:var(--primary-dark); margin:0; }
+.app-head small { font-size:10px; color:var(--muted); font-weight:500; }
+.app-body { padding:8px; }
+.container { display:grid; grid-template-columns:1fr; gap:8px; align-items:stretch; }
+@media (min-width:600px) { .container { grid-template-columns:270px 1fr; } }
+.left-col { display:flex; flex-direction:column; }
+.right-col { display:flex; flex-direction:column; min-height:0; }
+.box { background:var(--panel); border:1.5px solid var(--border-strong); border-radius:var(--radius); padding:8px; margin-bottom:8px; }
+.left-col .box:last-child { margin-bottom:0; }
+.label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px; display:block; }
+#drop { border:2px dashed #93c5fd; background:#fff; border-radius:var(--radius); padding:14px 10px; text-align:center; cursor:pointer; transition:.2s; }
+#drop:hover,#drop.over { border-color:var(--primary); background:#eff6ff; }
+.icon { font-size:22px; display:block; margin-bottom:4px; }
+.drop-text { font-weight:700; color:var(--primary); display:block; font-size:12px; }
+.drop-sub { font-size:9px; color:var(--muted); }
+.chips { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
+.chips:last-child { margin-bottom:0; }
+.chip { padding:3px 8px; border:1.5px solid var(--border); border-radius:12px; font-size:10px; cursor:pointer; background:#fff; font-weight:600; }
+.chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.slider-group { margin-bottom:6px; }
+.slider-group:last-child { margin-bottom:0; }
+.slider-row { display:flex; justify-content:space-between; font-size:10px; margin-bottom:2px; }
+input[type=range] { width:100%; height:4px; padding:0; }
+select,input[type=text] { width:100%; padding:5px 7px; border:1.5px solid var(--border); border-radius:5px; font-size:11px; margin-bottom:6px; font-family:inherit; outline:none; background:#fff; }
+select:focus,input[type=text]:focus { border-color:var(--primary); }
+.ck { font-size:10px; display:flex; align-items:center; gap:4px; color:var(--text); }
+.ck input { accent-color:var(--primary); }
+.stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:8px; flex:0 0 auto; }
+.stat-item { background:#fff; border:1.5px solid var(--border-strong); border-radius:6px; padding:5px 4px; text-align:center; }
+.stat-val { font-weight:800; font-size:13px; }
+.c-blue{color:var(--primary)} .c-red{color:var(--danger)} .c-green{color:var(--success)}
+.preview-area { background:#fff; border:1.5px solid var(--border-strong); border-radius:var(--radius); padding:8px; flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+.preview-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex:0 0 auto; }
+.grid-scroll { flex:1 1 auto; min-height:130px; overflow-y:auto; padding-right:2px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px; }
+.thumb { position:relative; aspect-ratio:3/4; border:1.5px solid var(--border); border-radius:5px; overflow:hidden; background:#f3f4f6; cursor:grab; }
+.thumb img { width:100%; height:100%; object-fit:cover; }
+.thumb-num { position:absolute; top:2px; left:2px; background:var(--primary); color:#fff; font-size:9px; padding:1px 4px; border-radius:4px; font-weight:700; }
+.thumb-del { position:absolute; top:2px; right:2px; width:16px; height:16px; background:rgba(239,68,68,.92); color:#fff; border:none; border-radius:50%; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.thumb-size { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.72); color:#fff; font-size:8px; text-align:center; padding:1px; }
+#emptyMsg { height:100%; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#9ca3af; font-size:10px; }
+#emptyMsg span:first-child { font-size:24px; }
+.actions { display:flex; gap:6px; margin-top:8px; flex:0 0 auto; flex-wrap:wrap; }
+.btn { flex:1; min-width:80px; padding:7px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+.btn-pri { background:var(--primary); color:#fff; }
+.btn-suc { background:var(--success); color:#fff; }
+.btn-cam { background:#f59e0b; color:#fff; }
+.btn-drive { background:var(--drive-color); color:#fff; }
+.btn-out { background:#fff; border:1.5px solid var(--border-strong); color:var(--text); }
+.btn-sm { padding:2px 8px; font-size:9px; flex:0 0 auto; }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+.progress-container { height:4px; background:#e5e7eb; border-radius:2px; margin-top:8px; overflow:hidden; display:none; flex:0 0 auto; }
+.progress-bar { height:100%; background:var(--primary); width:0%; transition:width .2s; }
+.status-text { font-size:9px; color:var(--muted); margin-top:4px; text-align:center; flex:0 0 auto; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:999; display:none; align-items:center; justify-content:center; padding:12px; }
+.modal-overlay.show { display:flex; }
+.modal-box { background:#fff; padding:16px; border-radius:10px; width:320px; max-width:100%; text-align:center; box-shadow:0 6px 20px rgba(0,0,0,.22); border:2px solid var(--border-strong); }
+.modal-title { font-weight:800; margin-bottom:8px; font-size:13px; }
+.modal-info { font-size:10px; color:var(--muted); margin:8px 0 2px; line-height:1.4; }
+.modal-box input[type=text] { font-size:12px; padding:7px 8px; text-align:center; margin-bottom:0; }
+.modal-btns { display:flex; gap:8px; margin-top:12px; }
+.modal-btn { flex:1; padding:7px; border-radius:5px; border:none; font-weight:700; cursor:pointer; font-size:11px; }
+.btn-yes { background:var(--danger); color:#fff; }
+.btn-go { background:var(--success); color:#fff; }
+.btn-no { background:#e5e7eb; color:var(--text); }
+.toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:var(--success); color:#fff; font-size:11px; font-weight:700; padding:7px 14px; border-radius:6px; opacity:0; transition:.25s; pointer-events:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.toast.show { opacity:1; }
+.toast.error { background:var(--danger); }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <h1>📄 Photo → PDF → ☁️</h1>
-    <span>Compress & Upload ke Google Drive</span>
-  </div>
-  <div style="font-size:24px">🗂️</div>
-</div>
-
-<div class="main">
-<div class="grid-layout">
-
-<!-- LEFT SIDEBAR -->
-<aside class="sidebar">
-  
-  <!-- Upload Area -->
-  <div class="section">
-    <span class="section-title">📁 UPLOAD FOTO</span>
-    <div id="dropZone" class="dropzone">
-      <span class="dropzone-icon">📁</span>
-      <span class="dropzone-text">Tap / Drop Foto di Sini</span>
-      <span class="dropzone-sub">JPG · PNG · WEBP · HEIC</span>
-    </div>
-    <input type="file" id="fileInput" class="hidden-input" accept="image/*" multiple>
-    <input type="file" id="camInput" class="hidden-input" accept="image/*" capture="environment">
-  </div>
-
-  <!-- Target Size -->
-  <div class="section">
-    <span class="section-title">TARGET UKURAN</span>
-    <div class="chips" id="chipSize">
-      <button class="chip" data-v="0.5">500KB</button>
-      <button class="chip" data-v="1">1MB</button>
-      <button class="chip active" data-v="5">5MB</button>
-      <button class="chip" data-v="10">10MB</button>
-      <button class="chip" data-v="0">⬇ Min</button>
-    </div>
-  </div>
-
-  <!-- Mode -->
-  <div class="section">
-    <span class="section-title">MODE KOMPRESI</span>
-    <div class="chips" id="chipMode" style="margin-bottom:12px">
-      <button class="chip active" data-m="bal">⚖️ Seimbang</button>
-      <button class="chip" data-m="size">⚡ Kecil</button>
-      <button class="chip" data-m="qual">✨ Kualitas</button>
-    </div>
-    
-    <div class="slider-group">
-      <div class="slider-header"><span>Resolusi Maks</span><span id="valRes">2000 px</span></div>
-      <input type="range" id="inpRes" min="500" max="4000" step="100" value="2000">
-    </div>
-    
-    <div class="slider-group" style="margin-bottom:0">
-      <div class="slider-header"><span>Kualitas JPEG</span><span id="valQual">70%</span></div>
-      <input type="range" id="inpQual" min="10" max="100" value="70">
-    </div>
-  </div>
-
-  <!-- Output -->
-  <div class="section">
-    <span class="section-title">OUTPUT PDF</span>
-    <select id="selSize">
-      <option value="a4">A4 (210 x 297 mm)</option>
-      <option value="letter">Letter (215.9 x 279.4 mm)</option>
-      <option value="fit">Sesuai Ukuran Foto</option>
-    </select>
-    <label class="checkbox-label">
-      <input type="checkbox" id="chkPageNum"> Tampilkan Nomor Halaman
-    </label>
-  </div>
-
-  <!-- Google Drive -->
-  <div class="drive-setup">
-    <span class="section-title" style="color:#1e40af">☁️ GOOGLE DRIVE SETUP</span>
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
-      <span>Status:</span>
-      <span id="driveStatus" class="status-badge status-wait">CEK...</span>
-    </div>
-    <input type="text" id="clientIdInput" class="drive-id-input" placeholder="Paste Client ID di sini...">
-    <button id="btnSaveId" style="width:100%;padding:8px;background:#4285F4;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px">💾 Simpan & Refresh</button>
-    <div style="margin-top:6px;font-size:9px;color:#64748b;text-align:center">
-      Dapatkan ID di console.cloud.google.com<br>(APIs & Services > Credentials > OAuth)
-    </div>
-  </div>
-
-</aside>
-
-<!-- RIGHT CONTENT -->
-<main class="content">
-  
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Foto</div><div class="stat-value blue" id="statCount">0</div></div>
-    <div class="stat-card"><div class="stat-label">Asli</div><div class="stat-value red" id="statOrig">-</div></div>
-    <div class="stat-card"><div class="stat-label">Hasil</div><div class="stat-value green" id="statResult">-</div></div>
-    <div class="stat-card"><div class="stat-label">Hemat</div><div class="stat-value gray" id="statSave">-</div></div>
-  </div>
-
-  <!-- Preview -->
-  <div class="preview-area">
-    <div class="preview-header">
-      <span style="font-weight:700;color:#374151">PREVIEW FOTO</span>
-      <button id="btnClearAll" style="padding:6px 12px;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">🗑️ Hapus Semua</button>
-    </div>
-    
-    <div class="preview-grid" id="previewGrid"></div>
-    
-    <div class="empty-state" id="emptyState">
-      <div class="empty-icon">🖼️</div>
-      <div style="font-weight:600;color:#9ca3af">Belum ada foto</div>
-      <div style="font-size:11px;margin-top:4px">Tap area kiri atau drag & drop</div>
-    </div>
-  </div>
-
-  <!-- Actions -->
-  <div class="actions">
-    <button class="btn btn-outline" id="btnGallery">+ Galeri</button>
-    <button class="btn btn-warning" id="btnCamera">📷 Kamera</button>
+<div class="app-wrap">
+  <div class="app-head">
+    <h1>📄 Photo ➔ PDF ➔ Drive</h1>
+    <small>Compress &amp; upload offline · Tanpa Server</small>
   </div>
   
-  <div class="btn-row-3">
-    <button class="btn btn-primary" id="btnCompress" disabled>🔄 Compress</button>
-    <button class="btn btn-success" id="btnPdf" disabled>📄 Buat PDF</button>
-    <button class="btn btn-drive" id="btnUpload" disabled>☁️ Upload</button>
+  <div class="app-body">
+    <div class="container">
+      <!-- KIRI -->
+      <div class="left-col">
+        <div class="box">
+          <div id="drop">
+            <span class="icon">📁</span>
+            <span class="drop-text">Klik / Drop Foto</span>
+            <span class="drop-sub">JPG · PNG · WEBP</span>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+        </div>
+
+        <div class="box">
+          <span class="label">Target Ukuran</span>
+          <div class="chips" id="targetChips">
+            <div class="chip" data-v="0.5">500KB</div>
+            <div class="chip" data-v="1">1MB</div>
+            <div class="chip active" data-v="5">5MB</div>
+            <div class="chip" data-v="10">10MB</div>
+            <div class="chip" data-v="0">⬇ Min</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <span class="label">Mode Kompresi</span>
+          <div class="chips" id="modeChips" style="margin-bottom:6px">
+            <div class="chip active" data-m="bal">⚖ Seimbang</div>
+            <div class="chip" data-m="size">⚡ Kecil</div>
+            <div class="chip" data-m="qual">✨ Kualitas</div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-row"><span>Resolusi</span><span id="valRes">2000px</span></div>
+            <input type="range" id="inpRes" min="500" max="4000" step="100" value="2000">
+          </div>
+          <div class="slider-group">
+            <div class="slider-row"><span>Kualitas</span><span id="valQual">70%</span></div>
+            <input type="range" id="inpQual" min="10" max="100" value="70">
+          </div>
+        </div>
+
+        <div class="box">
+          <span class="label">Output PDF</span>
+          <select id="pdfSize">
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+            <option value="fit">Sesuai Foto</option>
+          </select>
+          <label class="ck"><input type="checkbox" id="pdfNum"> Nomor Halaman</label>
+          
+          <hr style="margin:8px 0;border:none;border-top:1px solid #e5e7eb">
+          
+          <span class="label">🔑 Google Drive Setup</span>
+          <input type="text" id="clientIdInput" placeholder="Masukkan Client ID..." style="font-size:10px;padding:4px;">
+          <button class="btn btn-sm" style="background:#4285F4;color:white;width:100%" onclick="saveClientId()">💾 Simpan Client ID</button>
+          <div class="modal-info" style="margin-top:4px;font-size:8px">Dapatkan ID di console.cloud.google.com</div>
+        </div>
+      </div>
+
+      <!-- KANAN -->
+      <div class="right-col">
+        <div class="stats-bar">
+          <div class="stat-item"><span class="label" style="margin:0">Foto</span><div class="stat-val c-blue" id="stCount">0</div></div>
+          <div class="stat-item"><span class="label" style="margin:0">Asli</span><div class="stat-val c-red" id="stOrig">-</div></div>
+          <div class="stat-item"><span class="label" style="margin:0">Hasil</span><div class="stat-val c-green" id="stRes">-</div></div>
+          <div class="stat-item"><span class="label" style="margin:0">Hemat</span><div class="stat-val" id="stSave">-</div></div>
+        </div>
+
+        <div class="preview-area">
+          <div class="preview-head">
+            <span class="label" style="margin:0">🗂 Preview</span>
+            <button class="btn btn-out btn-sm" onclick="askDeleteAll()">🗑 Hapus Semua</button>
+          </div>
+          <div class="grid-scroll">
+            <div class="grid" id="grid"></div>
+            <div id="emptyMsg"><span>🖼</span><span>Belum ada foto</span></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-out" onclick="document.getElementById('fileInput').click()">＋ Galeri</button>
+          <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
+          <button class="btn btn-pri" id="btnComp" disabled onclick="processCompress()">🔄 Compress</button>
+          <button class="btn btn-suc" id="btnPdf" disabled onclick="askPdfName()">📄 Buat PDF</button>
+          <button class="btn btn-drive" id="btnDrive" disabled onclick="uploadToDrive()">☁️ Drive</button>
+        </div>
+
+        <div class="progress-container" id="progCont">
+          <div class="progress-bar" id="progBar"></div>
+        </div>
+        <div class="status-text" id="statusText">Siap.</div>
+      </div>
+    </div>
   </div>
-
-  <!-- Progress -->
-  <div class="progress-wrap" id="progWrap">
-    <div class="progress-bar-bg"><div class="progress-fill" id="progFill"></div></div>
-  </div>
-  <div class="status-text" id="statusText">Siap — Pilih foto untuk memulai</div>
-
-</main>
-</div>
 </div>
 
-<!-- Modals -->
-<div class="modal-overlay" id="modalDelete">
+<!-- MODALS -->
+<div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
-    <div class="modal-title">Hapus Semua Foto?</div>
-    <div class="modal-text">Semua foto yang telah ditambahkan akan dihapus permanen.</div>
-    <div class="modal-actions">
-      <button class="modal-btn modal-cancel" onclick="closeModal('modalDelete')">Batal</button>
-      <button class="modal-btn modal-danger" id="btnConfirmDel">Ya, Hapus</button>
+    <div class="modal-title">🗑 Hapus Semua Foto?</div>
+    <div style="font-size:11px;color:#666">Semua foto akan hilang.</div>
+    <div class="modal-btns">
+      <button class="modal-btn btn-no" onclick="closeModal('confirmModal')">Batal</button>
+      <button class="modal-btn btn-yes" onclick="doDeleteAll()">Hapus</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modalPdfName">
+<div class="modal-overlay" id="pdfModal">
   <div class="modal-box">
-    <div class="modal-title">Nama File PDF</div>
-    <input type="text" class="modal-input" id="pdfNameInput" value="Laporan-Foto" placeholder="nama-file...">
-    <div class="modal-actions">
-      <button class="modal-btn modal-cancel" onclick="closeModal('modalPdfName')">Batal</button>
-      <button class="modal-btn modal-confirm" id="btnCreatePdf">Buat PDF</button>
+    <div class="modal-title">💾 Nama File PDF</div>
+    <input type="text" id="modalFileName" value="hasil-foto" placeholder="nama-file">
+    <div class="modal-info" id="pdfModalInfo">.pdf ditambahkan otomatis</div>
+    <div class="modal-btns">
+      <button class="modal-btn btn-no" onclick="closeModal('pdfModal')">Batal</button>
+      <button class="modal-btn btn-go" onclick="confirmPdf()">⬇ Buat PDF</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toastEl"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-// ==========================================
-// INITIALIZATION - Safe wrapper for GitHub Pages
-// ==========================================
+const { jsPDF } = window.jspdf;
 
-(function(){
-  'use strict';
-  
-  // State
-  let photos = [];
-  let targetMB = 5;
-  let mode = 'bal';
-  let busy = false;
-  let pdfBlob = null;
-  let pdfName = '';
-  let googleAuthReady = false;
-  let sortInstance = null;
+// === STATE ===
+let photos = [];
+let targetMB = 5, mode = 'bal', busy = false;
+let pdfBlob = null, pdfName = '';
+let tokenClient = null;
 
-  // DOM Elements cache
-  const DOM = {};
-  
-  // Utilities
-  const $ = (id) => document.getElementById(id);
-  const fmt = (bytes) => {
-    if (!bytes) return '-';
-    return bytes >= 1048576 ? (bytes/1048576).toFixed(2) + ' MB' : 
-           bytes >= 1024 ? (bytes/1024).toFixed(1) + ' KB' : bytes + ' B';
-  };
-  
-  const wait = (ms) => new Promise(r => setTimeout(r, ms));
-  
-  function toast(msg, type='success') {
-    const el = $('toastEl');
-    el.textContent = msg;
-    el.className = 'toast show' + (type === 'error' ? ' error' : '');
-    clearTimeout(el._t);
-    el._t = setTimeout(() => el.classList.remove('show'), 3000);
-  }
+const $ = id => document.getElementById(id);
+const fmt = b => b >= 1048576 ? (b/1048576).toFixed(2)+' MB' : (b/1024).toFixed(0)+' KB';
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+const loadImg = src => new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
 
-  // ==========================================
-  // DOM READY
-  // ==========================================
-  
-  document.addEventListener('DOMContentLoaded', init);
-  
-  function init() {
-    try {
-      // Cache DOM
-      DOM.dropZone = $('dropZone');
-      DOM.fileInput = $('fileInput');
-      DOM.camInput = $('camInput');
-      DOM.previewGrid = $('previewGrid');
-      DOM.emptyState = $('emptyState');
-      
-      // Buttons
-      DOM.btnGallery = $('btnGallery');
-      DOM.btnCamera = $('btnCamera');
-      DOM.btnCompress = $('btnCompress');
-      DOM.btnPdf = $('btnPdf');
-      DOM.btnUpload = $('btnUpload');
-      DOM.btnClearAll = $('btnClearAll');
-      DOM.btnSaveId = $('btnSaveId');
-      
-      // Inputs
-      DOM.inpRes = $('inpRes');
-      DOM.inpQual = $('inpQual');
-      DOM.selSize = $('selSize');
-      DOM.chkPageNum = $('chkPageNum');
-      DOM.clientIdInput = $('clientIdInput');
-      DOM.pdfNameInput = $('pdfNameInput');
-      
-      // Displays
-      DOM.statCount = $('statCount');
-      DOM.statOrig = $('statOrig');
-      DOM.statResult = $('statResult');
-      DOM.statSave = ('statSave');
-      DOM.valRes = $('valRes');
-      DOM.valQual = $('valQual');
-      DOM.progWrap = $('progWrap');
-      DOM.progFill = ('progFill');
-      DOM.statusText = ('statusText');
-      DOM.driveStatus = $('driveStatus');
-      
-      // Setup Event Listeners
-      setupUploadEvents();
-      setupSettings();
-      setupActions();
-      loadSavedClientId();
-      checkEnvironment();
-      
-      // Initial render
-      renderGrid();
-      
-      console.log('✅ App initialized successfully');
-    } catch(err) {
-      console.error('Init error:', err);
-      toast('Error memuat aplikasi', 'error');
-    }
-  }
-  
-  // ==========================================
-  // FILE HANDLING
-  // ==========================================
-  
-  function setupUploadEvents() {
-    // Click zone triggers file input
-    DOM.dropZone.addEventListener('click', () => {
-      DOM.fileInput.click();
-    });
-    
-    // File input change
-    DOM.fileInput.addEventListener('change', handleFileSelect);
-    
-    // Camera input
-    DOM.camInput.addEventListener('change', handleCamSelect);
-    
-    // Drag and drop
-    DOM.dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      DOM.dropZone.style.borderColor = '#2563eb';
-      DOM.dropZone.style.background = '#eff6ff';
-    });
-    
-    DOM.dropZone.addEventListener('dragleave', () => {
-      DOM.dropZone.style.borderColor = '#93c5fd';
-      DOM.dropZone.style.background = 'white';
-    });
-    
-    DOM.dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      DOM.dropZone.style.borderColor = '#93c5fd';
-      DOM.dropZone.style.background = 'white';
-      handleFileSelect({target: {files: e.dataTransfer.files}});
-    });
-  }
-  
-  function handleFileSelect(e) {
-    const files = Array.from(e.target.files || []);
-    files.forEach(processSingleFile);
-    e.target.value = ''; // Reset
-  }
-  
-  function handleCamSelect(e) {
-    const files = Array.from(e.target.files || []);
-    files.forEach(f => {
-      f.name = 'CAM_' + new Date().toISOString().replace(/[:.]/g,'-') + '.jpg';
-      processSingleFile(f);
-    });
-    e.target.value = '';
-    toast('📷 Foto dari kamera ditambahkan');
-  }
-  
-  function processSingleFile(file) {
-    if (!file.type.startsWith('image/')) return;
-    
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        photos.push({
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-          name: file.name,
-          origSize: file.size,
-          dataUrl: ev.target.result,
-          w: img.width,
-          h: img.height,
-          compData: null,
-          compSize: null
-        });
+let tT;
+function toast(m, err=false){
+  const t=$('toast'); t.textContent=m; t.className='toast show' + (err ? ' error' : '');
+  clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// === FILE HANDLING ===
+const drop=$('drop');
+drop.onclick=()=>$('fileInput').click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
+drop.ondragleave=()=>drop.classList.remove('over');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)};
+$('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value=''};
+$('cameraInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';toast('📷 Foto ditambahkan!')};
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('drop',e=>e.preventDefault());
+
+function handleFiles(files){
+  [...files].forEach(f=>{
+    if(!f.type.startsWith('image/')) return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2), name:f.name, origSize:f.size, dataUrl:ev.target.result, w:img.width, h:img.height, compData:null, compSize:null});
         renderGrid();
-        toast('✅ ' + file.name + ' ditambahkan');
       };
-      img.src = ev.target.result;
+      img.src=ev.target.result;
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(f);
+  });
+}
+
+// === RENDER ===
+function renderGrid(){
+  const g=$('grid'); g.innerHTML='';
+  $('emptyMsg').style.display = photos.length ? 'none':'flex';
+  const tO=photos.reduce((s,p)=>s+p.origSize,0);
+  const tC=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
+  const done=photos.some(p=>p.compData);
+  $('stCount').textContent=photos.length;
+  $('stOrig').textContent=tO?fmt(tO):'-';
+  $('stRes').textContent=done?fmt(tC):'-';
+  $('stSave').textContent=(tO&&done)?'-'+Math.round((1-tC/tO)*100)+'%':'-';
+  $('btnComp').disabled=!photos.length||busy;
+  $('btnPdf').disabled=!photos.length||busy;
+  $('btnDrive').disabled=!pdfBlob||busy;
+
+  photos.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='thumb'; d.dataset.id=p.id;
+    d.innerHTML=`<span class="thumb-num">${i+1}</span><button class="thumb-del">×</button><img src="${p.compData||p.dataUrl}"><div class="thumb-size">${fmt(p.origSize)}${p.compSize?'→'+fmt(p.compSize):''}</div>`;
+    d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();photos=photos.filter(x=>x.id!==p.id);renderGrid()};
+    g.appendChild(d);
+  });
+  if(window.sortInst) window.sortInst.destroy();
+  window.sortInst=new Sortable(g,{animation:150,onEnd:()=>{const ids=[...g.children].map(el=>el.dataset.id);photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));renderGrid()}});
+}
+
+// === MODAL ===
+function openModal(id){$(id).classList.add('show')}
+function closeModal(id){$(id).classList.remove('show')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+
+function askDeleteAll(){if(photos.length)openModal('confirmModal')}
+function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');$('statusText').textContent='Dihapus.';pdfBlob=null;$('btnDrive').disabled=true;}
+
+function askPdfName(){
+  if(!photos.length||busy)return;
+  const est=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
+  $('pdfModalInfo').textContent=photos.length+' halaman · ~'+fmt(est*1.05);
+  openModal('pdfModal');
+  setTimeout(()=>$('modalFileName').focus(),50);
+}
+$('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmPdf();if(e.key==='Escape')closeModal('pdfModal')});
+
+// === SETTINGS ===
+$('targetChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('targetChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');targetMB=parseFloat(c.dataset.v);autoAdjust()};
+$('modeChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('modeChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');mode=c.dataset.m;autoAdjust()};
+$('inpRes').oninput=e=>$('valRes').textContent=e.target.value+'px';
+$('inpQual').oninput=e=>$('valQual').textContent=e.target.value+'%';
+
+function autoAdjust(){
+  if(mode==='qual'){$('inpRes').value=3000;$('inpQual').value=90}
+  else if(mode==='size'){$('inpRes').value=1200;$('inpQual').value=50}
+  else{
+    if(targetMB<=1){$('inpRes').value=1500;$('inpQual').value=60}
+    else if(targetMB<=5){$('inpRes').value=2000;$('inpQual').value=70}
+    else{$('inpRes').value=2500;$('inpQual').value=80}
   }
-  
-  // ==========================================
-  // RENDER GRID
-  // ==========================================
-  
-  function renderGrid() {
-    DOM.previewGrid.innerHTML = '';
-    DOM.emptyState.style.display = photos.length ? 'none' : 'flex';
-    
-    // Update stats
-    const tO = photos.reduce((s,p) => s + p.origSize, 0);
-    const tC = photos.reduce((s,p) => s + (p.compSize || p.origSize), 0);
-    const done = photos.some(p => p.compData);
-    
-    DOM.statCount.textContent = photos.length;
-    DOM.statOrig.textContent = fmt(tO);
-    DOM.statResult.textContent = done ? fmt(tC) : '-';
-    DOM.statSave.textContent = (tO && done) ? '-' + Math.round((1-tC/tO)*100) + '%' : '-';
-    
-    // Button states
-    const canAct = !busy && photos.length > 0;
-    DOM.btnCompress.disabled = !canAct;
-    DOM.btnPdf.disabled = !canAct;
-    DOM.btnUpload.disabled = !canAct || !pdfBlob || !googleAuthReady;
-    
-    // Render thumbnails
-    photos.forEach((p, idx) => {
-      const div = document.createElement('div');
-      div.className = 'thumb-item';
-      div.dataset.id = p.id;
-      div.innerHTML = `
-        <div class="thumb-num">${idx + 1}</div>
-        <button class="thumb-delete" title="Hapus">×</button>
-        <img class="thumb-img" src="${p.compData || p.dataUrl}" alt="${p.name}" loading="lazy">
-        <div class="thumb-size">${fmt(p.origSize)}${p.compSize ? ' → ' + fmt(p.compSize) : ''}</div>
-      `;
-      
-      // Delete button
-      div.querySelector('.thumb-delete').addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        photos = photos.filter(x => x.id !== p.id);
-        renderGrid();
-      });
-      
-      DOM.previewGrid.appendChild(div);
-    });
-    
-    // Re-init sortable
-    if (sortInstance) sortInstance.destroy();
-    sortInstance = new Sortable(DOM.previewGrid, {
-      animation: 150,
-      ghostClass: 'sortable-ghost',
-      onEnd: function() {
-        const ids = [...DOM.previewGrid.children].map(el => el.dataset.id);
-        photos.sort((a,b) => ids.indexOf(a.id) - ids.indexOf(b.id));
-        renderGrid();
-      }
-    });
+  $('valRes').textContent=$('inpRes').value+'px';
+  $('valQual').textContent=$('inpQual').value+'%';
+}
+autoAdjust();
+
+// === COMPRESS ===
+async function compressImage(p,maxRes,quality){
+  const img=await loadImg(p.dataUrl);
+  let w=img.width,h=img.height;
+  if(Math.max(w,h)>maxRes){const r=maxRes/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r)}
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+  let q=quality/100,dataUrl=cv.toDataURL('image/jpeg',q),size=Math.round(dataUrl.length*0.75);
+  const tb=targetMB>0?targetMB*1048576:Infinity,guard=0;
+  while(size>tb&&q>0.2&&guard++<12){q=Math.max(0.2,q-0.08);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}
+  while(size>tb&&Math.max(w,h)>600&&guard++<6){w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}
+  return {dataUrl,size,w,h};
+}
+
+async function processCompress(){
+  if(busy||!photos.length)return;
+  busy=true;$('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=true;
+  $('progCont').style.display='block';
+  const maxRes=+$('inpRes').value,qual=+$('inpQual').value;
+  for(let i=0;i<photos.length;i++){
+    $('statusText').textContent='Compress '+(i+1)+'/'+photos.length+'...';
+    $('progBar').style.width=((i+1)/photos.length*100)+'%';await wait(20);
+    try{const r=await compressImage(photos[i],maxRes,qual);photos[i].compData=r.dataUrl;photos[i].compSize=r.size;photos[i].w=r.w;photos[i].h=r.h;}
+    catch(e){photos[i].compData=photos[i].dataUrl;photos[i].compSize=photos[i].origSize}
+    renderGrid();
   }
+  busy=false;renderGrid();
+  $('statusText').textContent='✅ Kompresi selesai!';
+  setTimeout(()=>$('progCont').style.display='none',1800);
+}
+
+// === PDF GENERATION ===
+async function confirmPdf(){
+  closeModal('pdfModal');
+  await processPdf();
+}
+
+async function processPdf(){
+  if(busy||!photos.length)return;
+  if(!photos.some(p=>p.compData)) await processCompress();
+
+  pdfName=(($('modalFileName').value||'').trim()||'hasil-foto')+'.pdf';
+  const pdfSize=$('pdfSize').value,showNum=$('pdfNum').checked;
   
-  // ==========================================
-  // SETTINGS
-  // ==========================================
+  busy=true;$('btnComp').disabled=$('btnPdf').disabled=true;$('progCont').style.display='block';
+  $('statusText').textContent='Membuat PDF...';
+
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   
-  function setupSettings() {
-    // Target size chips
-    document.getElementById('chipSize').addEventListener('click', (e) => {
-      if (e.target.classList.contains('chip')) {
-        document.querySelectorAll('#chipSize .chip').forEach(c => c.classList.remove('active'));
-        e.target.classList.add('active');
-        targetMB = parseFloat(e.target.dataset.v);
-        autoAdjustSliders();
-      }
-    });
+  for(let i=0;i<photos.length;i++){
+    const p=photos[i],land=p.w>p.h,W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
+    if(i!==0) pdf.addPage(pdfSize==='fit'?[p.w*0.2646,p.h*0.2646]:(land?'l':'p'), pdfSize==='fit'?undefined:pdfSize);
     
-    // Mode chips
-    document.getElementById('chipMode').addEventListener('click', (e) => {
-      if (e.target.classList.contains('chip')) {
-        document.querySelectorAll('#chipMode .chip').forEach(c => c.classList.remove('active'));
-        e.target.classList.add('active');
-        mode = e.target.dataset.m;
-        autoAdjustSliders();
-      }
-    });
-    
-    // Sliders
-    DOM.inpRes.addEventListener('input', () => {
-      DOM.valRes.textContent = DOM.inpRes.value + ' px';
-    });
-    
-    DOM.inpQual.addEventListener('input', () => {
-      DOM.valQual.textContent = DOM.inpQual.value + '%';
-    });
-  }
-  
-  function autoAdjustSliders() {
-    if (mode === 'qual') {
-      DOM.inpRes.value = 3000;
-      DOM.inpQual.value = 90;
-    } else if (mode === 'size') {
-      DOM.inpRes.value = 1200;
-      DOM.inpQual.value = 50;
-    } else {
-      if (targetMB <= 1) { DOM.inpRes.value = 1500; DOM.inpQual.value = 60; }
-      else if (targetMB <= 5) { DOM.inpRes.value = 2000; DOM.inpQual.value = 70; }
-      else { DOM.inpRes.value = 2500; DOM.inpQual.value = 80; }
+    if(pdfSize==='fit'){
+      const pw=p.w*0.2646,ph=p.h*0.2646;
+      pdf.addPage([pw,ph],land?'l':'p');
+      pdf.addImage(p.compData,'JPEG',0,0,pw,ph,undefined,'FAST');
+    }else{
+      const r=Math.min(W/p.w,H/p.h),w=p.w*r,h=p.h*r;
+      pdf.addImage(p.compData,'JPEG',(W-w)/2,(H-h)/2,w,h,undefined,'FAST');
+      if(showNum){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+'/'+photos.length,W/2,H-4,{align:'center'})}
     }
-    DOM.valRes.textContent = DOM.inpRes.value + ' px';
-    DOM.valQual.textContent = DOM.inpQual.value + '%';
-  }
-  
-  // ==========================================
-  // ACTIONS
-  // ==========================================
-  
-  function setupActions() {
-    DOM.btnGallery.onclick = () => DOM.fileInput.click();
-    DOM.btnCamera.onclick = () => DOM.camInput.click();
-    DOM.btnClearAll.onclick = () => {
-      if (photos.length === 0) return;
-      openModal('modalDelete');
-    };
-    
-    $('btnConfirmDel').onclick = () => {
-      photos = [];
-      pdfBlob = null;
-      renderGrid();
-      closeModal('modalDelete');
-      toast('Semua foto dihapus');
-    };
-    
-    DOM.btnCompress.onclick = processCompress;
-    DOM.btnPdf.onclick = () => openModal('modalPdfName');
-    $('btnCreatePdf').onclick = createPDF;
-    DOM.btnUpload.onclick = uploadToDrive;
-    DOM.btnSaveId.onclick = saveClientIdAndReload;
-    
-    // Enter key for PDF name
-    DOM.pdfNameInput.onkeydown = (e) => {
-      if (e.key === 'Enter') createPDF();
-      if (e.key === 'Escape') closeModal('modalPdfName');
-    };
-  }
-  
-  // ==========================================
-  // COMPRESS LOGIC
-  // ==========================================
-  
-  async function compressOne(img, maxRes, quality) {
-    let w = img.width, h = img.height;
-    if (Math.max(w, h) > maxRes) {
-      const r = maxRes / Math.max(w, h);
-      w = Math.round(w * r);
-      h = Math.round(h * r);
-    }
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, w, h);
-    ctx.drawImage(img, 0, 0, w, h);
-    
-    let q = quality / 100;
-    let dataUrl = canvas.toDataURL('image/jpeg', q);
-    let size = Math.round(dataUrl.length * 0.75);
-    const limit = targetMB > 0 ? targetMB * 1048576 : Infinity;
-    
-    // Reduce quality loop
-    let guard = 0;
-    while (size > limit && q > 0.1 && guard++ < 15) {
-      q = Math.max(0.1, q - 0.05);
-      dataUrl = canvas.toDataURL('image/jpeg', q);
-      size = Math.round(dataUrl.length * 0.75);
-    }
-    
-    // Reduce resolution loop
-    while (size > limit && Math.max(w,h) > 400 && guard++ < 10) {
-      w = Math.round(w * 0.85);
-      h = Math.round(h * 0.85);
-      canvas.width = w;
-      canvas.height = h;
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
-      dataUrl = canvas.toDataURL('image/jpeg', q);
-      size = Math.round(dataUrl.length * 0.75);
-    }
-    
-    return {dataUrl, size, w, h};
-  }
-  
-  async function processCompress() {
-    if (busy || !photos.length) return;
-    busy = true;
-    updateButtons(true);
-    showProgress(true);
-    
-    const maxRes = parseInt(DOM.inpRes.value);
-    const qual = parseInt(DOM.inpQual.value);
-    
-    try {
-      for (let i = 0; i < photos.length; i++) {
-        setStatus(`Mengkompres ${i+1}/${photos.length}...`);
-        setProgress((i / photos.length) * 100);
-        
-        const img = await loadImage(photos[i].dataUrl);
-        const result = await compressOne(img, maxRes, qual);
-        
-        photos[i].compData = result.dataUrl;
-        photos[i].compSize = result.size;
-        photos[i].w = result.w;
-        photos[i].h = result.h;
-        
-        renderGrid();
-        await wait(30);
-      }
-      
-      setProgress(100);
-      setStatus('✅ Kompresi selesai!');
-      toast('Kompresi berhasil!');
-    } catch(err) {
-      console.error(err);
-      toast('Error: ' + err.message, 'error');
-    } finally {
-      busy = false;
-      updateButtons(false);
-      setTimeout(() => showProgress(false), 2000);
-    }
-  }
-  
-  // ==========================================
-  // PDF CREATION
-  // ==========================================
-  
-  async function createPDF() {
-    closeModal('modalPdfName');
-    pdfName = (DOM.pdfNameInput.value.trim() || 'hasil-foto') + '.pdf';
-    
-    // Compress first if needed
-    if (!photos.some(p => p.compData)) {
-      await processCompress();
-    }
-    
-    if (busy || !photos.length) return;
-    
-    busy = true;
-    updateButtons(true);
-    showProgress(true);
-    setStatus('Membuat PDF...');
-    
-    try {
-      const {jsPDF} = window.jspdf;
-      const fmtVal = DOM.selSize.value;
-      const pageNum = DOM.chkPageNum.checked;
-      
-      // Create PDF
-      let pdf;
-      if (fmtVal === 'fit' && photos.length > 0) {
-        const p = photos[0];
-        const pw = p.w * 0.264583, ph = p.h * 0.264583;
-        pdf = new jsPDF({orientation: p.w > p.h ? 'l' : 'p', format: [pw, ph], unit: 'mm'});
-      } else {
-        pdf = new jsPDF({orientation: 'p', format: fmtVal, unit: 'mm'});
-      }
-      
-      for (let i = 0; i < photos.length; i++) {
-        if (i > 0) {
-          if (fmtVal === 'fit') {
-            const p = photos[i];
-            pdf.addPage([p.w * 0.264583, p.h * 0.264583], p.w > p.h ? 'l' : 'p');
-          } else {
-            pdf.addPage(fmtVal);
-          }
-        }
-        
-        const p = photos[i];
-        const W = pdf.internal.pageSize.getWidth();
-        const H = pdf.internal.pageSize.getHeight();
-        
-        if (fmtVal === 'fit') {
-          pdf.addImage(p.compData, 'JPEG', 0, 0, W, H, undefined, 'FAST');
-        } else {
-          const ratio = Math.min(W/(p.w*0.264583), H/(p.h*0.264583));
-          const w = p.w * 0.264583 * ratio;
-          const h = p.h * 0.264583 * ratio;
-          pdf.addImage(p.compData, 'JPEG', (W-w)/2, (H-h)/2, w, h, undefined, 'FAST');
-          
-          if (pageNum) {
-            pdf.setFontSize(8);
-            pdf.setTextColor(150);
-            pdf.text(`${i+1} / ${photos.length}`, W/2, H - 4, {align: 'center'});
-          }
-        }
-        
-        setProgress(((i+1)/photos.length) * 100);
-        await wait(20);
-      }
-      
-      pdfBlob = pdf.output('blob');
-      setStatus('✅ PDF siap! Size: ' + fmt(pdfBlob.size));
-      toast('PDF "' + pdfName + '" berhasil dibuat!');
-      
-      // Auto-enable upload if drive ready
-      DOM.btnUpload.disabled = !googleAuthReady;
-      
-    } catch(err) {
-      console.error(err);
-      toast('Error membuat PDF: ' + err.message, 'error');
-    } finally {
-      busy = false;
-      updateButtons(false);
-      setTimeout(() => showProgress(false), 2000);
-    }
-  }
-  
-  // ==========================================
-  // GOOGLE DRIVE INTEGRATION
-  // ==========================================
-  
-  function checkEnvironment() {
-    const isSecure = location.protocol === 'https:' || 
-                      location.hostname === 'localhost' || 
-                      location.hostname === '127.0.0.1' ||
-                      /^(192\.168|10\.|172\.(1[6-9]|2\d|3[01]))/.test(location.hostname);
-    
-    if (isSecure) {
-      DOM.driveStatus.textContent = 'HTTPS OK';
-      DOM.driveStatus.className = 'status-badge status-ok';
-      initGoogleAPI();
-    } else {
-      DOM.driveStatus.textContent = 'NEEDS HTTPS';
-      DOM.driveStatus.className = 'status-badge status-error';
-      DOM.btnSaveId.style.display = 'none';
-      console.warn('Google Drive requires HTTPS or localhost');
-    }
-  }
-  
-  function loadSavedClientId() {
-    const saved = localStorage.getItem('gdrive_client_id');
-    if (saved) {
-      DOM.clientIdInput.value = saved;
-      if (location.protocol === 'https:') {
-        initGoogleAPI();
-      }
-    }
-  }
-  
-  function saveClientIdAndReload() {
-    const id = DOM.clientIdInput.value.trim();
-    if (!id) {
-      toast('Masukkan Client ID!', 'error');
-      return;
-    }
-    localStorage.setItem('gdrive_client_id', id);
-    toast('Client ID disimpan! Memuat ulang...');
-    setTimeout(() => location.reload(), 500);
-  }
-  
-  function initGoogleAPI() {
-    const clientId = DOM.clientIdInput.value.trim();
-    if (!clientId || typeof gapi === 'undefined') return;
-    
-    DOM.driveStatus.textContent = 'LOADING...';
-    DOM.driveStatus.className = 'status-badge status-wait';
-    
-    try {
-      gapi.load('client:auth2', () => {
-        gapi.auth2.init({
-          client_id: clientId,
-          scope: 'https://www.googleapis.com/auth/drive.file'
-        }).then(() => {
-          googleAuthReady = true;
-          DOM.driveStatus.textContent = 'READY ✅';
-          DOM.driveStatus.className = 'status-badge status-ok';
-          if (pdfBlob) DOM.btnUpload.disabled = false;
-          console.log('Google Auth ready');
-        }).catch(err => {
-          console.error('Auth init failed:', err);
-          DOM.driveStatus.textContent = 'AUTH ERROR';
-          DOM.driveStatus.className = 'status-badge status-error';
-        });
-      });
-    } catch(err) {
-      console.error('GAPI load error:', err);
-      DOM.driveStatus.textContent = 'API ERROR';
-      DOM.driveStatus.className = 'status-badge status-error';
-    }
-  }
-  
-  async function uploadToDrive() {
-    if (!pdfBlob) {
-      toast('Buat PDF dulu!', 'error');
-      return;
-    }
-    
-    if (!googleAuthReady || typeof gapi === 'undefined') {
-      toast('Google API belum siap', 'error');
-      return;
-    }
-    
-    try {
-      const auth = gapi.auth2.getAuthInstance();
-      if (!auth.isSignedIn.get()) {
-        setStatus('Login ke Google...');
-        await auth.signIn({scope: 'https://www.googleapis.com/auth/drive.file'});
-      }
-      
-      const token = auth.currentUser.get().getAuthResponse().access_token;
-      setStatus('Mengupload ke Drive...');
-      showProgress(true);
-      setProgress(30);
-      
-      const metadata = {
-        name: pdfName,
-        mimeType: 'application/pdf'
-      };
-      
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
-      form.append('file', pdfBlob);
-      
-      const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: {'Authorization': `Bearer ${token}`},
-        body: form
-      });
-      
-      setProgress(100);
-      
-      if (res.ok) {
-        const data = await res.json();
-        toast('✅ Berhasil upload ke Google Drive!');
-        setStatus('Uploaded! Cek Google Drive Anda.');
-      } else {
-        throw await res.text();
-      }
-    } catch(err) {
-      console.error(err);
-      toast('Upload gagal: ' + err.message, 'error');
-    } finally {
-      showProgress(false);
-    }
-  }
-  
-  // ==========================================
-  // HELPERS
-  // ==========================================
-  
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
-  }
-  
-  function updateButtons(disabled) {
-    const state = disabled || !photos.length;
-    DOM.btnCompress.disabled = state;
-    DOM.btnPdf.disabled = state;
-    DOM.btnUpload.disabled = state || !pdfBlob || !googleAuthReady;
-  }
-  
-  function showProgress(show) {
-    DOM.progWrap.style.display = show ? 'block' : 'none';
-    if (!show) setProgress(0);
-  }
-  
-  function setProgress(pct) {
-    DOM.progFill.style.width = pct + '%';
-  }
-  
-  function setStatus(text) {
-    DOM.statusText.textContent = text;
-  }
-  
-  function openModal(id) {
-    $(id).classList.add('active');
-    if (id === 'modalPdfName') {
-      DOM.pdfNameInput.focus();
-      DOM.pdfNameInput.select();
-    }
-  }
-  
-  function closeModal(id) {
-    $(id).classList.remove('active');
+    $('progBar').style.width=((i+1)/photos.length*100)+'%';
+    await wait(10);
   }
 
-})();
+  pdfBlob = pdf.output('blob');
+  busy=false;renderGrid();
+  $('btnDrive').disabled=false;
+  $('statusText').textContent='✅ '+pdfName+' ('+fmt(pdfBlob.size)+') siap upload!';
+  toast('✅ PDF siap! Klik ☁️ Drive untuk upload');
+  setTimeout(()=>$('progCont').style.display='none',1800);
+}
+
+// ==========================================
+// GOOGLE IDENTITY SERVICES & UPLOAD DRIVE
+// ==========================================
+
+function initGIS() {
+  try {
+    const savedId = localStorage.getItem('drive_client_id');
+    if (savedId) {
+      $('clientIdInput').value = savedId;
+      // Inisialisasi token client baru
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: savedId,
+        scope: 'https://www.googleapis.com/auth/drive.file',
+        callback: (tokenResponse) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            uploadBlobToDrive(tokenResponse.access_token);
+          }
+        },
+      });
+    }
+  } catch (err) {
+    console.error('Inisialisasi Google Auth Gagal: ', err);
+  }
+}
+
+function saveClientId(){
+  let id = $('clientIdInput').value.trim();
+  // Filter jika user memasukkan link url lengkap secara tidak sengaja
+  if(id.startsWith('https://')) {
+    id = id.replace('https://', '');
+  }
+  if(!id){
+    toast('❌ Masukkan Client ID!', true);
+    return;
+  }
+  localStorage.setItem('drive_client_id', id);
+  toast('✅ Client ID disimpan! Memuat ulang...');
+  setTimeout(()=>location.reload(), 1000);
+}
+
+function uploadToDrive() {
+  if (!pdfBlob) {
+    toast('❌ Silakan buat PDF terlebih dahulu!', true);
+    return;
+  }
+  
+  const savedId = localStorage.getItem('drive_client_id');
+  if(!savedId) {
+    toast('❌ Silakan simpan Client ID di kiri bawah!', true);
+    $('clientIdInput').focus();
+    return;
+  }
+
+  if (!tokenClient) {
+    initGIS();
+  }
+
+  if (!tokenClient) {
+    toast('❌ Sistem Google belum siap, silakan coba lagi.', true);
+    return;
+  }
+
+  // Minta token akses secara otomatis membuka pop-up login Google
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+async function uploadBlobToDrive(accessToken) {
+  $('statusText').textContent = '☁️ Mengunggah ke Google Drive...';
+  $('progCont').style.display = 'block';
+  $('progBar').style.width = '30%';
+
+  try {
+    const metadata = {
+      name: pdfName,
+      mimeType: 'application/pdf'
+    };
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+    form.append('file', pdfBlob);
+
+    $('progBar').style.width = '70%';
+
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: form
+    });
+
+    $('progBar').style.width = '100%';
+
+    if (res.ok) {
+      toast('✅ Berhasil diunggah ke Google Drive!');
+      $('statusText').textContent = '✅ Terunggah ke Google Drive!';
+    } else {
+      const errText = await res.text();
+      throw new Error(errText);
+    }
+  } catch (err) {
+    console.error(err);
+    toast('❌ Gagal mengunggah: ' + err.message, true);
+    $('statusText').textContent = '❌ Unggahan Gagal';
+  } finally {
+    setTimeout(() => $('progCont').style.display = 'none', 2000);
+  }
+}
 </script>
 </body>
 </html>
