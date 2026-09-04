@@ -38,7 +38,6 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
 .thumb-del{position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(239,68,68,.92);color:#fff;border:none;border-radius:50%;font-size:12px;line-height:1}
 #emptyMsg{padding:20px;text-align:center;color:#9ca3af;font-size:11px}
 
-/* ===== TOMBOL AKSI 3 KEADAAN ===== */
 .send-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:800;touch-action:manipulation;transition:background .2s}
 .send-btn:active:not(:disabled){transform:scale(.98)}
 .st-idle{background:var(--drive)}
@@ -105,6 +104,7 @@ const AF=['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','
 const JD=['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
 
 let photos=[],busy=false,btnState='idle';
+window.si=null;
 
 const $=id=>document.getElementById(id);
 const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';
@@ -167,20 +167,35 @@ async function addFiles(files){
   render(); stat(photos.length+' foto siap dikirim.');
 }
 
+/* ===== RENDER (aman dipanggil berkali-kali) ===== */
 function render(){
-  const g=$('grid'); g.innerHTML='';
+  const g=$('grid');
+
+  // Matikan Sortable lama dengan aman, lalu kosongkan referensinya
+  if(window.si){ try{ window.si.destroy(); }catch(e){} window.si=null; }
+
+  g.innerHTML='';
   $('emptyMsg').style.display=photos.length?'none':'block';
   $('fotoCount').textContent=photos.length;
   $('btnHapus').style.display=photos.length?'block':'none';
   if(btnState==='idle') $('btnSend').disabled=(!photos.length||busy);
+
   photos.forEach((p,i)=>{
     const d=document.createElement('div'); d.className='thumb'; d.dataset.id=p.id;
     d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del">×</button><img src="'+p.dataUrl+'">';
     d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();if(busy)return;photos=photos.filter(x=>x.id!==p.id);render();};
     g.appendChild(d);
   });
-  if(window.si) window.si.destroy();
-  if(photos.length>1) window.si=new Sortable(g,{animation:150,delay:200,delayOnTouchOnly:true,onEnd:()=>{const ids=[...g.children].map(el=>el.dataset.id);photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));render();}});
+
+  // Aktifkan geser-urutan hanya kalau foto > 1
+  if(photos.length>1){
+    try{
+      window.si=new Sortable(g,{animation:150,delay:200,delayOnTouchOnly:true,onEnd:()=>{
+        const ids=[...g.children].map(el=>el.dataset.id);
+        photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id)); render();
+      }});
+    }catch(e){ window.si=null; }
+  }
 }
 function hapusSemua(){ if(busy)return; photos=[]; render(); $('resultBox').style.display='none'; setBtn('idle'); stat('Foto dihapus.'); }
 function newDoc(){ photos=[]; render(); $('resultBox').style.display='none'; setBtn('idle'); stat('Siap.'); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -204,6 +219,7 @@ async function sendToDrive(){
 
   busy=true; $('resultBox').style.display='none';
   setBtn('send','Menyiapkan…');
+  let sukses=false;
   try{
     for(let i=0;i<photos.length;i++){
       setBtnLabel('Kompres '+(i+1)+'/'+photos.length);
@@ -235,21 +251,22 @@ async function sendToDrive(){
     const txt=await res.text();
     let j=null;
     try{ j=JSON.parse(txt); }
-    catch(e){ console.log(txt.slice(0,500)); throw new Error('Server Apps Script error — buka URL /exec, pastikan JSON v6, lalu Deploy New version'); }
+    catch(e){ throw new Error('Server Apps Script error — buka URL /exec, pastikan JSON v6, lalu Deploy New version'); }
     if(!j.ok) throw new Error(j.error||'Gagal menyimpan');
 
+    sukses=true;
     stat('✅ Tersimpan di Google Drive');
     toast('✅ Berhasil dikirim!');
     $('resultBox').style.display='block';
     $('resultBox').innerHTML='✅ <b>'+esc(j.name||fn)+'</b><br>📂 '+esc(j.path||'')+
       (j.url?'<br><a href="'+esc(j.url)+'" target="_blank">Buka file ↗</a>':'');
-    photos=[]; render();
-    setBtn('done');
   }catch(e){
     stat('❌ '+e.message); toast('❌ '+e.message,true);
-    setBtn('idle');
   }
-  busy=false; render();
+
+  busy=false;
+  if(sukses){ photos=[]; render(); setBtn('done'); }
+  else { render(); setBtn('idle'); }
 }
 
 render(); setBtn('idle');
