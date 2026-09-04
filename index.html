@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo PDF ➔ Google Drive</title>
+<title>Photo PDF ➔ G-Drive</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-<!-- Google Identity Services (Teknologi Login Google Terbaru) -->
-<script src="https://accounts.google.com/gsi/client" onload="initGIS()" async defer></script>
 <style>
 :root {
   --bg:#ffffff; --panel:#f8fafc; --border:#c5cdd8;
@@ -76,7 +74,7 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
 #emptyMsg { height:100%; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#9ca3af; font-size:10px; }
 #emptyMsg span:first-child { font-size:24px; }
 .actions { display:flex; gap:6px; margin-top:8px; flex:0 0 auto; flex-wrap:wrap; }
-.btn { flex:1; min-width:80px; padding:7px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+.btn { flex:1; min-width:70px; padding:7px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:4px; }
 .btn-pri { background:var(--primary); color:#fff; }
 .btn-suc { background:var(--success); color:#fff; }
 .btn-cam { background:#f59e0b; color:#fff; }
@@ -87,6 +85,7 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
 .progress-container { height:4px; background:#e5e7eb; border-radius:2px; margin-top:8px; overflow:hidden; display:none; flex:0 0 auto; }
 .progress-bar { height:100%; background:var(--primary); width:0%; transition:width .2s; }
 .status-text { font-size:9px; color:var(--muted); margin-top:4px; text-align:center; flex:0 0 auto; }
+.status-text a { color:var(--primary); font-weight:700; }
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:999; display:none; align-items:center; justify-content:center; padding:12px; }
 .modal-overlay.show { display:flex; }
 .modal-box { background:#fff; padding:16px; border-radius:10px; width:320px; max-width:100%; text-align:center; box-shadow:0 6px 20px rgba(0,0,0,.22); border:2px solid var(--border-strong); }
@@ -98,7 +97,7 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
 .btn-yes { background:var(--danger); color:#fff; }
 .btn-go { background:var(--success); color:#fff; }
 .btn-no { background:#e5e7eb; color:var(--text); }
-.toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:var(--success); color:#fff; font-size:11px; font-weight:700; padding:7px 14px; border-radius:6px; opacity:0; transition:.25s; pointer-events:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:var(--success); color:#fff; font-size:11px; font-weight:700; padding:7px 14px; border-radius:6px; opacity:0; transition:.25s; pointer-events:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,.15); max-width:90%; }
 .toast.show { opacity:1; }
 .toast.error { background:var(--danger); }
 ::-webkit-scrollbar { width:4px; }
@@ -110,7 +109,7 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
 <div class="app-wrap">
   <div class="app-head">
     <h1>📄 Photo ➔ PDF ➔ Drive</h1>
-    <small>Compress &amp; upload offline · Tanpa Server</small>
+    <small>Compress &amp; upload via Apps Script</small>
   </div>
   
   <div class="app-body">
@@ -166,10 +165,10 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
           
           <hr style="margin:8px 0;border:none;border-top:1px solid #e5e7eb">
           
-          <span class="label">🔑 Google Drive Setup</span>
-          <input type="text" id="clientIdInput" placeholder="Masukkan Client ID..." style="font-size:10px;padding:4px;">
-          <button class="btn btn-sm" style="background:#4285F4;color:white;width:100%" onclick="saveClientId()">💾 Simpan Client ID</button>
-          <div class="modal-info" style="margin-top:4px;font-size:8px">Dapatkan ID di console.cloud.google.com</div>
+          <span class="label">☁️ URL Apps Script</span>
+          <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:9px;padding:4px;">
+          <button class="btn btn-sm" style="background:#4285F4;color:white;width:100%" onclick="saveScriptUrl()">💾 Simpan URL</button>
+          <div class="modal-info" style="margin-top:4px;font-size:8px">URL Web App dari Apps Script Anda (Deploy → Web app → .../exec)</div>
         </div>
       </div>
 
@@ -197,8 +196,8 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
           <button class="btn btn-out" onclick="document.getElementById('fileInput').click()">＋ Galeri</button>
           <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
           <button class="btn btn-pri" id="btnComp" disabled onclick="processCompress()">🔄 Compress</button>
-          <button class="btn btn-suc" id="btnPdf" disabled onclick="askPdfName()">📄 Buat PDF</button>
-          <button class="btn btn-drive" id="btnDrive" disabled onclick="uploadToDrive()">☁️ Drive</button>
+          <button class="btn btn-suc" id="btnPdf" disabled onclick="askPdfName()">📄 PDF</button>
+          <button class="btn btn-drive" id="btnDrive" disabled onclick="askUploadName()">☁️ Drive</button>
         </div>
 
         <div class="progress-container" id="progCont">
@@ -210,7 +209,7 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
   </div>
 </div>
 
-<!-- MODALS -->
+<!-- MODAL HAPUS SEMUA -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
     <div class="modal-title">🗑 Hapus Semua Foto?</div>
@@ -222,6 +221,7 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
   </div>
 </div>
 
+<!-- MODAL NAMA FILE PDF (DOWNLOAD) -->
 <div class="modal-overlay" id="pdfModal">
   <div class="modal-box">
     <div class="modal-title">💾 Nama File PDF</div>
@@ -234,6 +234,19 @@ select:focus,input[type=text]:focus { border-color:var(--primary); }
   </div>
 </div>
 
+<!-- MODAL NAMA FILE + UPLOAD DRIVE -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal-box">
+    <div class="modal-title">☁️ Upload ke Google Drive</div>
+    <input type="text" id="modalUploadName" value="hasil-foto" placeholder="nama-file">
+    <div class="modal-info" id="uploadModalInfo">PDF dibuat lalu dikirim ke Drive Anda</div>
+    <div class="modal-btns">
+      <button class="modal-btn btn-no" onclick="closeModal('uploadModal')">Batal</button>
+      <button class="modal-btn btn-go" onclick="confirmUpload()">☁️ Upload</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -242,8 +255,6 @@ const { jsPDF } = window.jspdf;
 // === STATE ===
 let photos = [];
 let targetMB = 5, mode = 'bal', busy = false;
-let pdfBlob = null, pdfName = '';
-let tokenClient = null;
 
 const $ = id => document.getElementById(id);
 const fmt = b => b >= 1048576 ? (b/1048576).toFixed(2)+' MB' : (b/1024).toFixed(0)+' KB';
@@ -254,6 +265,22 @@ let tT;
 function toast(m, err=false){
   const t=$('toast'); t.textContent=m; t.className='toast show' + (err ? ' error' : '');
   clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// === LOAD SAVED SCRIPT URL ===
+(function(){
+  const saved = localStorage.getItem('gas_url');
+  if(saved) $('scriptUrlInput').value = saved;
+})();
+
+function saveScriptUrl(){
+  let url = $('scriptUrlInput').value.trim();
+  if(!url){ toast('❌ Masukkan URL Apps Script!', true); return; }
+  if(!url.includes('script.google') || !url.endsWith('/exec')){
+    toast('⚠️ URL harus berakhiran /exec', true);
+  }
+  localStorage.setItem('gas_url', url);
+  toast('✅ URL tersimpan!');
 }
 
 // === FILE HANDLING ===
@@ -296,7 +323,7 @@ function renderGrid(){
   $('stSave').textContent=(tO&&done)?'-'+Math.round((1-tC/tO)*100)+'%':'-';
   $('btnComp').disabled=!photos.length||busy;
   $('btnPdf').disabled=!photos.length||busy;
-  $('btnDrive').disabled=!pdfBlob||busy;
+  $('btnDrive').disabled=!photos.length||busy;
 
   photos.forEach((p,i)=>{
     const d=document.createElement('div');
@@ -315,7 +342,7 @@ function closeModal(id){$(id).classList.remove('show')}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
 
 function askDeleteAll(){if(photos.length)openModal('confirmModal')}
-function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');$('statusText').textContent='Dihapus.';pdfBlob=null;$('btnDrive').disabled=true;}
+function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');$('statusText').textContent='Dihapus.';}
 
 function askPdfName(){
   if(!photos.length||busy)return;
@@ -325,6 +352,21 @@ function askPdfName(){
   setTimeout(()=>$('modalFileName').focus(),50);
 }
 $('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmPdf();if(e.key==='Escape')closeModal('pdfModal')});
+
+function askUploadName(){
+  if(!photos.length||busy)return;
+  const url = localStorage.getItem('gas_url');
+  if(!url){
+    toast('❌ Isi URL Apps Script dulu di kiri bawah!', true);
+    $('scriptUrlInput').focus();
+    return;
+  }
+  const est=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
+  $('uploadModalInfo').textContent=photos.length+' halaman · ~'+fmt(est*1.05)+' · dikirim ke Drive';
+  openModal('uploadModal');
+  setTimeout(()=>$('modalUploadName').focus(),50);
+}
+$('modalUploadName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmUpload();if(e.key==='Escape')closeModal('uploadModal')});
 
 // === SETTINGS ===
 $('targetChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('targetChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');targetMB=parseFloat(c.dataset.v);autoAdjust()};
@@ -353,8 +395,10 @@ async function compressImage(p,maxRes,quality){
   const cv=document.createElement('canvas');cv.width=w;cv.height=h;
   const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
   let q=quality/100,dataUrl=cv.toDataURL('image/jpeg',q),size=Math.round(dataUrl.length*0.75);
-  const tb=targetMB>0?targetMB*1048576:Infinity,guard=0;
+  const tb=targetMB>0?targetMB*1048576:Infinity;
+  let guard=0;
   while(size>tb&&q>0.2&&guard++<12){q=Math.max(0.2,q-0.08);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}
+  guard=0;
   while(size>tb&&Math.max(w,h)>600&&guard++<6){w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}
   return {dataUrl,size,w,h};
 }
@@ -376,156 +420,117 @@ async function processCompress(){
   setTimeout(()=>$('progCont').style.display='none',1800);
 }
 
-// === PDF GENERATION ===
-async function confirmPdf(){
-  closeModal('pdfModal');
-  await processPdf();
-}
-
-async function processPdf(){
-  if(busy||!photos.length)return;
+// === BUILD PDF (dipakai download & upload) ===
+async function buildPdf(){
   if(!photos.some(p=>p.compData)) await processCompress();
-
-  pdfName=(($('modalFileName').value||'').trim()||'hasil-foto')+'.pdf';
   const pdfSize=$('pdfSize').value,showNum=$('pdfNum').checked;
-  
-  busy=true;$('btnComp').disabled=$('btnPdf').disabled=true;$('progCont').style.display='block';
-  $('statusText').textContent='Membuat PDF...';
-
-  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  
+  let pdf=null;
   for(let i=0;i<photos.length;i++){
-    const p=photos[i],land=p.w>p.h,W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
-    if(i!==0) pdf.addPage(pdfSize==='fit'?[p.w*0.2646,p.h*0.2646]:(land?'l':'p'), pdfSize==='fit'?undefined:pdfSize);
-    
+    const p=photos[i],land=p.w>p.h;
     if(pdfSize==='fit'){
-      const pw=p.w*0.2646,ph=p.h*0.2646;
-      pdf.addPage([pw,ph],land?'l':'p');
-      pdf.addImage(p.compData,'JPEG',0,0,pw,ph,undefined,'FAST');
+      const W=p.w*0.2646,H=p.h*0.2646;
+      if(i===0) pdf=new jsPDF({orientation:land?'l':'p',format:[W,H],unit:'mm'});
+      else pdf.addPage([W,H],land?'l':'p');
+      pdf.addImage(p.compData,'JPEG',0,0,W,H,undefined,'FAST');
     }else{
-      const r=Math.min(W/p.w,H/p.h),w=p.w*r,h=p.h*r;
-      pdf.addImage(p.compData,'JPEG',(W-w)/2,(H-h)/2,w,h,undefined,'FAST');
-      if(showNum){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+'/'+photos.length,W/2,H-4,{align:'center'})}
+      const o=land?'l':'p';
+      if(i===0) pdf=new jsPDF({orientation:o,format:pdfSize,unit:'mm'});
+      else pdf.addPage(pdfSize,o);
+      const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
+      const r=Math.min(PW/p.w,PH/p.h),w=p.w*r,h=p.h*r;
+      pdf.addImage(p.compData,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
+      if(showNum){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+' / '+photos.length,PW/2,PH-4,{align:'center'})}
     }
     $('progBar').style.width=((i+1)/photos.length*100)+'%';
     await wait(10);
   }
+  return pdf;
+}
 
-  pdfBlob = pdf.output('blob');
+// === DOWNLOAD PDF LOKAL ===
+async function confirmPdf(){
+  closeModal('pdfModal');
+  if(busy||!photos.length)return;
+  busy=true;$('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=true;
+  $('progCont').style.display='block';
+  $('statusText').textContent='Membuat PDF...';
+  const name=(($('modalFileName').value||'').trim()||'hasil-foto')+'.pdf';
+  const pdf=await buildPdf();
+  const blob=pdf.output('blob');
+  pdf.save(name);
   busy=false;renderGrid();
-  $('btnDrive').disabled=false;
-  $('statusText').textContent='✅ '+pdfName+' ('+fmt(pdfBlob.size)+') siap upload!';
-  toast('✅ PDF siap! Klik ☁️ Drive untuk upload');
+  $('statusText').textContent='✅ '+name+' ('+fmt(blob.size)+')';
+  toast('✅ PDF "'+name+'" berhasil dibuat!');
   setTimeout(()=>$('progCont').style.display='none',1800);
 }
 
-// ==========================================
-// GOOGLE IDENTITY SERVICES & UPLOAD DRIVE
-// ==========================================
-
-function initGIS() {
-  try {
-    const savedId = localStorage.getItem('drive_client_id');
-    if (savedId) {
-      $('clientIdInput').value = savedId;
-      // Inisialisasi token client baru
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: savedId,
-        scope: 'https://www.googleapis.com/auth/drive.file',
-        callback: (tokenResponse) => {
-          if (tokenResponse && tokenResponse.access_token) {
-            uploadBlobToDrive(tokenResponse.access_token);
-          }
-        },
-      });
-    }
-  } catch (err) {
-    console.error('Inisialisasi Google Auth Gagal: ', err);
-  }
+// === UPLOAD KE DRIVE VIA APPS SCRIPT ===
+function blobToBase64(blob){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=rej;
+    r.readAsDataURL(blob);
+  });
 }
 
-function saveClientId(){
-  let id = $('clientIdInput').value.trim();
-  // Filter jika user memasukkan link url lengkap secara tidak sengaja
-  if(id.startsWith('https://')) {
-    id = id.replace('https://', '');
-  }
-  if(!id){
-    toast('❌ Masukkan Client ID!', true);
-    return;
-  }
-  localStorage.setItem('drive_client_id', id);
-  toast('✅ Client ID disimpan! Memuat ulang...');
-  setTimeout(()=>location.reload(), 1000);
-}
+async function confirmUpload(){
+  closeModal('uploadModal');
+  if(busy||!photos.length)return;
 
-function uploadToDrive() {
-  if (!pdfBlob) {
-    toast('❌ Silakan buat PDF terlebih dahulu!', true);
-    return;
-  }
-  
-  const savedId = localStorage.getItem('drive_client_id');
-  if(!savedId) {
-    toast('❌ Silakan simpan Client ID di kiri bawah!', true);
-    $('clientIdInput').focus();
-    return;
-  }
+  const gasUrl = localStorage.getItem('gas_url');
+  if(!gasUrl){ toast('❌ URL Apps Script belum diisi!', true); return; }
 
-  if (!tokenClient) {
-    initGIS();
-  }
+  busy=true;$('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=true;
+  $('progCont').style.display='block';
+  $('statusText').textContent='Membuat PDF...';
 
-  if (!tokenClient) {
-    toast('❌ Sistem Google belum siap, silakan coba lagi.', true);
-    return;
-  }
+  try{
+    const name=(($('modalUploadName').value||'').trim()||'hasil-foto')+'.pdf';
+    const pdf=await buildPdf();
+    const blob=pdf.output('blob');
 
-  // Minta token akses secara otomatis membuka pop-up login Google
-  tokenClient.requestAccessToken({ prompt: 'consent' });
-}
+    $('statusText').textContent='☁️ Mengirim ke Google Drive...';
+    $('progBar').style.width='70%';
 
-async function uploadBlobToDrive(accessToken) {
-  $('statusText').textContent = '☁️ Mengunggah ke Google Drive...';
-  $('progCont').style.display = 'block';
-  $('progBar').style.width = '30%';
+    const base64=await blobToBase64(blob);
 
-  try {
-    const metadata = {
-      name: pdfName,
-      mimeType: 'application/pdf'
-    };
-
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
-    form.append('file', pdfBlob);
-
-    $('progBar').style.width = '70%';
-
-    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      },
-      body: form
+    // Kirim sebagai text agar tidak kena CORS preflight
+    const res=await fetch(gasUrl,{
+      method:'POST',
+      body:JSON.stringify({
+        filename:name,
+        mimeType:'application/pdf',
+        base64:base64
+      })
     });
 
-    $('progBar').style.width = '100%';
-
-    if (res.ok) {
-      toast('✅ Berhasil diunggah ke Google Drive!');
-      $('statusText').textContent = '✅ Terunggah ke Google Drive!';
-    } else {
-      const errText = await res.text();
-      throw new Error(errText);
+    const text=await res.text();
+    let link=null;
+    try{
+      const json=JSON.parse(text);
+      if(json.success===false) throw new Error(json.error||'Gagal dari server');
+      link=json.url||json.link||null;
+    }catch(parseErr){
+      if(parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
     }
-  } catch (err) {
+
+    $('progBar').style.width='100%';
+    busy=false;renderGrid();
+
+    if(link){
+      $('statusText').innerHTML='✅ Terupload! <a href="'+link+'" target="_blank">Buka di Drive</a>';
+    }else{
+      $('statusText').textContent='✅ '+name+' terupload ke Drive!';
+    }
+    toast('✅ PDF "'+name+'" masuk Google Drive!');
+  }catch(err){
     console.error(err);
-    toast('❌ Gagal mengunggah: ' + err.message, true);
-    $('statusText').textContent = '❌ Unggahan Gagal';
-  } finally {
-    setTimeout(() => $('progCont').style.display = 'none', 2000);
+    busy=false;renderGrid();
+    $('statusText').textContent='❌ Upload gagal';
+    toast('❌ Gagal: '+err.message, true);
   }
+  setTimeout(()=>$('progCont').style.display='none',2000);
 }
 </script>
 </body>
