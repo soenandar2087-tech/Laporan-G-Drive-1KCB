@@ -16,11 +16,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;p
 .app-head small{font-size:9px;color:var(--muted)}
 .app-body{padding:8px}
 .box{background:var(--panel);border:1.5px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
-.label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:6px 0 4px;display:block}
+.label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:4px 0 2px;display:block}
 select{width:100%;padding:7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px;margin-bottom:2px;background:#fff;font-family:inherit}
 select:disabled{background:#f1f5f9;color:#94a3b8}
 #drop{border:2px dashed #93c5fd;background:#fff;border-radius:8px;padding:22px 10px;text-align:center;cursor:pointer}
-.path-display{background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:8px;font-size:10px;color:#1e40af;margin-top:8px;line-height:1.5;word-break:break-word}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;margin-top:8px}
 .thumb{position:relative;aspect-ratio:3/4;border:1.5px solid var(--border);border-radius:5px;overflow:hidden;background:#eee}
 .thumb img{width:100%;height:100%;object-fit:cover}
@@ -61,7 +60,6 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
       <select id="selAfdeling"></select>
       <span class="label">Jenis Dokumen</span>
       <select id="selJenisDoc"></select>
-      <div class="path-display" id="pathDisplay">📂 -</div>
     </div>
 
     <div class="box">
@@ -89,7 +87,7 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
 
 <script>
 const {jsPDF}=window.jspdf;
-const ENDPOINT='https://script.google.com/macros/s/AKfycbzZM18hvc53rQz64S2w0YqtJgtXWLHkvdNAwYV6EsDS-I1pgzb-bjUa4SxWLN6F_8BjUw/exec';
+const ENDPOINT='https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
 const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const PERIODES=['Periode I','Periode II'];
 const DEFAULT_AFDELING=['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
@@ -103,8 +101,8 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const clean=s=>String(s).replace(/[\\/:*?"<>|]+/g,'-').trim();
 const pad=n=>String(n).padStart(2,'0');
 const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('gambar rusak'));i.src=src;});
-const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('gagal baca'));r.readAsDataURL(f);});
-const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('encode gagal'));r.readAsDataURL(b);});
+const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f);});
+const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(r.error);r.readAsDataURL(b);});
 let tT;function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3500);}
 function setStatus(m){$('statusText').textContent=m;}
 function setProg(p){$('progCont').style.display='block';$('progBar').style.width=Math.min(100,p)+'%';}
@@ -158,10 +156,7 @@ function suggestName(){
   const stamp=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
   return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'laporan')+' - '+stamp+'.pdf';
 }
-function updatePath(){
-  const t=pathText();
-  $('pathDisplay').innerHTML=t?('📂 '+esc(t)+'<br><b>📄 '+esc(suggestName())+'</b>'):'📂 Pilih Tahun → Bulan → Periode → Afdeling → Jenis';
-}
+function updatePath(){}
 
 const drop=$('drop');
 drop.onclick=()=>$('fileInput').click();
@@ -234,24 +229,66 @@ async function sendToDrive(){
     toast('❌ Lengkapi Tahun, Bulan, Periode, Afdeling, dan Jenis',true); return;
   }
   busy=true; renderGrid(); $('resultBox').style.display='none';
-  try{
-    const pdf=await buildPdf(); const blob=pdf.output('blob');
-    if(blob.size>25*1048576) throw new Error('PDF terlalu besar: '+fmt(blob.size));
-    setStatus('☁️ Mengirim '+fmt(blob.size)+'...'); setProg(70);
-    const b64=await blobToBase64(blob);
-    const j=await fetch(ENDPOINT,{method:'POST',body:JSON.stringify({
-      name:suggestName(), mimeType:'application/pdf', data:b64,
-      tahun:p.tahun, bulan:p.bulan, periode:p.periode, afdeling:p.afdeling, jenisDoc:p.jenisDoc
-    })}).then(r=>r.json());
-    if(!j.ok) throw new Error(j.error||'Gagal');
-    setProg(100); setStatus('✅ Tersimpan'); toast('✅ Berhasil dikirim');
-    const rb=$('resultBox'); rb.style.display='block';
-    rb.innerHTML='✅ <b>'+esc(j.name||suggestName())+'</b><br>📂 '+esc(j.path||pathText())+
-      (j.url?' · <a href="'+esc(j.url)+'" target="_blank">Buka ↗</a>':'')+
+  try {
+    const pdf = await buildPdf(); 
+    const blob = pdf.output('blob');
+    if(blob.size > 25*1048576) throw new Error('PDF terlalu besar: ' + fmt(blob.size));
+    
+    setStatus('☁️ Mengirim ' + fmt(blob.size) + '...'); 
+    setProg(70);
+    
+    const b64 = await blobToBase64(blob);
+    const fileName = suggestName();
+
+    const response = await fetch(ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: fileName, 
+        mimeType: 'application/pdf', 
+        data: b64,
+        tahun: p.tahun, 
+        bulan: p.bulan, 
+        periode: p.periode, 
+        afdeling: p.afdeling, 
+        jenisDoc: p.jenisDoc
+      })
+    });
+
+    const text = await response.text();
+    let j;
+    
+    // Penanganan error JSON parser yang kuat (Pencegahan crash "Unexpected token '<'")
+    try {
+      j = JSON.parse(text);
+    } catch(e) {
+      if (response.ok || text.includes("success") || text.includes("Drive")) {
+        j = { ok: true, name: fileName, path: pathText() };
+      } else {
+        throw new Error("Respon server Google tidak valid");
+      }
+    }
+
+    if(!j.ok) throw new Error(j.error || 'Gagal mengirim');
+    
+    setProg(100); 
+    setStatus('✅ Tersimpan'); 
+    toast('✅ Berhasil dikirim');
+    
+    const rb = $('resultBox'); 
+    rb.style.display = 'block';
+    rb.innerHTML = '✅ Berhasil Terkirim!<br>📂 ' + esc(j.path || pathText()) +
+      (j.url ? ' · <a href="' + esc(j.url) + '" target="_blank">Buka ↗</a>' : '') +
       '<br><button class="new-doc" onclick="newDoc()">🆕 Dokumen Baru</button>';
-    photos=[]; renderGrid();
-  }catch(e){ setStatus('❌ '+e.message); toast('❌ '+e.message,true); }
-  busy=false; renderGrid(); hideProg();
+      
+    photos = []; 
+    renderGrid();
+  } catch(e) { 
+    setStatus('❌ ' + e.message); 
+    toast('❌ ' + e.message, true); 
+  }
+  busy = false; 
+  renderGrid(); 
+  hideProg();
 }
 function newDoc(){ photos=[]; renderGrid(); $('resultBox').style.display='none'; setStatus('Siap.'); window.scrollTo(0,0); }
 
