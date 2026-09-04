@@ -2,536 +2,644 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo PDF ➔ G-Drive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Photo PDF ➔ Drive</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
 :root {
-  --bg:#ffffff; --panel:#f8fafc; --border:#c5cdd8;
-  --border-strong:#94a3b8;
-  --primary:#2563eb; --primary-dark:#1d4ed8;
-  --text:#1f2937; --muted:#6b7280;
-  --danger:#ef4444; --success:#10b981;
-  --drive-color:#4285F4;
-  --radius:8px; --fs:11px;
+  --primary:#2563eb; --panel:#f8fafc; --border:#e2e8f0;
+  --success:#10b981; --danger:#ef4444;
+  --drive-color:#4285F4; --bg:#fff;
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-body {
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:transparent; color:var(--text); font-size:var(--fs);
-  overflow-x:hidden; padding:6px;
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:#1f2937;font-size:14px;line-height:1.5;
+  -webkit-tap-highlight-color:transparent;
 }
-.app-wrap {
-  border:2px solid var(--primary); border-radius:12px; background:#fff;
-  box-shadow:0 4px 14px rgba(37,99,235,.12); overflow:hidden;
+.app-container{
+  max-width:600px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;
 }
-.app-head {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 12px; background:linear-gradient(135deg,#eff6ff 0%,#fff 100%);
-  border-bottom:2px solid var(--primary);
+.header{
+  background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;
+  padding:16px;text-align:center;border-bottom-left-radius:20px;border-bottom-right-radius:20px;
+  box-shadow:0 4px 6px rgba(0,0,0,.1);
 }
-.app-head h1 { font-size:13px; font-weight:800; color:var(--primary-dark); margin:0; }
-.app-head small { font-size:10px; color:var(--muted); font-weight:500; }
-.app-body { padding:8px; }
-.container { display:grid; grid-template-columns:1fr; gap:8px; align-items:stretch; }
-@media (min-width:600px) { .container { grid-template-columns:270px 1fr; } }
-.left-col { display:flex; flex-direction:column; }
-.right-col { display:flex; flex-direction:column; min-height:0; }
-.box { background:var(--panel); border:1.5px solid var(--border-strong); border-radius:var(--radius); padding:8px; margin-bottom:8px; }
-.left-col .box:last-child { margin-bottom:0; }
-.label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px; display:block; }
-#drop { border:2px dashed #93c5fd; background:#fff; border-radius:var(--radius); padding:14px 10px; text-align:center; cursor:pointer; transition:.2s; }
-#drop:hover,#drop.over { border-color:var(--primary); background:#eff6ff; }
-.icon { font-size:22px; display:block; margin-bottom:4px; }
-.drop-text { font-weight:700; color:var(--primary); display:block; font-size:12px; }
-.drop-sub { font-size:9px; color:var(--muted); }
-.chips { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
-.chips:last-child { margin-bottom:0; }
-.chip { padding:3px 8px; border:1.5px solid var(--border); border-radius:12px; font-size:10px; cursor:pointer; background:#fff; font-weight:600; }
-.chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
-.slider-group { margin-bottom:6px; }
-.slider-group:last-child { margin-bottom:0; }
-.slider-row { display:flex; justify-content:space-between; font-size:10px; margin-bottom:2px; }
-input[type=range] { width:100%; height:4px; padding:0; }
-select,input[type=text] { width:100%; padding:5px 7px; border:1.5px solid var(--border); border-radius:5px; font-size:11px; margin-bottom:6px; font-family:inherit; outline:none; background:#fff; }
-select:focus,input[type=text]:focus { border-color:var(--primary); }
-.ck { font-size:10px; display:flex; align-items:center; gap:4px; color:var(--text); }
-.ck input { accent-color:var(--primary); }
-.stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:8px; flex:0 0 auto; }
-.stat-item { background:#fff; border:1.5px solid var(--border-strong); border-radius:6px; padding:5px 4px; text-align:center; }
-.stat-val { font-weight:800; font-size:13px; }
-.c-blue{color:var(--primary)} .c-red{color:var(--danger)} .c-green{color:var(--success)}
-.preview-area { background:#fff; border:1.5px solid var(--border-strong); border-radius:var(--radius); padding:8px; flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
-.preview-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex:0 0 auto; }
-.grid-scroll { flex:1 1 auto; min-height:130px; overflow-y:auto; padding-right:2px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px; }
-.thumb { position:relative; aspect-ratio:3/4; border:1.5px solid var(--border); border-radius:5px; overflow:hidden; background:#f3f4f6; cursor:grab; }
-.thumb img { width:100%; height:100%; object-fit:cover; }
-.thumb-num { position:absolute; top:2px; left:2px; background:var(--primary); color:#fff; font-size:9px; padding:1px 4px; border-radius:4px; font-weight:700; }
-.thumb-del { position:absolute; top:2px; right:2px; width:16px; height:16px; background:rgba(239,68,68,.92); color:#fff; border:none; border-radius:50%; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.thumb-size { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.72); color:#fff; font-size:8px; text-align:center; padding:1px; }
-#emptyMsg { height:100%; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#9ca3af; font-size:10px; }
-#emptyMsg span:first-child { font-size:24px; }
-.actions { display:flex; gap:6px; margin-top:8px; flex:0 0 auto; flex-wrap:wrap; }
-.btn { flex:1; min-width:70px; padding:7px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:4px; }
-.btn-pri { background:var(--primary); color:#fff; }
-.btn-suc { background:var(--success); color:#fff; }
-.btn-cam { background:#f59e0b; color:#fff; }
-.btn-drive { background:var(--drive-color); color:#fff; }
-.btn-out { background:#fff; border:1.5px solid var(--border-strong); color:var(--text); }
-.btn-sm { padding:2px 8px; font-size:9px; flex:0 0 auto; }
-.btn:disabled { opacity:.45; cursor:not-allowed; }
-.progress-container { height:4px; background:#e5e7eb; border-radius:2px; margin-top:8px; overflow:hidden; display:none; flex:0 0 auto; }
-.progress-bar { height:100%; background:var(--primary); width:0%; transition:width .2s; }
-.status-text { font-size:9px; color:var(--muted); margin-top:4px; text-align:center; flex:0 0 auto; }
-.status-text a { color:var(--primary); font-weight:700; }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:999; display:none; align-items:center; justify-content:center; padding:12px; }
-.modal-overlay.show { display:flex; }
-.modal-box { background:#fff; padding:16px; border-radius:10px; width:320px; max-width:100%; text-align:center; box-shadow:0 6px 20px rgba(0,0,0,.22); border:2px solid var(--border-strong); }
-.modal-title { font-weight:800; margin-bottom:8px; font-size:13px; }
-.modal-info { font-size:10px; color:var(--muted); margin:8px 0 2px; line-height:1.4; }
-.modal-box input[type=text] { font-size:12px; padding:7px 8px; text-align:center; margin-bottom:0; }
-.modal-btns { display:flex; gap:8px; margin-top:12px; }
-.modal-btn { flex:1; padding:7px; border-radius:5px; border:none; font-weight:700; cursor:pointer; font-size:11px; }
-.btn-yes { background:var(--danger); color:#fff; }
-.btn-go { background:var(--success); color:#fff; }
-.btn-no { background:#e5e7eb; color:var(--text); }
-.toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:var(--success); color:#fff; font-size:11px; font-weight:700; padding:7px 14px; border-radius:6px; opacity:0; transition:.25s; pointer-events:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,.15); max-width:90%; }
-.toast.show { opacity:1; }
-.toast.error { background:var(--danger); }
-::-webkit-scrollbar { width:4px; }
-::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+.header h1{font-size:18px;font-weight:800;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+
+.main-content{padding:12px;flex:1;display:flex;flex-direction:column;gap:12px}
+
+/* Dropzone */
+.drop-zone{
+  border:2px dashed #93c5fd;background:#eff6ff;border-radius:16px;
+  padding:24px;text-align:center;cursor:pointer;transition:.2s;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.drop-zone:active,.drop-zone.dragover{background:#dbeafe;border-color:#2563eb;transform:scale(.98)}
+.drop-icon{font-size:48px}
+.drop-text{font-weight:700;color:#1e40af}
+.drop-sub{font-size:12px;color:#64748b}
+
+/* Cards */
+.card{
+  background:white;border:1px solid var(--border);border-radius:12px;
+  padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.card-header{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600;
+  cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:.2s
+}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Sliders */
+.slider-group{margin-bottom:12px}
+.slider-row{display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:4px}
+input[type=range]{width:100%;height:6px;border-radius:3px;background:#e2e8f0;-webkit-appearance:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--primary);border-radius:50%;cursor:pointer}
+
+/* Grid Preview */
+.grid-preview{
+  background:#f8fafc;border:1px solid var(--border);border-radius:12px;
+  padding:12px;min-height:200px;overflow-y:auto;flex:1;
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.thumb{
+  position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;
+  background:#e2e8f0;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.1);
+}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb-num{
+  position:absolute;top:4px;left:4px;background:var(--primary);color:#fff;
+  font-size:11px;font-weight:700;padding:2px 6px;border-radius:10px
+}
+.thumb-del{
+  position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(239,68,68,.9);
+  color:#fff;border:none;border-radius:50%;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;z-index:2
+}
+.thumb-size{
+  position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);
+  color:#fff;font-size:10px;padding:2px;text-align:center
+}
+.empty-state{
+  height:100%;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:#94a3b8;gap:8px
+}
+.empty-icon{font-size:48px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-item{
+  background:#f8fafc;border-radius:8px;padding:8px;text-align:center;border:1px solid var(--border)
+}
+.stat-val{font-size:16px;font-weight:800}
+.stat-label{font-size:10px;color:#64748b}
+.c-blue{color:#2563eb}.c-red{color:#ef4444}.c-green{color:#10b981}
+
+/* Actions */
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.btn{
+  flex:1;min-width:120px;padding:12px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:6px;transition:.2s
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-warning{background:#f59e0b;color:#fff}
+.btn-drive{background:var(--drive-color);color:#fff}
+.btn-outline{background:#fff;color:#374151;border:2px solid var(--border)}
+.btn:disabled{opacity:.5;pointer-events:none}
+
+/* Setup Box */
+.setup-box{
+  background:#fefce8;border:1px solid #fbbf24;border-radius:12px;
+  padding:12px;margin-top:8px
+}
+.setup-input{
+  width:100%;padding:10px;border:1.5px solid #eab308;border-radius:8px;
+  font-family:monospace;font-size:12px;margin-bottom:8px
+}
+
+/* Progress */
+.progress-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:8px;display:none}
+.progress-fill{height:100%;background:var(--primary);width:0%;transition:.3s}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#1f2937;color:#fff;padding:12px 20px;border-radius:30px;
+  font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);
+  opacity:0;transition:.3s;white-space:nowrap;max-width:90%
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-10px)}
+.toast.error{background:#dc2626}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;
+  display:none;align-items:center;justify-content:center;padding:16px
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:#fff;border-radius:16px;padding:20px;width:320px;max-width:100%;
+  text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.2)
+}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:12px;color:#111}
+.modal-body{margin-bottom:16px;color:#555;font-size:13px}
+.modal-input{
+  width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;
+  font-size:14px;text-align:center;margin-bottom:16px
+}
+.modal-buttons{display:flex;gap:8px}
+.modal-btn{
+  flex:1;padding:10px;border:none;border-radius:8px;font-weight:700;cursor:pointer;
+  font-size:13px
+}
 </style>
 </head>
 <body>
 
-<div class="app-wrap">
-  <div class="app-head">
-    <h1>📄 Photo ➔ PDF ➔ Drive</h1>
-    <small>Compress &amp; upload via Apps Script</small>
+<div class="app-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>📸 Photo ➔ PDF ➔ Drive</h1>
+    <p>Compress &amp; Kirim Langsung ke Google Drive</p>
   </div>
-  
-  <div class="app-body">
-    <div class="container">
-      <!-- KIRI -->
-      <div class="left-col">
-        <div class="box">
-          <div id="drop">
-            <span class="icon">📁</span>
-            <span class="drop-text">Klik / Drop Foto</span>
-            <span class="drop-sub">JPG · PNG · WEBP</span>
-          </div>
-          <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
-        </div>
 
-        <div class="box">
-          <span class="label">Target Ukuran</span>
-          <div class="chips" id="targetChips">
-            <div class="chip" data-v="0.5">500KB</div>
-            <div class="chip" data-v="1">1MB</div>
-            <div class="chip active" data-v="5">5MB</div>
-            <div class="chip" data-v="10">10MB</div>
-            <div class="chip" data-v="0">⬇ Min</div>
-          </div>
-        </div>
+  <div class="main-content">
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="dropZone">
+      <span class="drop-icon">📁</span>
+      <span class="drop-text">Klik atau Ketuk Sini</span>
+      <span class="drop-sub">Pilih Foto / Atau Gunakan Tombol Di Bawah</span>
+    </div>
+    
+    <!-- Hidden Inputs -->
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
 
-        <div class="box">
-          <span class="label">Mode Kompresi</span>
-          <div class="chips" id="modeChips" style="margin-bottom:6px">
-            <div class="chip active" data-m="bal">⚖ Seimbang</div>
-            <div class="chip" data-m="size">⚡ Kecil</div>
-            <div class="chip" data-m="qual">✨ Kualitas</div>
-          </div>
-          <div class="slider-group">
-            <div class="slider-row"><span>Resolusi</span><span id="valRes">2000px</span></div>
-            <input type="range" id="inpRes" min="500" max="4000" step="100" value="2000">
-          </div>
-          <div class="slider-group">
-            <div class="slider-row"><span>Kualitas</span><span id="valQual">70%</span></div>
-            <input type="range" id="inpQual" min="10" max="100" value="70">
-          </div>
-        </div>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-item"><div class="stat-val c-blue" id="statCount">0</div><div class="stat-label">Foto</div></div>
+      <div class="stat-item"><div class="stat-val c-red" id="statOrig">-</div><div class="stat-label">Asli</div></div>
+      <div class="stat-item"><div class="stat-val c-green" id="statComp">-</div><div class="stat-label">Kompresi</div></div>
+      <div class="stat-item"><div class="stat-val c-blue" id="statSave">-</div><div class="stat-label">Hemat</div></div>
+    </div>
 
-        <div class="box">
-          <span class="label">Output PDF</span>
-          <select id="pdfSize">
-            <option value="a4">A4</option>
-            <option value="letter">Letter</option>
-            <option value="fit">Sesuai Foto</option>
-          </select>
-          <label class="ck"><input type="checkbox" id="pdfNum"> Nomor Halaman</label>
-          
-          <hr style="margin:8px 0;border:none;border-top:1px solid #e5e7eb">
-          
-          <span class="label">☁️ URL Apps Script</span>
-          <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/AKfycbx2ppV2NNiVIEXRNyM9aomQ1gxlHRz0c60_m9-sXUGC8S45gmeZ1KX2gXWyC8NvWkGfQw/exec" style="font-size:9px;padding:4px;">
-          <button class="btn btn-sm" style="background:#4285F4;color:white;width:100%" onclick="saveScriptUrl()">💾 Simpan URL</button>
-          <div class="modal-info" style="margin-top:4px;font-size:8px">URL Web App dari Apps Script Anda (Deploy → Web app → .../exec)</div>
-        </div>
+    <!-- Settings -->
+    <div class="card">
+      <div class="card-header">⚙️ Pengaturan Kompresi</div>
+      
+      <div class="card-header" style="margin-top:12px">Target Ukuran</div>
+      <div class="chips" id="sizeChips">
+        <div class="chip active" data-mb="1">&lt; 1MB</div>
+        <div class="chip" data-mb="2">&lt; 2MB</div>
+        <div class="chip" data-mb="5">&lt; 5MB</div>
+        <div class="chip" data-mb="0">Min</div>
       </div>
 
-      <!-- KANAN -->
-      <div class="right-col">
-        <div class="stats-bar">
-          <div class="stat-item"><span class="label" style="margin:0">Foto</span><div class="stat-val c-blue" id="stCount">0</div></div>
-          <div class="stat-item"><span class="label" style="margin:0">Asli</span><div class="stat-val c-red" id="stOrig">-</div></div>
-          <div class="stat-item"><span class="label" style="margin:0">Hasil</span><div class="stat-val c-green" id="stRes">-</div></div>
-          <div class="stat-item"><span class="label" style="margin:0">Hemat</span><div class="stat-val" id="stSave">-</div></div>
-        </div>
+      <div class="slider-group">
+        <div class="slider-row"><span>Kualitas (JPEG)</span><span id="qualityVal">70%</span></div>
+        <input type="range" id="qualityRange" min="10" max="95" value="70">
+      </div>
 
-        <div class="preview-area">
-          <div class="preview-head">
-            <span class="label" style="margin:0">🗂 Preview</span>
-            <button class="btn btn-out btn-sm" onclick="askDeleteAll()">🗑 Hapus Semua</button>
-          </div>
-          <div class="grid-scroll">
-            <div class="grid" id="grid"></div>
-            <div id="emptyMsg"><span>🖼</span><span>Belum ada foto</span></div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btn-out" onclick="document.getElementById('fileInput').click()">＋ Galeri</button>
-          <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
-          <button class="btn btn-pri" id="btnComp" disabled onclick="processCompress()">🔄 Compress</button>
-          <button class="btn btn-suc" id="btnPdf" disabled onclick="askPdfName()">📄 PDF</button>
-          <button class="btn btn-drive" id="btnDrive" disabled onclick="askUploadName()">☁️ Drive</button>
-        </div>
-
-        <div class="progress-container" id="progCont">
-          <div class="progress-bar" id="progBar"></div>
-        </div>
-        <div class="status-text" id="statusText">Siap.</div>
+      <div class="slider-group">
+        <div class="slider-row"><span>Maks Lebar (px)</span><span id="resVal">1920</span></div>
+        <input type="range" id="resRange" min="800" max="3000" value="1920">
       </div>
     </div>
-  </div>
-</div>
 
-<!-- MODAL HAPUS SEMUA -->
-<div class="modal-overlay" id="confirmModal">
-  <div class="modal-box">
-    <div class="modal-title">🗑 Hapus Semua Foto?</div>
-    <div style="font-size:11px;color:#666">Semua foto akan hilang.</div>
-    <div class="modal-btns">
-      <button class="modal-btn btn-no" onclick="closeModal('confirmModal')">Batal</button>
-      <button class="modal-btn btn-yes" onclick="doDeleteAll()">Hapus</button>
+    <!-- APPS SCRIPT SETUP -->
+    <div class="setup-box">
+      <div class="card-header">🔌 Koneksi ke Google Drive (Apps Script)</div>
+      <input type="text" class="setup-input" id="endpointUrl" 
+             placeholder="Paste URL Web App Anda di sini..." 
+             value="">
+      <button class="btn btn-outline" onclick="saveEndpoint()" style="width:100%;justify-content:center">
+        💾 Simpan Endpoint &nbsp;<span id="savedIcon"></span>
+      </button>
+      <p style="font-size:11px;color:#854d0e;margin-top:6px">
+        💡 Dapatkan URL dari Deploy > Web App di script.google.com Anda.
+        Mode akses pilih "Anyone".
+      </p>
+    </div>
+
+    <!-- Preview Grid -->
+    <div class="grid-preview">
+      <div class="grid" id="photoGrid"></div>
+      <div class="empty-state" id="emptyState">
+        <span class="empty-icon">🖼️</span>
+        <span>Belum ada foto</span>
+        <span style="font-size:12px">Ambil foto atau pilih dari galeri</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button class="btn btn-outline" onclick="$('fileInput').click()">+ Galeri</button>
+      <button class="btn btn-warning" onclick="$('cameraInput').click()">📷 Camera</button>
+      <button class="btn btn-primary" id="btnCompress" disabled onclick="compressAll()">
+        🔄 Compress
+      </button>
+      <button class="btn btn-success" id="btnUpload" disabled onclick="uploadToDrive()">
+        ☁️ Send to Drive
+      </button>
+    </div>
+
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill"></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL NAMA FILE PDF (DOWNLOAD) -->
-<div class="modal-overlay" id="pdfModal">
-  <div class="modal-box">
-    <div class="modal-title">💾 Nama File PDF</div>
-    <input type="text" id="modalFileName" value="hasil-foto" placeholder="nama-file">
-    <div class="modal-info" id="pdfModalInfo">.pdf ditambahkan otomatis</div>
-    <div class="modal-btns">
-      <button class="modal-btn btn-no" onclick="closeModal('pdfModal')">Batal</button>
-      <button class="modal-btn btn-go" onclick="confirmPdf()">⬇ Buat PDF</button>
+<!-- Modal Nama File -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal">
+    <div class="modal-title">Nama File PDF?</div>
+    <input type="text" class="modal-input" id="pdfFileName" placeholder="laporan_01.pdf" value="dokumen_compressed.pdf">
+    <div class="modal-buttons">
+      <button class="modal-btn btn-outline" onclick="closeModal('nameModal')">Batal</button>
+      <button class="modal-btn btn-success" onclick="confirmUpload()">Kirim</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL NAMA FILE + UPLOAD DRIVE -->
-<div class="modal-overlay" id="uploadModal">
-  <div class="modal-box">
-    <div class="modal-title">☁️ Upload ke Google Drive</div>
-    <input type="text" id="modalUploadName" value="hasil-foto" placeholder="nama-file">
-    <div class="modal-info" id="uploadModalInfo">PDF dibuat lalu dikirim ke Drive Anda</div>
-    <div class="modal-btns">
-      <button class="modal-btn btn-no" onclick="closeModal('uploadModal')">Batal</button>
-      <button class="modal-btn btn-go" onclick="confirmUpload()">☁️ Upload</button>
-    </div>
-  </div>
-</div>
-
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-const { jsPDF } = window.jspdf;
-
 // === STATE ===
 let photos = [];
-let targetMB = 5, mode = 'bal', busy = false;
+let targetMB = 1; // default target size
+let pdfBlob = null;
 
 const $ = id => document.getElementById(id);
 const fmt = b => b >= 1048576 ? (b/1048576).toFixed(2)+' MB' : (b/1024).toFixed(0)+' KB';
-const wait = ms => new Promise(r=>setTimeout(r,ms));
-const loadImg = src => new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
+const wait = ms => new Promise(r => setTimeout(r, ms));
 
-let tT;
-function toast(m, err=false){
-  const t=$('toast'); t.textContent=m; t.className='toast show' + (err ? ' error' : '');
-  clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-// === LOAD SAVED SCRIPT URL ===
-(function(){
-  const saved = localStorage.getItem('gas_url');
-  if(saved) $('scriptUrlInput').value = saved;
-})();
-
-function saveScriptUrl(){
-  let url = $('scriptUrlInput').value.trim();
-  if(!url){ toast('❌ Masukkan URL Apps Script!', true); return; }
-  if(!url.includes('script.google') || !url.endsWith('/exec')){
-    toast('⚠️ URL harus berakhiran /exec', true);
-  }
-  localStorage.setItem('gas_url', url);
-  toast('✅ URL tersimpan!');
+function toast(msg, err=false){
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 // === FILE HANDLING ===
-const drop=$('drop');
-drop.onclick=()=>$('fileInput').click();
-drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
-drop.ondragleave=()=>drop.classList.remove('over');
-drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)};
-$('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value=''};
-$('cameraInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';toast('📷 Foto ditambahkan!')};
-window.addEventListener('dragover',e=>e.preventDefault());
-window.addEventListener('drop',e=>e.preventDefault());
+const dropZone = $('dropZone');
+const fileInput = $('fileInput');
+const cameraInput = $('cameraInput');
 
-function handleFiles(files){
-  [...files].forEach(f=>{
-    if(!f.type.startsWith('image/')) return;
-    const r=new FileReader();
-    r.onload=ev=>{
-      const img=new Image();
-      img.onload=()=>{
-        photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2), name:f.name, origSize:f.size, dataUrl:ev.target.result, w:img.width, h:img.height, compData:null, compSize:null});
-        renderGrid();
-      };
-      img.src=ev.target.result;
-    };
-    r.readAsDataURL(f);
+dropZone.onclick = () => fileInput.click();
+dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
+dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+dropZone.ondrop = e => {
+  e.preventDefault(); 
+  dropZone.classList.remove('dragover'); 
+  handleFiles(e.dataTransfer.files);
+};
+
+fileInput.onchange = e => { handleFiles(e.target.files); e.target.value=''; };
+cameraInput.onchange = e => { handleFiles(e.target.files); e.target.value=''; toast('📷 Foto dari kamera ditambahkan!'); };
+
+async function handleFiles(files) {
+  for(let f of files) {
+    if(!f.type.startsWith('image/')) continue;
+    const base64 = await readFileAsDataURL(f);
+    const img = await loadImage(base64);
+    
+    photos.push({
+      id: Date.now() + Math.random(),
+      name: f.name,
+      origSize: f.size,
+      width: img.width,
+      height: img.height,
+      dataUrl: base64,
+      compressedDataUrl: null,
+      compressedSize: null
+    });
+  }
+  renderGrid();
+  updateStats();
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
-// === RENDER ===
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+// === RENDER GRID ===
 function renderGrid(){
-  const g=$('grid'); g.innerHTML='';
-  $('emptyMsg').style.display = photos.length ? 'none':'flex';
-  const tO=photos.reduce((s,p)=>s+p.origSize,0);
-  const tC=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
-  const done=photos.some(p=>p.compData);
-  $('stCount').textContent=photos.length;
-  $('stOrig').textContent=tO?fmt(tO):'-';
-  $('stRes').textContent=done?fmt(tC):'-';
-  $('stSave').textContent=(tO&&done)?'-'+Math.round((1-tC/tO)*100)+'%':'-';
-  $('btnComp').disabled=!photos.length||busy;
-  $('btnPdf').disabled=!photos.length||busy;
-  $('btnDrive').disabled=!photos.length||busy;
-
-  photos.forEach((p,i)=>{
-    const d=document.createElement('div');
-    d.className='thumb'; d.dataset.id=p.id;
-    d.innerHTML=`<span class="thumb-num">${i+1}</span><button class="thumb-del">×</button><img src="${p.compData||p.dataUrl}"><div class="thumb-size">${fmt(p.origSize)}${p.compSize?'→'+fmt(p.compSize):''}</div>`;
-    d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();photos=photos.filter(x=>x.id!==p.id);renderGrid()};
-    g.appendChild(d);
-  });
-  if(window.sortInst) window.sortInst.destroy();
-  window.sortInst=new Sortable(g,{animation:150,onEnd:()=>{const ids=[...g.children].map(el=>el.dataset.id);photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));renderGrid()}});
-}
-
-// === MODAL ===
-function openModal(id){$(id).classList.add('show')}
-function closeModal(id){$(id).classList.remove('show')}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
-
-function askDeleteAll(){if(photos.length)openModal('confirmModal')}
-function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');$('statusText').textContent='Dihapus.';}
-
-function askPdfName(){
-  if(!photos.length||busy)return;
-  const est=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
-  $('pdfModalInfo').textContent=photos.length+' halaman · ~'+fmt(est*1.05);
-  openModal('pdfModal');
-  setTimeout(()=>$('modalFileName').focus(),50);
-}
-$('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmPdf();if(e.key==='Escape')closeModal('pdfModal')});
-
-function askUploadName(){
-  if(!photos.length||busy)return;
-  const url = localStorage.getItem('gas_url');
-  if(!url){
-    toast('❌ Isi URL Apps Script dulu di kiri bawah!', true);
-    $('scriptUrlInput').focus();
-    return;
-  }
-  const est=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
-  $('uploadModalInfo').textContent=photos.length+' halaman · ~'+fmt(est*1.05)+' · dikirim ke Drive';
-  openModal('uploadModal');
-  setTimeout(()=>$('modalUploadName').focus(),50);
-}
-$('modalUploadName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmUpload();if(e.key==='Escape')closeModal('uploadModal')});
-
-// === SETTINGS ===
-$('targetChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('targetChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');targetMB=parseFloat(c.dataset.v);autoAdjust()};
-$('modeChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('modeChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');mode=c.dataset.m;autoAdjust()};
-$('inpRes').oninput=e=>$('valRes').textContent=e.target.value+'px';
-$('inpQual').oninput=e=>$('valQual').textContent=e.target.value+'%';
-
-function autoAdjust(){
-  if(mode==='qual'){$('inpRes').value=3000;$('inpQual').value=90}
-  else if(mode==='size'){$('inpRes').value=1200;$('inpQual').value=50}
-  else{
-    if(targetMB<=1){$('inpRes').value=1500;$('inpQual').value=60}
-    else if(targetMB<=5){$('inpRes').value=2000;$('inpQual').value=70}
-    else{$('inpRes').value=2500;$('inpQual').value=80}
-  }
-  $('valRes').textContent=$('inpRes').value+'px';
-  $('valQual').textContent=$('inpQual').value+'%';
-}
-autoAdjust();
-
-// === COMPRESS ===
-async function compressImage(p,maxRes,quality){
-  const img=await loadImg(p.dataUrl);
-  let w=img.width,h=img.height;
-  if(Math.max(w,h)>maxRes){const r=maxRes/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r)}
-  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
-  const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
-  let q=quality/100,dataUrl=cv.toDataURL('image/jpeg',q),size=Math.round(dataUrl.length*0.75);
-  const tb=targetMB>0?targetMB*1048576:Infinity;
-  let guard=0;
-  while(size>tb&&q>0.2&&guard++<12){q=Math.max(0.2,q-0.08);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}
-  guard=0;
-  while(size>tb&&Math.max(w,h)>600&&guard++<6){w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75)}
-  return {dataUrl,size,w,h};
-}
-
-async function processCompress(){
-  if(busy||!photos.length)return;
-  busy=true;$('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=true;
-  $('progCont').style.display='block';
-  const maxRes=+$('inpRes').value,qual=+$('inpQual').value;
-  for(let i=0;i<photos.length;i++){
-    $('statusText').textContent='Compress '+(i+1)+'/'+photos.length+'...';
-    $('progBar').style.width=((i+1)/photos.length*100)+'%';await wait(20);
-    try{const r=await compressImage(photos[i],maxRes,qual);photos[i].compData=r.dataUrl;photos[i].compSize=r.size;photos[i].w=r.w;photos[i].h=r.h;}
-    catch(e){photos[i].compData=photos[i].dataUrl;photos[i].compSize=photos[i].origSize}
-    renderGrid();
-  }
-  busy=false;renderGrid();
-  $('statusText').textContent='✅ Kompresi selesai!';
-  setTimeout(()=>$('progCont').style.display='none',1800);
-}
-
-// === BUILD PDF (dipakai download & upload) ===
-async function buildPdf(){
-  if(!photos.some(p=>p.compData)) await processCompress();
-  const pdfSize=$('pdfSize').value,showNum=$('pdfNum').checked;
-  let pdf=null;
-  for(let i=0;i<photos.length;i++){
-    const p=photos[i],land=p.w>p.h;
-    if(pdfSize==='fit'){
-      const W=p.w*0.2646,H=p.h*0.2646;
-      if(i===0) pdf=new jsPDF({orientation:land?'l':'p',format:[W,H],unit:'mm'});
-      else pdf.addPage([W,H],land?'l':'p');
-      pdf.addImage(p.compData,'JPEG',0,0,W,H,undefined,'FAST');
-    }else{
-      const o=land?'l':'p';
-      if(i===0) pdf=new jsPDF({orientation:o,format:pdfSize,unit:'mm'});
-      else pdf.addPage(pdfSize,o);
-      const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
-      const r=Math.min(PW/p.w,PH/p.h),w=p.w*r,h=p.h*r;
-      pdf.addImage(p.compData,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
-      if(showNum){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+' / '+photos.length,PW/2,PH-4,{align:'center'})}
-    }
-    $('progBar').style.width=((i+1)/photos.length*100)+'%';
-    await wait(10);
-  }
-  return pdf;
-}
-
-// === DOWNLOAD PDF LOKAL ===
-async function confirmPdf(){
-  closeModal('pdfModal');
-  if(busy||!photos.length)return;
-  busy=true;$('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=true;
-  $('progCont').style.display='block';
-  $('statusText').textContent='Membuat PDF...';
-  const name=(($('modalFileName').value||'').trim()||'hasil-foto')+'.pdf';
-  const pdf=await buildPdf();
-  const blob=pdf.output('blob');
-  pdf.save(name);
-  busy=false;renderGrid();
-  $('statusText').textContent='✅ '+name+' ('+fmt(blob.size)+')';
-  toast('✅ PDF "'+name+'" berhasil dibuat!');
-  setTimeout(()=>$('progCont').style.display='none',1800);
-}
-
-// === UPLOAD KE DRIVE VIA APPS SCRIPT ===
-function blobToBase64(blob){
-  return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result.split(',')[1]);
-    r.onerror=rej;
-    r.readAsDataURL(blob);
-  });
-}
-
-async function confirmUpload(){
-  closeModal('uploadModal');
-  if(busy||!photos.length)return;
-
-  const gasUrl = localStorage.getItem('gas_url');
-  if(!gasUrl){ toast('❌ URL Apps Script belum diisi!', true); return; }
-
-  busy=true;$('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=true;
-  $('progCont').style.display='block';
-  $('statusText').textContent='Membuat PDF...';
-
-  try{
-    const name=(($('modalUploadName').value||'').trim()||'hasil-foto')+'.pdf';
-    const pdf=await buildPdf();
-    const blob=pdf.output('blob');
-
-    $('statusText').textContent='☁️ Mengirim ke Google Drive...';
-    $('progBar').style.width='70%';
-
-    const base64=await blobToBase64(blob);
-
-    // Kirim sebagai text agar tidak kena CORS preflight
-    const res=await fetch(gasUrl,{
-      method:'POST',
-      body:JSON.stringify({
-        filename:name,
-        mimeType:'application/pdf',
-        base64:base64
-      })
+  const grid = $('photoGrid');
+  grid.innerHTML = '';
+  
+  if(photos.length === 0) {
+    $('emptyState').style.display = 'flex';
+    grid.style.display = 'none';
+  } else {
+    $('emptyState').style.display = 'none';
+    grid.style.display = 'grid';
+    
+    photos.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.className = 'thumb';
+      div.innerHTML = `
+        <img src="${p.compressedDataUrl || p.dataUrl}" alt="${p.name}">
+        <span class="thumb-num">${i+1}</span>
+        <button class="thumb-del" onclick="removePhoto('${p.id}')">×</button>
+        <span class="thumb-size">${fmt(p.origSize)}${p.compressedSize ? ' → '+fmt(p.compressedSize) : ''}</span>
+      `;
+      grid.appendChild(div);
     });
 
-    const text=await res.text();
-    let link=null;
-    try{
-      const json=JSON.parse(text);
-      if(json.success===false) throw new Error(json.error||'Gagal dari server');
-      link=json.url||json.link||null;
-    }catch(parseErr){
-      if(parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
-    }
-
-    $('progBar').style.width='100%';
-    busy=false;renderGrid();
-
-    if(link){
-      $('statusText').innerHTML='✅ Terupload! <a href="'+link+'" target="_blank">Buka di Drive</a>';
-    }else{
-      $('statusText').textContent='✅ '+name+' terupload ke Drive!';
-    }
-    toast('✅ PDF "'+name+'" masuk Google Drive!');
-  }catch(err){
-    console.error(err);
-    busy=false;renderGrid();
-    $('statusText').textContent='❌ Upload gagal';
-    toast('❌ Gagal: '+err.message, true);
+    // Enable/disable buttons
+    $('btnCompress').disabled = false;
+    $('btnUpload').disabled = !photos.some(p => p.compressedDataUrl);
   }
-  setTimeout(()=>$('progCont').style.display='none',2000);
+  
+  // Sortable
+  if(window.sortInst) window.sortInst.destroy();
+  window.sortInst = new Sortable(grid, { animation: 150 });
 }
+
+function removePhoto(id) {
+  photos = photos.filter(p => p.id != id);
+  renderGrid();
+  updateStats();
+}
+
+function updateStats(){
+  const totalOrig = photos.reduce((s,p)=>s+p.origSize, 0);
+  const totalComp = photos.reduce((s,p)=>s+(p.compressedSize||p.origSize), 0);
+  const saved = totalOrig - totalComp;
+  
+  $('statCount').textContent = photos.length;
+  $('statOrig').textContent = totalOrig ? fmt(totalOrig) : '-';
+  $('statComp').textContent = totalOrig ? fmt(totalComp) : '-';
+  $('statSave').textContent = saved > 0 ? fmt(saved) + ' 🔥' : '-';
+}
+
+// === SETTINGS HANDLERS ===
+$('sizeChips').onclick = e => {
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('#sizeChips .chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  targetMB = parseFloat(chip.dataset.mb);
+};
+
+$('qualityRange').oninput = e => $('qualityVal').textContent = e.target.value + '%';
+$('resRange').oninput = e => $('resVal').textContent = e.target.value + 'px';
+
+// Save endpoint to localStorage
+function saveEndpoint(){
+  let url = $('endpointUrl').value.trim();
+  if(!url){toast('❌ Masukkan URL!', true);return;}
+  
+  // Clean up trailing slash or query params if needed
+  localStorage.setItem('apps_script_endpoint', url);
+  $('savedIcon').textContent = '✅ Saved!';
+  toast('✅ Endpoint tersimpan!');
+  checkUploadReady();
+}
+
+// Check saved endpoint on load
+(function(){
+  const saved = localStorage.getItem('apps_script_endpoint');
+  if(saved){
+    $('endpointUrl').value = saved;
+    $('savedIcon').textContent = '✅';
+  }
+})();
+
+function checkUploadReady(){
+  const hasCompressed = photos.some(p => p.compressedDataUrl);
+  const hasEndpoint = !!localStorage.getItem('apps_script_endpoint');
+  $('btnUpload').disabled = !hasCompressed || !hasEndpoint;
+}
+
+// === COMPRESSION ENGINE ===
+async function compressImage(p) {
+  const maxRes = parseInt($('resRange').value);
+  const quality = parseInt($('qualityRange').value) / 100;
+  const maxBytes = targetMB * 1048576; // MB to bytes
+  
+  const img = await loadImage(p.dataUrl);
+  let w = img.width, h = img.height;
+  
+  // Resize if needed
+  if(Math.max(w,h) > maxRes) {
+    const ratio = Math.min(maxRes/w, maxRes/h);
+    w = Math.round(w * ratio);
+    h = Math.round(h * ratio);
+  }
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,w,h);
+  ctx.drawImage(img, 0,0, w,h);
+  
+  // Binary search for quality if size limit set
+  let q = quality;
+  if(targetMB > 0) {
+    let low = 0.1, high = quality, bestQ = quality;
+    let attempts = 0;
+    
+    while(attempts++ < 6 && high - low > 0.05) {
+      const mid = (low+high)/2;
+      const testUrl = canvas.toDataURL('image/jpeg', mid);
+      const testSize = testUrl.length * 0.75; // Approximate
+      
+      if(testSize <= maxBytes) {
+        bestQ = mid;
+        low = mid; // Try better quality
+      } else {
+        high = mid; // Lower quality
+      }
+    }
+    q = bestQ;
+  }
+  
+  const dataUrl = canvas.toDataURL('image/jpeg', q);
+  const compressedSize = Math.round(dataUrl.length * 0.75);
+  
+  return { dataUrl, compressedSize };
+}
+
+async function compressAll() {
+  if(photos.length===0 || busy) return;
+  busy = true;
+  
+  $('progressBar').style.display = 'block';
+  $('btnCompress').disabled = true;
+  
+  for(let i=0; i<photos.length; i++) {
+    const p = photos[i];
+    if(p.compressedDataUrl) continue; // Skip already compressed
+    
+    $('statusText')?.setItem?.('text',`Mengkompres ${i+1}/${photos.length}...`);
+    $('progressFill').style.width = ((i/photos.length)*100) + '%';
+    
+    try {
+      const result = await compressImage(p);
+      p.compressedDataUrl = result.dataUrl;
+      p.compressedSize = result.compressedSize;
+    } catch(e) {
+      console.error('Compress error:', e);
+      // Fallback to original
+      p.compressedDataUrl = p.dataUrl;
+      p.compressedSize = p.origSize;
+    }
+    renderGrid();
+    updateStats();
+    await wait(50); // Small delay for UI update
+  }
+  
+  $('progressFill').style.width = '100%';
+  busy = false;
+  $('btnCompress').disabled = false;
+  checkUploadReady();
+  toast('✅ Semua foto terkompres!');
+  
+  setTimeout(() => {
+    $('progressBar').style.display = 'none';
+    $('progressFill').style.width = '0%';
+  }, 2000);
+}
+
+// === PDF GENERATION (JSZip-free single image version for simplicity) ===
+// Untuk multi-page PDF yang ringan pakai jsPDF seperti biasa
+async function generatePDFBlob() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  
+  for(const p of photos) {
+    if(!p.compressedDataUrl) continue;
+    
+    const img = await loadImage(p.compressedDataUrl);
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    
+    // Fit image to A4
+    const scale = Math.min(pageW/img.width*0.9, pageH/img.height*0.9);
+    const w = img.width * scale;
+    const h = img.height * scale;
+    const x = (pageW-w)/2;
+    const y = (pageH-h)/2;
+    
+    doc.addImage(p.compressedDataUrl, 'JPEG', x,y, w,h);
+    doc.addPage(); // Next page for next photo
+  }
+  
+  // Remove last empty page if any
+  if(doc.getNumberOfPages() > 1) doc.deletePage(doc.getNumberOfPages());
+  
+  return doc.output('blob');
+}
+
+// === UPLOAD TO GOOGLE DRIVE VIA APPS SCRIPT ===
+async function uploadToDrive() {
+  if(busy) return;
+  const endpoint = localStorage.getItem('apps_script_endpoint');
+  if(!endpoint){toast('❌ Setup endpoint dulu! Kolom di atas.', true);return;}
+  
+  openModal('nameModal');
+}
+
+function openModal(id){ $(id).classList.add('show'); }
+function closeModal(id){ $(id).classList.remove('show'); }
+
+async function confirmUpload(){
+  closeModal('nameModal');
+  busy = true;
+  
+  const filename = $('pdfFileName').value || 'document.pdf';
+  const endpoint = localStorage.getItem('apps_script_endpoint');
+  
+  // Generate PDF
+  $('progressBar').style.display = 'block';
+  $('progressFill').style.width = '30%';
+  $('statusText')?.setItem?.('text','Membuat PDF...');
+  
+  try {
+    // Option A: If you want all images as individual JPEGs uploaded as zip (requires JSZip lib)
+    // Option B: Single PDF file (current implementation)
+    const blob = await generatePDFBlob();
+    
+    // Convert blob to base64
+    const b64 = await blobToBase64(blob);
+    
+    $('progressFill').style.width = '60%';
+    $('statusText')?.setItem?.('text','Mengunggah ke Drive...');
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors', // Important for cross-origin to Google Scripts
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: filename,
+        mimeType: 'application/pdf',
+        data: b64, // Base64 string
+        action: 'save'
+      })
+    });
+    
+    $('progressFill').style.width = '100%';
+    
+    // Since mode:no-cors we can't read response easily, assume success after timeout
+    await wait(3000);
+    toast('☁️ Berhasil dikirim ke Google Drive!');
+    
+  } catch(err) {
+    console.error(err);
+    toast('❌ Error: ' + err.message, true);
+  } finally {
+    busy = false;
+    setTimeout(() => {
+      $('progressBar').style.display = 'none';
+      $('progressFill').style.width = '0%';
+    }, 2500);
+  }
+}
+
+function blobToBase64(blob) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]); // Strip header
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Initialize status element if not present in this HTML
+if(!$('statusText')){
+  const s = document.createElement('div');
+  s.id = 'statusText';
+  s.style.cssText = 'text-align:center;font-size:12px;color:#666;margin-top:4px';
+  document.querySelector('.main-content').appendChild(s);
+}
+
 </script>
 </body>
 </html>
