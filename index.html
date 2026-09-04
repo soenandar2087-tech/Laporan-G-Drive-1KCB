@@ -3,41 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📁 Photo → PDF → Drive (Terstruktur)</title>
+<title>Dokumen 1KCB · Foto → PDF → Drive</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
-:root{--primary:#2563eb;--primary-dark:#1d4ed8;--panel:#f8fafc;--border:#c5cdd8;--border-strong:#94a3b8;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4;--radius:8px;--fs:11px}
+:root{--panel:#f8fafc;--border:#c5cdd8;--border-strong:#94a3b8;--primary:#2563eb;--primary-dark:#1d4ed8;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4;--radius:8px;--fs:11px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:transparent;color:var(--text);font-size:var(--fs);overflow-x:hidden;padding:6px}
 .app-wrap{border:2px solid var(--primary);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(37,99,235,.12);overflow:hidden}
-.app-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:linear-gradient(135deg,#eff6ff,#fff);border-bottom:2px solid var(--primary)}
+.app-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:linear-gradient(135deg,#eff6ff 0%,#fff 100%);border-bottom:2px solid var(--primary)}
 .app-head h1{font-size:13px;font-weight:800;color:var(--primary-dark)}
 .app-head small{font-size:10px;color:var(--muted);font-weight:500}
 .gear{background:#fff;border:1.5px solid var(--border-strong);border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer}
 .app-body{padding:8px}
-.container{display:grid;grid-template-columns:1fr;gap:8px}
-@media(min-width:600px){.container{grid-template-columns:270px 1fr}}
+.container{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch}
+@media(min-width:600px){.container{grid-template-columns:290px 1fr}}
 .left-col,.right-col{display:flex;flex-direction:column;min-height:0}
 .box{background:var(--panel);border:1.5px solid var(--border-strong);border-radius:var(--radius);padding:8px;margin-bottom:8px}
 .left-col .box:last-child{margin-bottom:0}
 .label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
-.select-group{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.select-group.full{grid-template-columns:1fr}
-select{width:100%;padding:6px 8px;border:1.5px solid var(--border);border-radius:5px;font-size:10px;background:#fff;color:var(--text);font-family:inherit;cursor:pointer;outline:none}
-select:focus{border-color:var(--primary)}
-.path-display{background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:6px;margin-top:6px;font-size:9px;color:#1e40af;line-height:1.4;word-break:break-word}
-#drop{border:2px dashed #93c5fd;background:#fff;border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer;transition:.2s}
+.step{border-color:var(--primary);background:#eff6ff}
+.step .label{color:var(--primary-dark)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sub{font-size:9px;font-weight:700;color:var(--muted);display:block;margin-bottom:2px}
+.path{font-size:10px;background:#fff;border:1.5px dashed var(--border-strong);border-radius:6px;padding:6px 8px;word-break:break-word;line-height:1.45}
+.path.ok{border-style:solid;border-color:#86efac;background:#f0fdf4}
+.path.bad{border-color:#fca5a5;background:#fef2f2}
+.badge{display:inline-block;min-width:16px;text-align:center;background:var(--primary);color:#fff;border-radius:10px;padding:0 5px;font-size:9px;margin-left:4px}
+#drop{border:2px dashed #93c5fd;background:#fff;border-radius:var(--radius);padding:12px 10px;text-align:center;cursor:pointer;transition:.2s}
 #drop:hover,#drop.over{border-color:var(--primary);background:#eff6ff}
 .icon{font-size:22px;display:block;margin-bottom:4px}
 .drop-text{font-weight:700;color:var(--primary);display:block;font-size:12px}
 .drop-sub{font-size:9px;color:var(--muted)}
-.chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.row2{display:flex;gap:6px;margin-top:6px}
+.row2 .btn{flex:1 1 0}
+details.box summary{cursor:pointer;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;list-style:none;display:flex;align-items:center;gap:4px}
+details.box summary::-webkit-details-marker{display:none}
+details.box summary::before{content:'▸';font-size:12px}
+details.box[open] summary::before{content:'▾'}
+.sec{margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.chips:last-child{margin-bottom:0}
 .chip{padding:3px 8px;border:1.5px solid var(--border);border-radius:12px;font-size:10px;cursor:pointer;background:#fff;font-weight:600}
 .chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-.slider-group{margin-bottom:6px}
+.slider-group{margin-bottom:6px}.slider-group:last-child{margin-bottom:0}
 .slider-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
 input[type=range]{width:100%;height:4px;padding:0}
+select,input[type=text]{width:100%;padding:6px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:11px;margin-bottom:6px;font-family:inherit;outline:none;background:#fff}
+select:focus,input[type=text]:focus{border-color:var(--primary)}
+input[type=text]:disabled{background:#f1f5f9;color:#64748b}
+.ck{font-size:10px;display:flex;align-items:center;gap:4px}.ck input{accent-color:var(--primary)}
+.setup{border-color:#fbbf24;background:#fffbeb}
+.setup .row{display:flex;gap:6px}
+.setup .hint{font-size:9px;color:#92400e;line-height:1.4;margin-top:4px;word-break:break-word}
 .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
 .stat-item{background:#fff;border:1.5px solid var(--border-strong);border-radius:6px;padding:5px 4px;text-align:center}
 .stat-val{font-weight:800;font-size:13px}
@@ -54,7 +71,8 @@ input[type=range]{width:100%;height:4px;padding:0}
 #emptyMsg{min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#9ca3af;font-size:10px}
 #emptyMsg span:first-child{font-size:24px}
 .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.btn{flex:1;min-width:80px;padding:8px 6px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;text-align:center}
+.btn{flex:1 1 30%;padding:8px 6px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;text-align:center}
+a.btn{text-decoration:none;display:inline-block}
 .btn-pri{background:var(--primary);color:#fff}.btn-suc{background:var(--success);color:#fff}
 .btn-cam{background:#f59e0b;color:#fff}.btn-drive{background:var(--drive);color:#fff}
 .btn-out{background:#fff;border:1.5px solid var(--border-strong);color:var(--text)}
@@ -63,20 +81,21 @@ input[type=range]{width:100%;height:4px;padding:0}
 .progress-container{height:4px;background:#e5e7eb;border-radius:2px;margin-top:8px;overflow:hidden;display:none}
 .progress-bar{height:100%;background:var(--primary);width:0%;transition:width .2s}
 .status-text{font-size:9px;color:var(--muted);margin-top:4px;text-align:center;word-break:break-word}
-#resultBox{display:none;margin-top:6px;padding:6px 8px;border:1.5px solid #86efac;background:#f0fdf4;border-radius:6px;font-size:10px;text-align:center;word-break:break-word}
-#resultBox a{color:var(--primary-dark);font-weight:700}
+#resultBox{display:none;margin-top:6px;padding:8px;border:1.5px solid #86efac;background:#f0fdf4;border-radius:6px;font-size:10px;text-align:center;word-break:break-word;line-height:1.5}
+#resultBox .rb-btns{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none;align-items:center;justify-content:center;padding:12px}
 .modal-overlay.show{display:flex}
 .modal-box{background:#fff;padding:16px;border-radius:10px;width:320px;max-width:100%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.22);border:2px solid var(--border-strong)}
 .modal-title{font-weight:800;margin-bottom:8px;font-size:13px}
-.modal-info{font-size:10px;color:var(--muted);margin:8px 0 2px}
-.modal-box input[type=text]{font-size:12px;padding:7px 8px;text-align:center;margin-bottom:0;width:100%;border:1.5px solid var(--border);border-radius:5px;outline:none}
-.modal-box input[type=text]:focus{border-color:var(--primary)}
+.modal-info{font-size:10px;color:var(--muted);margin:8px 0 2px;line-height:1.5;word-break:break-word}
+.modal-box input[type=text]{font-size:12px;padding:7px 8px;text-align:center;margin-bottom:0}
 .modal-btns{display:flex;gap:8px;margin-top:12px}
 .modal-btn{flex:1;padding:7px;border-radius:5px;border:none;font-weight:700;cursor:pointer;font-size:11px}
 .btn-yes{background:var(--danger);color:#fff}.btn-go{background:var(--success);color:#fff}.btn-no{background:#e5e7eb;color:var(--text)}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;font-size:11px;font-weight:700;padding:7px 14px;border-radius:6px;opacity:0;transition:.25s;pointer-events:none;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.15);max-width:92vw;text-align:center}
 .toast.show{opacity:1}.toast.error{background:var(--danger)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .5s}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
 </style>
 </head>
@@ -84,96 +103,112 @@ input[type=range]{width:100%;height:4px;padding:0}
 
 <div class="app-wrap">
   <div class="app-head">
-    <div><h1>📁 Photo → PDF → Drive</h1><small>Terstruktur per folder</small></div>
-    <button class="gear" onclick="toggleSetup()" title="Setup URL">⚙️</button>
+    <div>
+      <h1>📄 Dokumen 1KCB · Foto → PDF → Drive</h1>
+      <small id="connInfo">☁️ Drive: memeriksa…</small>
+    </div>
+    <button class="gear" onclick="toggleSetup()" title="Pengaturan koneksi">⚙️</button>
   </div>
 
   <div class="app-body">
     <div class="container">
 
-      <!-- ===== KIRI ===== -->
+      <!-- ================= KIRI ================= -->
       <div class="left-col">
-        
-        <!-- PILIHAN FOLDER -->
-        <div class="box" style="border-color:#fbbf24;background:#fffbeb">
-          <span class="label">📂 Tujuan Penyimpanan</span>
-          
-          <span class="label" style="margin-top:8px">Tahun</span>
-          <select id="selTahun" onchange="updatePath()">
-            <option value="">-- Pilih Tahun --</option>
-          </select>
 
-          <span class="label" style="margin-top:6px">Bulan</span>
-          <select id="selBulan" onchange="updatePath()">
-            <option value="">-- Pilih Bulan --</option>
-          </select>
-
-          <span class="label" style="margin-top:6px">Afdeling</span>
-          <select id="selAfdeling" onchange="updatePath()">
-            <option value="">-- Pilih Afdeling --</option>
-          </select>
-
-          <span class="label" style="margin-top:6px">Jenis Dokumen</span>
-          <select id="selJenisDoc" onchange="updatePath()">
-            <option value="">-- Pilih Jenis --</option>
-          </select>
-
-          <div class="path-display" id="pathDisplay">📂 Belum ada pilihan</div>
+        <!-- ① TUJUAN DOKUMEN -->
+        <div class="box step" id="stepDest">
+          <span class="label">① Tujuan Dokumen</span>
+          <div class="grid2">
+            <div>
+              <span class="sub">Afdeling *</span>
+              <select id="selAfd"></select>
+              <input type="text" id="afdOther" placeholder="Ketik nama afdeling…" style="display:none">
+            </div>
+            <div>
+              <span class="sub">Jenis Dokumen *</span>
+              <select id="selJenis"></select>
+              <input type="text" id="jenisOther" placeholder="Ketik jenis dokumen…" style="display:none">
+            </div>
+          </div>
+          <div class="grid2">
+            <div><span class="sub">Tahun</span><select id="selTahun"></select></div>
+            <div><span class="sub">Bulan</span><select id="selBulan"></select></div>
+          </div>
+          <div class="path bad" id="pathPreview">📁 …</div>
         </div>
 
-        <!-- DROP ZONE -->
+        <!-- ② AMBIL FOTO -->
         <div class="box">
+          <span class="label">② Ambil Foto <span class="badge" id="fotoBadge">0</span></span>
           <div id="drop">
             <span class="icon">📁</span>
             <span class="drop-text">Klik / Drop Foto</span>
-            <span class="drop-sub">JPG · PNG · WEBP</span>
+            <span class="drop-sub">JPG · PNG · WEBP · bisa banyak sekaligus</span>
+          </div>
+          <div class="row2">
+            <button class="btn btn-cam" onclick="openCamera()">📷 Kamera</button>
+            <button class="btn btn-out" onclick="openGallery()">🖼 Galeri</button>
           </div>
           <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
           <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
         </div>
 
-        <!-- KOMPRESI -->
-        <div class="box">
-          <span class="label">Target Ukuran</span>
-          <div class="chips" id="targetChips">
-            <div class="chip" data-v="0.5">500KB</div>
-            <div class="chip" data-v="1">1MB</div>
-            <div class="chip active" data-v="5">5MB</div>
-            <div class="chip" data-v="10">10MB</div>
-            <div class="chip" data-v="0">⬇ Min</div>
+        <!-- ⚙ PENGATURAN (opsional, terlipat di HP) -->
+        <details class="box" id="advBox">
+          <summary>⚙️ Kompresi &amp; PDF (opsional)</summary>
+          <div class="sec">
+            <span class="label">Target Ukuran / Foto</span>
+            <div class="chips" id="targetChips">
+              <div class="chip" data-v="0.5">500KB</div>
+              <div class="chip" data-v="1">1MB</div>
+              <div class="chip active" data-v="5">5MB</div>
+              <div class="chip" data-v="10">10MB</div>
+              <div class="chip" data-v="0">⬇ Min</div>
+            </div>
           </div>
-        </div>
+          <div class="sec">
+            <span class="label">Mode Kompresi</span>
+            <div class="chips" id="modeChips" style="margin-bottom:6px">
+              <div class="chip active" data-m="bal">⚖ Seimbang</div>
+              <div class="chip" data-m="size">⚡ Kecil</div>
+              <div class="chip" data-m="qual">✨ Kualitas</div>
+            </div>
+            <div class="slider-group">
+              <div class="slider-row"><span>Resolusi</span><span id="valRes">2000px</span></div>
+              <input type="range" id="inpRes" min="500" max="4000" step="100" value="2000">
+            </div>
+            <div class="slider-group">
+              <div class="slider-row"><span>Kualitas</span><span id="valQual">70%</span></div>
+              <input type="range" id="inpQual" min="10" max="100" value="70">
+            </div>
+          </div>
+          <div class="sec">
+            <span class="label">Output PDF</span>
+            <select id="pdfSize">
+              <option value="a4">A4</option>
+              <option value="letter">Letter</option>
+              <option value="a5">A5</option>
+              <option value="fit">Sesuai Foto</option>
+            </select>
+            <label class="ck"><input type="checkbox" id="pdfNum"> Nomor Halaman</label>
+          </div>
+        </details>
 
-        <div class="box">
-          <span class="label">Mode Kompresi</span>
-          <div class="chips" id="modeChips">
-            <div class="chip active" data-m="bal">⚖ Seimbang</div>
-            <div class="chip" data-m="size">⚡ Kecil</div>
-            <div class="chip" data-m="qual">✨ Kualitas</div>
+        <!-- KONEKSI APPS SCRIPT -->
+        <div class="box setup" id="setupBox">
+          <span class="label">🔌 URL Web App Apps Script</span>
+          <input type="text" id="endpointInput" placeholder="https://script.google.com/macros/s/AKfycbxPC2k1lwB_7FQs8JkGX_aFB0qvFkEIKfqe1LJtqso4pVQQ8yToOUFb8BS7mBWanbwCZA/exec">
+          <div class="row">
+            <button class="btn btn-out" id="btnSaveEp" onclick="saveEndpoint()">💾 Simpan</button>
+            <button class="btn btn-pri" onclick="testEndpoint()">🔍 Tes Koneksi</button>
           </div>
-          <div class="slider-group">
-            <div class="slider-row"><span>Resolusi</span><span id="valRes">2000px</span></div>
-            <input type="range" id="inpRes" min="500" max="4000" step="100" value="2000">
-          </div>
-          <div class="slider-group">
-            <div class="slider-row"><span>Kualitas</span><span id="valQual">70%</span></div>
-            <input type="range" id="inpQual" min="10" max="100" value="70">
-          </div>
-        </div>
-
-        <!-- SETUP -->
-        <div class="box" id="setupBox" style="display:none">
-          <span class="label">🔌 URL Apps Script</span>
-          <input type="text" id="endpointInput" placeholder="https://script.google.com/macros/s/AKfycbyT_u1F3pqo83hoys97LCgoF32cuPHM0VgohfKSb2_MHVjO0E-nuaq1eMzd5L71Hx-40g/exec" style="width:100%;padding:5px;border:1.5px solid var(--border);border-radius:5px;font-size:10px;margin-bottom:6px">
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-out btn-sm" style="flex:1" onclick="saveEndpoint()">💾 Simpan</button>
-            <button class="btn btn-pri btn-sm" style="flex:1" onclick="testEndpoint()">🔍 Tes</button>
-          </div>
-          <div style="font-size:9px;color:#855d0e;margin-top:6px" id="epStatus"></div>
+          <div class="hint" id="epStatus">Belum diatur.</div>
+          <div class="hint">Deploy → Web app → Execute as: <b>Me</b> · Who has access: <b>Anyone</b>. Pakai URL berakhiran <b>/exec</b>.</div>
         </div>
       </div>
 
-      <!-- ===== KANAN ===== -->
+      <!-- ================= KANAN ================= -->
       <div class="right-col">
         <div class="stats-bar">
           <div class="stat-item"><span class="label" style="margin:0">Foto</span><div class="stat-val c-blue" id="stCount">0</div></div>
@@ -184,7 +219,7 @@ input[type=range]{width:100%;height:4px;padding:0}
 
         <div class="preview-area">
           <div class="preview-head">
-            <span class="label" style="margin:0">🗂 Preview</span>
+            <span class="label" style="margin:0">🗂 Preview (geser untuk urutkan)</span>
             <button class="btn btn-out btn-sm" onclick="askDeleteAll()">🗑 Hapus Semua</button>
           </div>
           <div class="grid-scroll">
@@ -194,11 +229,11 @@ input[type=range]{width:100%;height:4px;padding:0}
         </div>
 
         <div class="actions">
-          <button class="btn btn-out" onclick="document.getElementById('fileInput').click()">＋ Galeri</button>
-          <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
+          <button class="btn btn-out" onclick="openGallery()">＋ Tambah</button>
+          <button class="btn btn-cam" onclick="openCamera()">📷 Kamera</button>
           <button class="btn btn-pri" id="btnComp" disabled onclick="processCompress()">🔄 Compress</button>
-          <button class="btn btn-suc" id="btnPdf" disabled onclick="askDownload()">⬇ PDF</button>
-          <button class="btn btn-drive" id="btnDrive" disabled onclick="askSave()">☁️ Kirim</button>
+          <button class="btn btn-suc" id="btnPdf" disabled onclick="askName('download')">⬇ PDF</button>
+          <button class="btn btn-drive" id="btnDrive" disabled onclick="askName('drive')">☁️ Kirim ke Drive</button>
         </div>
 
         <div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
@@ -210,24 +245,11 @@ input[type=range]{width:100%;height:4px;padding:0}
   </div>
 </div>
 
-<!-- MODAL NAMA FILE -->
-<div class="modal-overlay" id="pdfModal">
-  <div class="modal-box">
-    <div class="modal-title" id="modalTitle">Nama File PDF</div>
-    <input type="text" id="modalFileName" placeholder="laporan" value="">
-    <div class="modal-info" id="pdfModalInfo"></div>
-    <div class="modal-btns">
-      <button class="modal-btn btn-no" onclick="closeModal('pdfModal')">Batal</button>
-      <button class="modal-btn btn-go" id="modalGo" onclick="confirmSave()">OK</button>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL HAPUS SEMUA -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
-    <div class="modal-title">🗑 Hapus Semua?</div>
-    <div style="font-size:11px;color:#666">Semua foto akan hilang.</div>
+    <div class="modal-title">🗑 Hapus Semua Foto?</div>
+    <div style="font-size:11px;color:#666">Semua foto yang sudah dimuat akan hilang.</div>
     <div class="modal-btns">
       <button class="modal-btn btn-no" onclick="closeModal('confirmModal')">Batal</button>
       <button class="modal-btn btn-yes" onclick="doDeleteAll()">Hapus</button>
@@ -235,111 +257,160 @@ input[type=range]{width:100%;height:4px;padding:0}
   </div>
 </div>
 
+<!-- MODAL NAMA FILE -->
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">💾 Nama File</div>
+    <input type="text" id="modalFileName" placeholder="nama-file">
+    <div class="modal-info" id="pdfModalInfo"></div>
+    <div class="modal-btns">
+      <button class="modal-btn btn-no" onclick="closeModal('pdfModal')">Batal</button>
+      <button class="modal-btn btn-go" id="modalGo" onclick="confirmName()">OK</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const {jsPDF}=window.jspdf;
+const { jsPDF } = window.jspdf;
 
-const DEFAULT_ENDPOINT=''; // Isi dengan URL /exec Anda di sini supaya otomatis
+/* ==================== KONFIGURASI PEMILIK (ubah di sini) ==================== */
+const DEFAULT_ENDPOINT = '';
+/* ↑ Tempel URL Web App Apps Script (…/exec) di antara tanda kutip, contoh:
+   const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycb…/exec';
+   Bila diisi, pengguna tidak perlu mengatur apa pun.                            */
 
-let photos=[],targetMB=5,mode='bal',busy=false,pdfName='',pendingAction='';
-let configData={afdeling:[],jenisDoc:[]};
+const ROOT_LABEL = 'Dokumen 1KCB';   // nama folder induk (untuk tampilan; folder asli dibuat Code.gs)
+
+const AFDELING_LIST = [
+  'Afdeling I', 'Afdeling II', 'Afdeling III', 'Afdeling IV', 'Afdeling V', 'Afdeling VI''
+];
+const JENIS_LIST = [
+  'Peta Pemeliharaan', 'Dokumentasi Pemel', 'Peta Real Pemupukan', 'Dokumentasi Pemupukan',
+  'SP Pupuk', 'Slip Mobilisasi Pemupukan', 'Lamp.Angkut TBS', 'Lamp Jangkos', 'SP Jangkos', 'Lamp Pok TBS', 'Slip Mobilisasi Pemel''
+];
+const ALLOW_OTHER = true;   // true = ada pilihan "Lainnya (ketik sendiri)…"
+/* ============================================================================ */
+
+const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+let photos=[], targetMB=5, mode='bal', busy=false, pdfName='dokumen.pdf', pendingAction=null, rootLabel=ROOT_LABEL;
 
 const $=id=>document.getElementById(id);
 const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Gambar error'));i.src=src;});
-const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('File error'));r.readAsDataURL(f);});
-const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('Encode error'));r.readAsDataURL(b);});
 const pad=n=>String(n).padStart(2,'0');
-const dateStamp=()=>{const d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes());};
-const isValidEndpoint=u=>/^https:\/\/script\.google\.com\/.+\/exec$/.test(u);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ls={get:k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Gambar tidak bisa dibaca'));i.src=src;});
+const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Gagal membaca file'));r.readAsDataURL(f);});
+const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('Gagal encode file'));r.readAsDataURL(b);});
 
-let tT;
+let tT,hT;
 function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3500);}
 function setStatus(m){$('statusText').textContent=m;}
-function setProg(p){$('progCont').style.display='block';$('progBar').style.width=Math.min(100,Math.max(0,p))+'%';}
-function hideProg(){setTimeout(()=>{$('progCont').style.display='none';$('progBar').style.width='0%';},1500);}
+function setProg(p){clearTimeout(hT);$('progCont').style.display='block';$('progBar').style.width=Math.min(100,Math.max(0,p))+'%';}
+function hideProg(){hT=setTimeout(()=>{$('progCont').style.display='none';$('progBar').style.width='0%';},1500);}
 
-/* INIT DROPDOWN TAHUN */
-(function(){
-  const now=new Date().getFullYear();
-  for(let y=now;y>=now-5;y--){
-    const opt=document.createElement('option');
-    opt.value=y; opt.textContent=y;
-    $('selTahun').appendChild(opt);
-  }
-})();
+/* ================= ① TUJUAN DOKUMEN ================= */
+const selAfd=$('selAfd'), selJenis=$('selJenis'), selTahun=$('selTahun'), selBulan=$('selBulan'), afdOther=$('afdOther'), jenisOther=$('jenisOther');
 
-const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-
-/* INIT DROPDOWN BULAN */
-(function(){
-  MONTHS.forEach((m,i)=>{const opt=document.createElement('option');opt.value=m;opt.textContent=m;$('selBulan').appendChild(opt);});
-})();
-
-/* LOAD CONFIG DARI APPS SCRIPT */
-async function loadConfig(){
-  const ep=getEndpoint();
-  if(!ep)return;
-  try{
-    const j=await callEndpoint(ep,null);
-    configData=j.config||{afdeling:[],jenisDoc:[]};
-    populateSelects();
-  }catch(e){
-    console.error('Config load error:',e);
-  }
+function fillSelect(sel,list,ph){
+  sel.innerHTML='';
+  sel.add(new Option(ph,''));
+  list.forEach(v=>sel.add(new Option(v,v)));
+  if(ALLOW_OTHER) sel.add(new Option('Lainnya (ketik sendiri)…','__other__'));
 }
-
-function populateSelects(){
-  const af=$('selAfdeling'), jd=$('selJenisDoc');
-  af.innerHTML='<option value="">-- Pilih Afdeling --</option>';
-  jd.innerHTML='<option value="">-- Pilih Jenis --</option>';
-  (configData.afdeling||[]).forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;af.appendChild(o);});
-  (configData.jenisDoc||[]).forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;jd.appendChild(o);});
+function restore(sel,inp,k1,k2){
+  const v=ls.get(k1);
+  if(v){ sel.value=v; if(sel.value!==v) sel.selectedIndex=0; }
+  inp.value=ls.get(k2);
 }
-
+function initDest(){
+  fillSelect(selAfd,AFDELING_LIST,'-- Pilih Afdeling --');
+  fillSelect(selJenis,JENIS_LIST,'-- Pilih Jenis --');
+  const now=new Date(), Y=now.getFullYear();
+  for(let y=Y-3;y<=Y+1;y++) selTahun.add(new Option(String(y),String(y)));
+  selTahun.value=String(Y);
+  BULAN.forEach((b,i)=>selBulan.add(new Option(pad(i+1)+' - '+b,pad(i+1)+' - '+b)));
+  selBulan.selectedIndex=now.getMonth();
+  restore(selAfd,afdOther,'dest_afd','dest_afd_txt');
+  restore(selJenis,jenisOther,'dest_jenis','dest_jenis_txt');
+  [selAfd,selJenis].forEach(s=>s.addEventListener('change',onDestChange));
+  [afdOther,jenisOther].forEach(i=>i.addEventListener('input',updatePath));
+  [selTahun,selBulan].forEach(s=>s.addEventListener('change',updatePath));
+  onDestChange();
+}
+function onDestChange(){
+  afdOther.style.display=selAfd.value==='__other__'?'block':'none';
+  jenisOther.style.display=selJenis.value==='__other__'?'block':'none';
+  updatePath();
+}
+function getDest(){
+  const afd=selAfd.value==='__other__'?afdOther.value.trim():selAfd.value;
+  const jenis=selJenis.value==='__other__'?jenisOther.value.trim():selJenis.value;
+  return {afd,jenis,tahun:selTahun.value,bulan:selBulan.value};
+}
+function destOk(){const d=getDest();return !!(d.afd&&d.jenis&&d.tahun&&d.bulan);}
+function destPath(){const d=getDest();return [d.tahun,d.bulan,d.afd||'(Afdeling?)',d.jenis||'(Jenis?)'];}
+function destText(){return [rootLabel].concat(destPath()).join(' / ');}
 function updatePath(){
-  const t=$('selTahun').value, b=$('selBulan').value, a=$('selAfdeling').value, j=$('selJenisDoc').value;
-  const parts=[t,b,a,j].filter(x=>x);
-  $('pathDisplay').textContent=parts.length?'📂 '+parts.join(' → '):'📂 Belum ada pilihan';
+  const ok=destOk(), el=$('pathPreview');
+  el.textContent='📁 '+destText()+(ok?'':'  ← lengkapi Afdeling & Jenis');
+  el.className='path '+(ok?'ok':'bad');
+  ls.set('dest_afd',selAfd.value); ls.set('dest_afd_txt',afdOther.value);
+  ls.set('dest_jenis',selJenis.value); ls.set('dest_jenis_txt',jenisOther.value);
+}
+function requireDest(){
+  if(destOk()) return true;
+  const d=getDest();
+  const el=!d.afd?(selAfd.value==='__other__'?afdOther:selAfd):(selJenis.value==='__other__'?jenisOther:selJenis);
+  toast('⚠️ Lengkapi dulu ① Tujuan Dokumen (Afdeling & Jenis)',true);
+  const box=$('stepDest'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+  box.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>el.focus(),350);
+  return false;
+}
+function defaultName(){
+  const d=getDest(), n=new Date();
+  return (n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+'_'+pad(n.getHours())+pad(n.getMinutes())+' '+(d.jenis||'Dokumen')+' '+(d.afd||'')).trim();
 }
 
-function getFolderParams(){
-  return{tahun:$('selTahun').value,bulan:$('selBulan').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value};
-}
-
-/* FILE UPLOAD */
+/* ================= ② AMBIL FOTO ================= */
+function openGallery(){ if(!requireDest()) return; $('fileInput').click(); }
+function openCamera(){ if(!requireDest()) return; $('cameraInput').click(); }
 const drop=$('drop');
-drop.onclick=()=>$('fileInput').click();
+drop.onclick=openGallery;
 drop.ondragover=e=>{e.preventDefault();drop.classList.add('over');};
 drop.ondragleave=()=>drop.classList.remove('over');
-drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files);};
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');if(!requireDest())return;handleFiles(e.dataTransfer.files);};
 $('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
 $('cameraInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('drop',e=>e.preventDefault());
 
 async function handleFiles(files){
   const list=[...files].filter(f=>f.type.startsWith('image/'));
-  if(!list.length)return;
+  if(!list.length) return;
   setStatus('Memuat '+list.length+' foto...');
   let added=0;
   for(const f of list){
     try{
       const dataUrl=await readAsDataURL(f);
       const img=await loadImg(dataUrl);
-      photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2),name:f.name,origSize:f.size,dataUrl,w:img.naturalWidth,h:img.naturalHeight,compData:null,compSize:null});
+      photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2),name:f.name,origSize:f.size,dataUrl,
+                   w:img.naturalWidth,h:img.naturalHeight,compData:null,compSize:null});
       added++;
     }catch(e){toast('❌ '+f.name+': '+e.message,true);}
   }
   renderGrid();
-  if(added)setStatus(added+' foto ditambahkan.');
+  if(added){setStatus(added+' foto ditambahkan · total '+photos.length);toast('📷 '+added+' foto ditambahkan (total '+photos.length+')');}
 }
 
-/* RENDER */
+/* ================= RENDER ================= */
 function renderGrid(){
-  const grid=$('grid');grid.innerHTML='';
+  const grid=$('grid'); grid.innerHTML='';
   $('emptyMsg').style.display=photos.length?'none':'flex';
+  $('fotoBadge').textContent=photos.length;
   const tO=photos.reduce((s,p)=>s+p.origSize,0);
   const tC=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
   const done=photos.some(p=>p.compData);
@@ -351,192 +422,219 @@ function renderGrid(){
 
   photos.forEach((p,i)=>{
     const d=document.createElement('div');
-    d.className='thumb';d.dataset.id=p.id;
-    d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del">×</button>'+
+    d.className='thumb'; d.dataset.id=p.id;
+    d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del" title="Hapus">×</button>'+
                 '<img src="'+(p.compData||p.dataUrl)+'">'+
                 '<div class="thumb-size">'+fmt(p.origSize)+(p.compSize?' → '+fmt(p.compSize):'')+'</div>';
     d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();if(busy)return;photos=photos.filter(x=>x.id!==p.id);renderGrid();};
     grid.appendChild(d);
   });
-  if(window.sortInst)window.sortInst.destroy();
+  if(window.sortInst) window.sortInst.destroy();
   window.sortInst=new Sortable(grid,{animation:150,onEnd:()=>{
     const ids=[...grid.children].map(el=>el.dataset.id);
-    photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));renderGrid();
+    photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id)); renderGrid();
   }});
 }
 
-/* SETTINGS */
+/* ================= MODAL ================= */
+function openModal(id){$(id).classList.add('show');}
+function closeModal(id){$(id).classList.remove('show');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+function askDeleteAll(){if(photos.length&&!busy)openModal('confirmModal');}
+function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');setStatus('Semua foto dihapus.');$('resultBox').style.display='none';}
+
+function askName(action){
+  if(!photos.length||busy) return;
+  if(!requireDest()) return;
+  if(action==='drive'&&!getEndpoint()){toast('❌ URL Apps Script belum diisi (klik ⚙️)',true);showSetup(true);return;}
+  pendingAction=action;
+  $('modalTitle').textContent=action==='drive'?'☁️ Kirim ke Google Drive':'⬇ Simpan PDF';
+  $('modalGo').textContent=action==='drive'?'☁️ Kirim':'⬇ Download';
+  const est=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
+  $('pdfModalInfo').innerHTML=photos.length+' halaman · ± '+fmt(est*1.05)+' · .pdf otomatis'+
+    (action==='drive'?'<br><b>📁 '+esc(destText())+'</b>':'');
+  const inp=$('modalFileName'); inp.value=defaultName();
+  openModal('pdfModal'); setTimeout(()=>{inp.focus();inp.select();},50);
+}
+$('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmName();if(e.key==='Escape')closeModal('pdfModal');});
+function confirmName(){
+  let n=($('modalFileName').value||'').trim().replace(/[\\/:*?"<>|]+/g,'-')||'dokumen';
+  if(!/\.pdf$/i.test(n)) n+='.pdf';
+  pdfName=n; closeModal('pdfModal');
+  if(pendingAction==='drive') sendToDrive(); else downloadPdf();
+}
+
+/* ================= SETTINGS ================= */
 $('targetChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('targetChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');targetMB=parseFloat(c.dataset.v);autoAdjust();};
 $('modeChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('modeChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');mode=c.dataset.m;autoAdjust();};
 $('inpRes').oninput=e=>$('valRes').textContent=e.target.value+'px';
 $('inpQual').oninput=e=>$('valQual').textContent=e.target.value+'%';
-function autoAdjust(){if(mode==='qual'){$('inpRes').value=3000;$('inpQual').value=90;}else if(mode==='size'){$('inpRes').value=1200;$('inpQual').value=50;}else{if(targetMB<=1){$('inpRes').value=1500;$('inpQual').value=60;}else if(targetMB<=5){$('inpRes').value=2000;$('inpQual').value=70;}else{$('inpRes').value=2500;$('inpQual').value=80;}}$('valRes').textContent=$('inpRes').value+'px';$('valQual').textContent=$('inpQual').value+'%';}
+function autoAdjust(){
+  if(mode==='qual'){$('inpRes').value=3000;$('inpQual').value=90;}
+  else if(mode==='size'){$('inpRes').value=1200;$('inpQual').value=50;}
+  else{
+    if(targetMB<=1){$('inpRes').value=1500;$('inpQual').value=60;}
+    else if(targetMB<=5){$('inpRes').value=2000;$('inpQual').value=70;}
+    else{$('inpRes').value=2500;$('inpQual').value=80;}
+  }
+  $('valRes').textContent=$('inpRes').value+'px';
+  $('valQual').textContent=$('inpQual').value+'%';
+}
 autoAdjust();
 
-/* COMPRESS */
+/* ================= COMPRESS ================= */
 async function compressImage(p,maxRes,quality){
   const img=await loadImg(p.dataUrl);
   let w=img.naturalWidth,h=img.naturalHeight;
   if(Math.max(w,h)>maxRes){const r=maxRes/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
-  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
   const ctx=cv.getContext('2d');
   const draw=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);};
   draw();
-  let q=quality/100,dataUrl=cv.toDataURL('image/jpeg',q),size=Math.round(dataUrl.length*0.75);
+  let q=quality/100, dataUrl=cv.toDataURL('image/jpeg',q), size=Math.round(dataUrl.length*0.75);
   const tb=targetMB>0?targetMB*1048576:Infinity;
   let guard=0;
   while(size>tb&&q>0.2&&guard++<12){q=Math.max(0.2,q-0.08);dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75);}
   guard=0;
-  while(size>tb&&Math.max(w,h)>600&&guard++<6){w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;draw();dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75);}
-  return{dataUrl,size,w,h};
+  while(size>tb&&Math.max(w,h)>600&&guard++<6){
+    w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;draw();
+    dataUrl=cv.toDataURL('image/jpeg',q);size=Math.round(dataUrl.length*0.75);
+  }
+  return {dataUrl,size,w,h};
 }
-
 async function doCompress(onlyMissing){
-  const maxRes=+$('inpRes').value,qual=+$('inpQual').value;
+  const maxRes=+$('inpRes').value, qual=+$('inpQual').value;
   const list=onlyMissing?photos.filter(p=>!p.compData):photos;
   for(let i=0;i<list.length;i++){
-    setStatus('Compress '+(i+1)+'/'+list.length+'...');setProg((i+1)/list.length*100);await wait(20);
+    setStatus('Compress '+(i+1)+'/'+list.length+'...'); setProg((i+1)/list.length*100); await wait(20);
     try{const r=await compressImage(list[i],maxRes,qual);Object.assign(list[i],{compData:r.dataUrl,compSize:r.size,w:r.w,h:r.h});}
     catch(e){list[i].compData=list[i].dataUrl;list[i].compSize=list[i].origSize;}
     renderGrid();
   }
 }
-
 async function processCompress(){
-  if(busy||!photos.length)return;
-  busy=true;renderGrid();
+  if(busy||!photos.length) return;
+  busy=true; renderGrid();
   await doCompress(false);
-  busy=false;renderGrid();
-  setStatus('✅ Kompresi selesai!');toast('✅ Selesai');hideProg();
+  busy=false; renderGrid();
+  setStatus('✅ Kompresi selesai!'); toast('✅ Kompresi selesai'); hideProg();
 }
 
-/* PDF */
+/* ================= PDF ================= */
 async function buildPdf(p0,p1){
-  if(photos.some(p=>!p.compData))await doCompress(true);
-  const pdfSize=$('pdfSize').value||'a4',showNum=$('pdfNum')?.checked;
+  if(photos.some(p=>!p.compData)) await doCompress(true);
+  const pdfSize=$('pdfSize').value, showNum=$('pdfNum').checked;
   let pdf=null;
   for(let i=0;i<photos.length;i++){
-    const p=photos[i],land=p.w>p.h,type=/^data:image\/png/i.test(p.compData)?'PNG':'JPEG';
+    const p=photos[i], land=p.w>p.h, type=/^data:image\/png/i.test(p.compData)?'PNG':'JPEG';
     if(pdfSize==='fit'){
-      const W=p.w*0.2646,H=p.h*0.2646;
-      if(i===0)pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:[W,H]});else pdf.addPage([W,H],land?'l':'p');
+      const W=p.w*0.2646, H=p.h*0.2646;
+      if(i===0) pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:[W,H]}); else pdf.addPage([W,H],land?'l':'p');
       pdf.addImage(p.compData,type,0,0,W,H,undefined,'FAST');
     }else{
       const o=land?'l':'p';
-      if(i===0)pdf=new jsPDF({orientation:o,unit:'mm',format:pdfSize});else pdf.addPage(pdfSize,o);
-      const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
-      const r=Math.min(PW/p.w,PH/p.h),w=p.w*r,h=p.h*r;
+      if(i===0) pdf=new jsPDF({orientation:o,unit:'mm',format:pdfSize}); else pdf.addPage(pdfSize,o);
+      const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
+      const r=Math.min(PW/p.w,PH/p.h), w=p.w*r, h=p.h*r;
       pdf.addImage(p.compData,type,(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
       if(showNum){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+' / '+photos.length,PW/2,PH-4,{align:'center'});}
     }
-    setStatus('Menyusun '+(i+1)+'/'+photos.length+'...');setProg(p0+(p1-p0)*(i+1)/photos.length);await wait(10);
+    setStatus('Menyusun halaman '+(i+1)+'/'+photos.length+'...'); setProg(p0+(p1-p0)*(i+1)/photos.length); await wait(10);
   }
   return pdf;
 }
-
-async function askDownload(){
-  if(!photos.length||busy)return;
-  const est=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0);
-  $('modalTitle').textContent='⬇ Download PDF';
-  $('pdfModalInfo').textContent=photos.length+' halaman · ~'+fmt(est*1.05)+' · .pdf otomatis';
-  $('modalGo').textContent='⬇ Download';
-  const inp=$('modalFileName');if(!inp.value.trim())inp.value='laporan-'+dateStamp();
-  pendingAction='download';
-  openModal('pdfModal');setTimeout(()=>{inp.focus();inp.select();},50);
-}
-
-async function askSave(){
-  if(!photos.length||busy)return;
-  const p=getFolderParams();
-  if(!p.tahun||!p.bulan||!p.afdeling||!p.jenisDoc){toast('❌ Pilih tahun, bulan, afdeling, dan jenis dokumen dulu!',true);return;}
-  const est=photos.reduce((s,ph)=>s+(ph.compSize||ph.origSize),0);
-  $('modalTitle').textContent='☁️ Kirim ke Google Drive';
-  $('pdfModalInfo').textContent=photos.length+' halaman · ~'+fmt(est*1.05)+' · '+p.tahun+' → '+p.bulan+' → '+p.afdeling+' → '+p.jenisDoc;
-  $('modalGo').textContent='☁️ Kirim';
-  const inp=$('modalFileName');if(!inp.value.trim())inp.value='laporan-'+dateStamp();
-  pendingAction='drive';
-  openModal('pdfModal');setTimeout(()=>{inp.focus();inp.select();},50);
-}
-
-function confirmSave(){
-  let n=($('modalFileName').value||'').trim().replace(/[\\/:*?"<>|]+/g,'-')||'hasil-foto';
-  if(!/\.pdf$/i.test(n))n+='.pdf';
-  pdfName=n;closeModal('pdfModal');
-  if(pendingAction==='download')downloadPdf();else sendToDrive();
-}
-
 async function downloadPdf(){
-  if(busy)return;busy=true;renderGrid();$('resultBox').style.display='none';
+  if(busy) return; busy=true; renderGrid(); $('resultBox').style.display='none';
   try{
     const pdf=await buildPdf(0,95);
     const blob=pdf.output('blob');
     pdf.save(pdfName);
-    setProg(100);setStatus('✅ '+pdfName+' ('+fmt(blob.size)+')');toast('✅ PDF dibuat!');
+    setProg(100); setStatus('✅ '+pdfName+' ('+fmt(blob.size)+')'); toast('✅ PDF "'+pdfName+'" berhasil dibuat!');
   }catch(e){console.error(e);setStatus('❌ '+e.message);toast('❌ '+e.message,true);}
   finally{busy=false;renderGrid();hideProg();}
 }
 
-/* DRIVE */
-function getEndpoint(){return(DEFAULT_ENDPOINT||'').trim()||(localStorage.getItem('gas_endpoint')||'').trim();}
-function saveEndpoint(){const url=$('endpointInput').value.trim();if(!url){localStorage.removeItem('gas_endpoint');refreshSetupUI();toast('URL dihapus');return;}if(!isValidEndpoint(url)){toast('❌ URL harus dari script.google.com berakhiran /exec',true);return;}localStorage.setItem('gas_endpoint',url);refreshSetupUI();toast('✅ URL tersimpan. Klik "Tes".');}
-function toggleSetup(){$('setupBox').style.display=$('setupBox').style.display==='none'?'block':'none';}
-function refreshSetupUI(){const fixed=!!(DEFAULT_ENDPOINT||'').trim(),inp=$('endpointInput');if(fixed){inp.value=DEFAULT_ENDPOINT.trim();inp.disabled=true;$('btnSaveEp')?.style?.setProperty?.('display','none');$('epStatus').textContent='🔒 Dari kode';}else{const s=localStorage.getItem('gas_endpoint')||'';inp.value=s;$('epStatus').textContent=s?'💾 Tersimpan':'Belum diatur';}$('setupBox').style.display=getEndpoint()?'none':'block';}
-
+/* ================= GOOGLE DRIVE via APPS SCRIPT ================= */
+function getEndpoint(){return (DEFAULT_ENDPOINT||'').trim()||ls.get('gas_endpoint').trim();}
+function isValidEndpoint(u){return /^https:\/\/script\.google\.com\/.+\/exec$/.test(u);}
+function saveEndpoint(){
+  const url=$('endpointInput').value.trim();
+  if(!url){ls.del('gas_endpoint');refreshSetupUI();toast('URL dihapus');pingEndpoint();return;}
+  if(!isValidEndpoint(url)){toast('❌ URL harus dari script.google.com dan berakhiran /exec (bukan /dev)',true);return;}
+  ls.set('gas_endpoint',url); refreshSetupUI(); toast('✅ URL tersimpan.'); pingEndpoint();
+}
+/* Tanpa header Content-Type (text/plain) supaya tidak kena preflight CORS. */
 async function callEndpoint(url,payload){
   const opt=payload?{method:'POST',body:JSON.stringify(payload)}:{method:'GET'};
   let res;
-  try{res=await fetch(url,opt);}catch(e){throw new Error('Tidak terhubung');}
+  try{res=await fetch(url,opt);}
+  catch(e){throw new Error('Tidak bisa terhubung ke Apps Script (cek internet, URL, dan akses "Anyone")');}
   const txt=await res.text();
-  let j;try{j=JSON.parse(txt);}catch(e){throw new Error('Respon bukan JSON');}
-  if(!j.ok)throw new Error(j.error||'Error');
+  let j; try{j=JSON.parse(txt);}
+  catch(e){throw new Error('Respon bukan JSON. Pastikan deploy Web App: Execute as = Me, Who has access = Anyone, dan sudah buat VERSI BARU setelah edit Code.gs');}
+  if(!j.ok) throw new Error(j.error||'Gagal di Apps Script');
   return j;
 }
-
 async function testEndpoint(){
   const url=$('endpointInput').value.trim()||getEndpoint();
   if(!url){toast('❌ Isi URL dulu',true);return;}
   if(!isValidEndpoint(url)){toast('❌ URL harus berakhiran /exec',true);return;}
-  $('epStatus').textContent='⏳ Testing...';
-  try{const j=await callEndpoint(url);$('epStatus').textContent='✅ Terhubung · root: '+(j.root||'-');toast('✅ OK');}
+  $('epStatus').textContent='⏳ Menguji koneksi...';
+  try{const j=await callEndpoint(url);if(j.folder){rootLabel=j.folder;updatePath();}$('epStatus').textContent='✅ Terhubung · folder induk: '+(j.folder||'-');toast('✅ Koneksi OK');}
   catch(e){$('epStatus').textContent='❌ '+e.message;toast('❌ '+e.message,true);}
+}
+async function pingEndpoint(){
+  const url=getEndpoint(), ci=$('connInfo');
+  if(!url){ci.textContent='☁️ Drive: belum diatur (klik ⚙️)';return;}
+  ci.textContent='☁️ Drive: memeriksa…';
+  try{const j=await callEndpoint(url);if(j.folder){rootLabel=j.folder;updatePath();}ci.textContent='☁️ Drive: terhubung ✓';}
+  catch(e){ci.textContent='☁️ Drive: tidak terhubung ✗';}
 }
 
 async function sendToDrive(){
-  if(busy)return;
-  const url=getEndpoint();if(!url){toast('❌ URL belum diisi',true);return;}
-  const p=getFolderParams();if(!p.tahun||!p.bulan||!p.afdeling||!p.jenisDoc){toast('❌ Pilih folder dulu!',true);return;}
-  busy=true;renderGrid();$('resultBox').style.display='none';
+  if(busy) return;
+  const url=getEndpoint(); if(!url){toast('❌ URL Apps Script belum diisi',true);return;}
+  if(!requireDest()) return;
+  const path=destPath(), pathText=destText();
+  busy=true; renderGrid(); $('resultBox').style.display='none';
   try{
     const pdf=await buildPdf(0,50);
     const blob=pdf.output('blob');
-    if(blob.size>25*1048576)throw new Error('PDF terlalu besar ('+fmt(blob.size)+')');
-    setStatus('Menyiapkan '+fmt(blob.size)+'...');setProg(55);
+    if(blob.size>25*1048576) throw new Error('PDF terlalu besar ('+fmt(blob.size)+'). Turunkan target ukuran lalu Compress ulang.');
+    setStatus('Menyiapkan '+fmt(blob.size)+'...'); setProg(55);
     const b64=await blobToBase64(blob);
-    setStatus('☁️ Mengirim ke Drive...');setProg(70);
-    const j=await callEndpoint(url,Object.assign({name:pdfName,mimeType:'application/pdf',data:b64},p));
-    setProg(100);setStatus('✅ Tersimpan');
+    setStatus('☁️ Mengirim '+fmt(blob.size)+' ke '+pathText+' … jangan tutup halaman'); setProg(70);
+    const j=await callEndpoint(url,{name:pdfName,mimeType:'application/pdf',data:b64,path:path});
+    setProg(100); setStatus('✅ Tersimpan: '+(j.name||pdfName));
     const rb=$('resultBox');
-    rb.innerHTML='✅ <b>'+esc(j.name||pdfName)+'</b> ('+fmt(blob.size)+')<br>📂 '+esc(j.path||'')+(j.url?' · <a href="'+esc(j.url)+'" target="_blank" rel="noopener">Buka ↗</a>':'');
+    rb.innerHTML='✅ <b>'+esc(j.name||pdfName)+'</b> ('+fmt(blob.size)+')<br>📁 '+esc(j.path||pathText)+
+      '<div class="rb-btns">'+
+      (j.url?'<a class="btn btn-out" href="'+esc(j.url)+'" target="_blank" rel="noopener">📄 Buka file</a>':'')+
+      (j.folderUrl?'<a class="btn btn-out" href="'+esc(j.folderUrl)+'" target="_blank" rel="noopener">📁 Buka folder</a>':'')+
+      '<button class="btn btn-pri" onclick="newDoc()">🆕 Dokumen baru</button></div>';
     rb.style.display='block';
-    toast('✅ Kirim sukses!');
+    toast('✅ Berhasil dikirim ke Google Drive!');
   }catch(e){console.error(e);setStatus('❌ '+e.message);toast('❌ '+e.message,true);}
   finally{busy=false;renderGrid();hideProg();}
 }
+function newDoc(){photos=[];renderGrid();$('resultBox').style.display='none';setStatus('Siap untuk dokumen baru.');$('stepDest').scrollIntoView({behavior:'smooth',block:'start'});}
 
-/* MODAL */
-function openModal(id){$(id).classList.add('show');}
-function closeModal(id){$(id).classList.remove('show');}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
-function askDeleteAll(){if(photos.length&&!busy)openModal('confirmModal');}
-function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');setStatus('Dihapus');$('resultBox').style.display='none';}
-$('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmSave();if(e.key==='Escape')closeModal('pdfModal');});
+/* ================= SETUP UI ================= */
+function showSetup(v){$('setupBox').style.display=v?'block':'none';}
+function toggleSetup(){showSetup($('setupBox').style.display==='none');}
+function refreshSetupUI(){
+  const fixed=!!(DEFAULT_ENDPOINT||'').trim(), inp=$('endpointInput');
+  if(fixed){inp.value=DEFAULT_ENDPOINT.trim();inp.disabled=true;$('btnSaveEp').style.display='none';$('epStatus').textContent='🔒 Diatur di kode (DEFAULT_ENDPOINT).';}
+  else{const s=ls.get('gas_endpoint');inp.value=s;$('epStatus').textContent=s?'💾 Tersimpan di browser ini.':'Belum diatur – tempel URL /exec lalu Simpan.';}
+  showSetup(!getEndpoint());
+}
 
-/* INIT */
+/* ================= INIT ================= */
+initDest();
 refreshSetupUI();
-populateSelects();
-loadConfig();
-$('modalFileName').value='laporan-'+dateStamp();
+if(window.innerWidth>=600) $('advBox').open=true;
 renderGrid();
+pingEndpoint();
 </script>
 </body>
 </html>
