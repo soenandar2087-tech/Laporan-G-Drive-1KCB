@@ -11,90 +11,91 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:6px;font-size:11px;color:var(--text);background:#f1f5f9}
 .app-wrap{border:2px solid var(--primary);border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.app-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid var(--primary)}
-.app-head h1{font-size:13px;font-weight:800;color:var(--primary-dark)}
-.app-head small{font-size:9px;color:var(--muted);display:block;margin-top:2px}
+.app-head{padding:10px 12px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid var(--primary)}
+.app-head h1{font-size:14px;font-weight:800;color:var(--primary-dark)}
+.app-head small{font-size:9px;color:var(--muted)}
 .app-body{padding:8px}
 .box{background:var(--panel);border:1.5px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
-.box:last-child{margin-bottom:0}
 .label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:6px 0 4px;display:block}
-select{width:100%;padding:6px;border:1.5px solid var(--border);border-radius:5px;font-size:11px;margin-bottom:4px;background:#fff;font-family:inherit}
-#drop{border:2px dashed #93c5fd;background:#fff;border-radius:8px;padding:20px 10px;text-align:center;cursor:pointer;transition:.2s}
-#drop:hover{border-color:var(--primary);background:#eff6ff}
-.path-display{background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:8px;font-size:10px;color:#1e40af;margin-top:6px;word-break:break-word;line-height:1.5}
+select{width:100%;padding:7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px;margin-bottom:2px;background:#fff;font-family:inherit}
+select:disabled{background:#f1f5f9;color:#94a3b8}
+#drop{border:2px dashed #93c5fd;background:#fff;border-radius:8px;padding:22px 10px;text-align:center;cursor:pointer}
+.path-display{background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:8px;font-size:10px;color:#1e40af;margin-top:8px;line-height:1.5;word-break:break-word}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;margin-top:8px}
 .thumb{position:relative;aspect-ratio:3/4;border:1.5px solid var(--border);border-radius:5px;overflow:hidden;background:#eee}
 .thumb img{width:100%;height:100%;object-fit:cover}
 .thumb-num{position:absolute;top:2px;left:2px;background:var(--primary);color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:700}
-.thumb-del{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(239,68,68,.92);color:#fff;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
-#emptyMsg{min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:4px}
+.thumb-del{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(239,68,68,.92);color:#fff;border:none;border-radius:50%;cursor:pointer}
+#emptyMsg{min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:4px}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-.btn{padding:10px;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
-.btn-cam{background:#f59e0b;color:#fff}.btn-drive{background:var(--drive);color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn{padding:11px;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.btn-cam{background:#f59e0b;color:#fff}.btn-drive{background:var(--drive);color:#fff}.btn:disabled{opacity:.45}
 .progress-container{height:4px;background:#e5e7eb;border-radius:2px;margin-top:8px;display:none;overflow:hidden}
 .progress-bar{height:100%;background:var(--primary);width:0%;transition:.15s}
-.status-text{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;word-break:break-word}
-#resultBox{display:none;margin-top:6px;padding:8px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:10px;text-align:center;word-break:break-word;line-height:1.6}
+.status-text{font-size:10px;color:var(--muted);text-align:center;margin-top:4px}
+#resultBox{display:none;margin-top:6px;padding:8px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:10px;text-align:center;line-height:1.6}
 #resultBox a{color:var(--primary-dark);font-weight:700;text-decoration:none}
-#resultBox .new-doc{margin-top:8px;padding:6px 12px;background:var(--primary);color:#fff;border:none;border-radius:5px;font-weight:700;cursor:pointer}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:8px 14px;border-radius:6px;opacity:0;z-index:1000;font-weight:700;max-width:92vw;text-align:center;transition:.25s;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.new-doc{margin-top:8px;padding:6px 12px;background:var(--primary);color:#fff;border:none;border-radius:5px;font-weight:700;cursor:pointer}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:8px 14px;border-radius:6px;opacity:0;z-index:1000;font-weight:700;max-width:92vw;text-align:center;transition:.25s}
 .toast.show{opacity:1}.toast.error{background:var(--danger)}
 </style>
 </head>
 <body>
 <div class="app-wrap">
-<div class="app-head">
-  <div>
+  <div class="app-head">
     <h1>📁 Dokumen 1KCB</h1>
     <small>Pilih tujuan → Foto → Kirim</small>
   </div>
-</div>
-
-<div class="app-body">
-  <div class="box" style="background:#fffbeb;border-color:#fbbf24">
-    <span class="label">📂 Tujuan Penyimpanan</span>
-    <span class="label">Tahun</span><select id="selTahun"></select>
-    <span class="label">Bulan</span><select id="selBulan"></select>
-    <span class="label">Afdeling</span><select id="selAfdeling"></select>
-    <span class="label">Jenis Dokumen</span><select id="selJenisDoc"></select>
-    <div class="path-display" id="pathDisplay">📂 -</div>
-  </div>
-
-  <div class="box">
-    <div id="drop">
-      <div style="font-size:28px;margin-bottom:8px">📁</div>
-      <div style="font-weight:700;color:var(--primary);font-size:13px">Klik / Drop Foto</div>
-      <div style="color:var(--muted);font-size:10px;margin-top:4px">JPG · PNG · WEBP</div>
+  <div class="app-body">
+    <div class="box" style="background:#fffbeb;border-color:#fbbf24">
+      <span class="label">📂 Tujuan Penyimpanan</span>
+      <span class="label">Tahun</span>
+      <select id="selTahun"></select>
+      <span class="label">Bulan</span>
+      <select id="selBulan"></select>
+      <span class="label">Periode</span>
+      <select id="selPeriode" disabled>
+        <option value="">-- Pilih bulan dulu --</option>
+      </select>
+      <span class="label">Afdeling</span>
+      <select id="selAfdeling"></select>
+      <span class="label">Jenis Dokumen</span>
+      <select id="selJenisDoc"></select>
+      <div class="path-display" id="pathDisplay">📂 -</div>
     </div>
-    <div class="grid" id="grid"></div>
-    <div id="emptyMsg"><span style="font-size:28px">🖼</span><span>Belum ada foto</span></div>
-    <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+
+    <div class="box">
+      <div id="drop">
+        <div style="font-size:28px;margin-bottom:6px">📁</div>
+        <div style="font-weight:700;color:var(--primary);font-size:13px">Klik / Drop Foto</div>
+        <div style="color:var(--muted);font-size:10px;margin-top:4px">JPG · PNG · WEBP</div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div id="emptyMsg"><span style="font-size:28px">🖼</span><span>Belum ada foto</span></div>
+      <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
+      <button class="btn btn-drive" id="btnSend" disabled onclick="sendToDrive()">☁️ Kirim ke Drive</button>
+    </div>
+    <div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
+    <div class="status-text" id="statusText">Siap.</div>
+    <div id="resultBox"></div>
   </div>
-
-  <div class="actions">
-    <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
-    <button class="btn btn-drive" id="btnSend" disabled onclick="sendToDrive()">☁️ Kirim ke Drive</button>
-  </div>
-
-  <div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
-  <div class="status-text" id="statusText">Siap.</div>
-  <div id="resultBox"></div>
 </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 const {jsPDF}=window.jspdf;
-
 const ENDPOINT='https://script.google.com/macros/s/AKfycbzZM18hvc53rQz64S2w0YqtJgtXWLHkvdNAwYV6EsDS-I1pgzb-bjUa4SxWLN6F_8BjUw/exec';
 const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const PERIODES=['Periode I','Periode II'];
 const DEFAULT_AFDELING=['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
 const DEFAULT_JENIS=['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
 
 let photos=[],busy=false;
-
 const $=id=>document.getElementById(id);
 const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -104,122 +105,157 @@ const pad=n=>String(n).padStart(2,'0');
 const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('gambar rusak'));i.src=src;});
 const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('gagal baca'));r.readAsDataURL(f);});
 const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('encode gagal'));r.readAsDataURL(b);});
-
-let tT;
-function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3500);}
+let tT;function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3500);}
 function setStatus(m){$('statusText').textContent=m;}
 function setProg(p){$('progCont').style.display='block';$('progBar').style.width=Math.min(100,p)+'%';}
 function hideProg(){setTimeout(()=>{$('progCont').style.display='none';$('progBar').style.width='0%';},1200);}
 
-/* ============ DROPDOWN ============ */
-function fillSel(el,arr){const cur=el.value;el.innerHTML='<option value="">-- Pilih --</option>';arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});if(arr.indexOf(cur)>=0)el.value=cur;}
+function fillSel(el,arr,ph){const cur=el.value;el.innerHTML='<option value="">'+(ph||'-- Pilih --')+'</option>';arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});if(arr.indexOf(cur)>=0)el.value=cur;}
+
 function initDropdowns(){
   const now=new Date(),y=now.getFullYear();
   const sT=$('selTahun');sT.innerHTML='<option value="">-- Tahun --</option>';
-  for(let i=y+1;i>=y-5;i--){const o=document.createElement('option');o.value=i;o.textContent=i;sT.appendChild(o);}sT.value=String(y);
-  fillSel($('selBulan'),MONTHS);$('selBulan').value=MONTHS[now.getMonth()];
-  fillSel($('selAfdeling'),DEFAULT_AFDELING);fillSel($('selJenisDoc'),DEFAULT_JENIS);
-  ['selTahun','selBulan','selAfdeling','selJenisDoc'].forEach(id=>$(id).onchange=updatePath);
+  for(let i=y+1;i>=y-5;i--){const o=document.createElement('option');o.value=i;o.textContent=i;sT.appendChild(o);}
+  sT.value=String(y);
+  fillSel($('selBulan'),MONTHS,'-- Bulan --'); $('selBulan').value=MONTHS[now.getMonth()];
+  fillSel($('selAfdeling'),DEFAULT_AFDELING,'-- Afdeling --');
+  fillSel($('selJenisDoc'),DEFAULT_JENIS,'-- Jenis Dokumen --');
+  $('selTahun').onchange=updatePath;
+  $('selBulan').onchange=onBulanChange;
+  $('selPeriode').onchange=updatePath;
+  $('selAfdeling').onchange=updatePath;
+  $('selJenisDoc').onchange=updatePath;
+  onBulanChange();
+}
+
+function onBulanChange(){
+  const bulan=$('selBulan').value;
+  const sel=$('selPeriode');
+  if(!bulan){
+    sel.disabled=true;
+    sel.innerHTML='<option value="">-- Pilih bulan dulu --</option>';
+  }else{
+    const cur=sel.value;
+    sel.disabled=false;
+    fillSel(sel,PERIODES,'-- Periode --');
+    if(PERIODES.indexOf(cur)>=0) sel.value=cur;
+  }
   updatePath();
 }
-function getFolderParams(){return{tahun:$('selTahun').value,bulan:$('selBulan').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value};}
-function pathText(){const p=getFolderParams();return [p.tahun,p.bulan,p.afdeling,p.jenisDoc].filter(Boolean).join(' / ');}
-function suggestName(){const p=getFolderParams(),d=new Date();const stamp=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());return clean([p.jenisDoc,p.afdeling].filter(Boolean).join(' - ')||'laporan')+' - '+stamp+'.pdf';}
-function updatePath(){const t=pathText();$('pathDisplay').innerHTML=t?('📂 '+esc(t)+'<br><b>📄 '+esc(suggestName())+'</b>'):'📂 Pilih Tahun / Bulan / Afdeling / Jenis';}
 
-/* ============ FILE ============ */
+function getFolderParams(){
+  return{
+    tahun:$('selTahun').value,
+    bulan:$('selBulan').value,
+    periode:$('selPeriode').value,
+    afdeling:$('selAfdeling').value,
+    jenisDoc:$('selJenisDoc').value
+  };
+}
+function pathText(){const p=getFolderParams();return [p.tahun,p.bulan,p.periode,p.afdeling,p.jenisDoc].filter(Boolean).join(' / ');}
+function suggestName(){
+  const p=getFolderParams(),d=new Date();
+  const stamp=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+  return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'laporan')+' - '+stamp+'.pdf';
+}
+function updatePath(){
+  const t=pathText();
+  $('pathDisplay').innerHTML=t?('📂 '+esc(t)+'<br><b>📄 '+esc(suggestName())+'</b>'):'📂 Pilih Tahun → Bulan → Periode → Afdeling → Jenis';
+}
+
 const drop=$('drop');
 drop.onclick=()=>$('fileInput').click();
 drop.ondragover=e=>e.preventDefault();
 drop.ondrop=e=>{e.preventDefault();handleFiles(e.dataTransfer.files);};
 $('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
 $('cameraInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
+
 async function handleFiles(files){
-  const list=[...files].filter(f=>f.type.startsWith('image/'));if(!list.length)return;
+  const list=[...files].filter(f=>f.type.startsWith('image/')); if(!list.length)return;
   for(const f of list){
-    try{const d=await readAsDataURL(f);const img=await loadImg(d);
+    try{
+      const d=await readAsDataURL(f); const img=await loadImg(d);
       photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2),name:f.name,origSize:f.size,dataUrl:d,w:img.naturalWidth,h:img.naturalHeight,compData:null,compSize:null});
     }catch(e){toast('❌ '+f.name,true);}
   }
   renderGrid();
 }
+
 function renderGrid(){
-  const g=$('grid');g.innerHTML='';
+  const g=$('grid'); g.innerHTML='';
   $('emptyMsg').style.display=photos.length?'none':'flex';
   $('btnSend').disabled=(!photos.length||busy);
   photos.forEach((p,i)=>{
-    const d=document.createElement('div');d.className='thumb';d.dataset.id=p.id;
-    d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del" title="Hapus">×</button><img src="'+p.dataUrl+'">';
+    const d=document.createElement('div'); d.className='thumb'; d.dataset.id=p.id;
+    d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del">×</button><img src="'+p.dataUrl+'">';
     d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();if(busy)return;photos=photos.filter(x=>x.id!==p.id);renderGrid();};
     g.appendChild(d);
   });
-  if(window.sortInst)window.sortInst.destroy();
+  if(window.sortInst) window.sortInst.destroy();
   window.sortInst=new Sortable(g,{animation:150,onEnd:()=>{const ids=[...g.children].map(el=>el.dataset.id);photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));renderGrid();}});
 }
 
-/* ============ COMPRESS (preset auto) ============ */
 async function compressImage(p){
-  const img=await loadImg(p.dataUrl);let w=img.naturalWidth,h=img.naturalHeight;
+  const img=await loadImg(p.dataUrl); let w=img.naturalWidth,h=img.naturalHeight;
   const maxRes=2000;
   if(Math.max(w,h)>maxRes){const r=maxRes/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
-  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
-  const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+  const ctx=cv.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h); ctx.drawImage(img,0,0,w,h);
   let q=0.7,du=cv.toDataURL('image/jpeg',q),sz=Math.round(du.length*0.75);
-  const tb=5*1048576;let g=0;
+  const tb=5*1048576; let g=0;
   while(sz>tb&&q>0.2&&g++<12){q=Math.max(0.2,q-0.08);du=cv.toDataURL('image/jpeg',q);sz=Math.round(du.length*0.75);}
   return{dataUrl:du,size:sz,w,h};
 }
 async function doCompress(){
   for(let i=0;i<photos.length;i++){
-    setStatus('Menyiapkan '+(i+1)+'/'+photos.length+'...');setProg((i+1)/photos.length*40);await wait(15);
-    try{const r=await compressImage(photos[i]);Object.assign(photos[i],{compData:r.dataUrl,compSize:r.size,w:r.w,h:r.h});}
-    catch(e){photos[i].compData=photos[i].dataUrl;photos[i].compSize=photos[i].origSize;}
+    setStatus('Menyiapkan '+(i+1)+'/'+photos.length+'...'); setProg((i+1)/photos.length*40); await wait(10);
+    try{const r=await compressImage(photos[i]); Object.assign(photos[i],{compData:r.dataUrl,compSize:r.size,w:r.w,h:r.h});}
+    catch(e){photos[i].compData=photos[i].dataUrl; photos[i].compSize=photos[i].origSize;}
   }
 }
-
-/* ============ PDF ============ */
 async function buildPdf(){
-  if(photos.some(p=>!p.compData))await doCompress();
+  if(photos.some(p=>!p.compData)) await doCompress();
   let pdf=null;
   for(let i=0;i<photos.length;i++){
-    const p=photos[i],land=p.w>p.h;
-    if(i===0)pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:'a4'});else pdf.addPage('a4',land?'l':'p');
-    const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
-    const r=Math.min(PW/p.w,PH/p.h),w=p.w*r,h=p.h*r;
+    const p=photos[i], land=p.w>p.h;
+    if(i===0) pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:'a4'}); else pdf.addPage('a4',land?'l':'p');
+    const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
+    const r=Math.min(PW/p.w,PH/p.h), w=p.w*r, h=p.h*r;
     pdf.addImage(p.compData,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
-    setStatus('Menyusun PDF '+(i+1)+'/'+photos.length);setProg(40+(i+1)/photos.length*20);await wait(10);
+    setStatus('Menyusun PDF '+(i+1)+'/'+photos.length); setProg(40+(i+1)/photos.length*20); await wait(8);
   }
   return pdf;
 }
 
-/* ============ KIRIM ============ */
 async function sendToDrive(){
-  if(busy||!photos.length)return;
+  if(busy||!photos.length) return;
   const p=getFolderParams();
-  if(!p.tahun||!p.bulan||!p.afdeling||!p.jenisDoc){toast('❌ Lengkapi Tahun/Bulan/Afdeling/Jenis',true);return;}
-  busy=true;renderGrid();$('resultBox').style.display='none';
+  if(!p.tahun||!p.bulan||!p.periode||!p.afdeling||!p.jenisDoc){
+    toast('❌ Lengkapi Tahun, Bulan, Periode, Afdeling, dan Jenis',true); return;
+  }
+  busy=true; renderGrid(); $('resultBox').style.display='none';
   try{
-    const pdf=await buildPdf();const blob=pdf.output('blob');
-    if(blob.size>25*1048576)throw new Error('PDF terlalu besar: '+fmt(blob.size));
-    setStatus('☁️ Mengirim '+fmt(blob.size)+'...');setProg(70);
+    const pdf=await buildPdf(); const blob=pdf.output('blob');
+    if(blob.size>25*1048576) throw new Error('PDF terlalu besar: '+fmt(blob.size));
+    setStatus('☁️ Mengirim '+fmt(blob.size)+'...'); setProg(70);
     const b64=await blobToBase64(blob);
-    const j=await fetch(ENDPOINT,{method:'POST',body:JSON.stringify({name:suggestName(),mimeType:'application/pdf',data:b64,tahun:p.tahun,bulan:p.bulan,afdeling:p.afdeling,jenisDoc:p.jenisDoc})}).then(r=>r.json());
-    if(!j.ok)throw new Error(j.error||'Gagal');
-    setProg(100);
-    setStatus('✅ Tersimpan');toast('✅ Berhasil dikirim');
-    const rb=$('resultBox');rb.style.display='block';
+    const j=await fetch(ENDPOINT,{method:'POST',body:JSON.stringify({
+      name:suggestName(), mimeType:'application/pdf', data:b64,
+      tahun:p.tahun, bulan:p.bulan, periode:p.periode, afdeling:p.afdeling, jenisDoc:p.jenisDoc
+    })}).then(r=>r.json());
+    if(!j.ok) throw new Error(j.error||'Gagal');
+    setProg(100); setStatus('✅ Tersimpan'); toast('✅ Berhasil dikirim');
+    const rb=$('resultBox'); rb.style.display='block';
     rb.innerHTML='✅ <b>'+esc(j.name||suggestName())+'</b><br>📂 '+esc(j.path||pathText())+
       (j.url?' · <a href="'+esc(j.url)+'" target="_blank">Buka ↗</a>':'')+
       '<br><button class="new-doc" onclick="newDoc()">🆕 Dokumen Baru</button>';
-    photos=[];renderGrid();
-  }catch(e){setStatus('❌ '+e.message);toast('❌ '+e.message,true);}
-  busy=false;renderGrid();hideProg();
+    photos=[]; renderGrid();
+  }catch(e){ setStatus('❌ '+e.message); toast('❌ '+e.message,true); }
+  busy=false; renderGrid(); hideProg();
 }
-function newDoc(){photos=[];renderGrid();$('resultBox').style.display='none';setStatus('Siap.');window.scrollTo(0,0);}
+function newDoc(){ photos=[]; renderGrid(); $('resultBox').style.display='none'; setStatus('Siap.'); window.scrollTo(0,0); }
 
-/* ============ INIT ============ */
-initDropdowns();renderGrid();
-(async()=>{try{const j=await fetch(ENDPOINT).then(r=>r.json());if(j.config){if(j.config.afdeling)fillSel($('selAfdeling'),j.config.afdeling);if(j.config.jenisDoc)fillSel($('selJenisDoc'),j.config.jenisDoc);updatePath();}}catch(e){}})();
+initDropdowns(); renderGrid();
 </script>
 </body>
 </html>
