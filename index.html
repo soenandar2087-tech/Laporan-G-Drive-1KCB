@@ -3,66 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo → PDF → Drive</title>
+<title>Dokumen 1KCB</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
-:root{--primary:#2563eb;--primary-dark:#1d4ed8;--panel:#f8fafc;--border:#c5cdd8;--border-strong:#94a3b8;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4}
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--panel:#f8fafc;--border:#cbd5e0;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:6px;font-size:11px;color:var(--text)}
-.app-wrap{border:2px solid var(--primary);border-radius:12px;background:#fff;overflow:hidden}
-.app-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#eff6ff;border-bottom:2px solid var(--primary)}
-.app-head h1{font-size:13px;color:var(--primary-dark)}
-.gear{background:#fff;border:1.5px solid var(--border-strong);border-radius:6px;padding:3px 8px;cursor:pointer}
-.app-body{padding:8px}.container{display:grid;gap:8px;grid-template-columns:1fr}
-@media(min-width:600px){.container{grid-template-columns:280px 1fr}}
-.box{background:var(--panel);border:1.5px solid var(--border-strong);border-radius:8px;padding:8px;margin-bottom:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:6px;font-size:11px;color:var(--text);background:#f1f5f9}
+.app-wrap{border:2px solid var(--primary);border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.app-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid var(--primary)}
+.app-head h1{font-size:13px;font-weight:800;color:var(--primary-dark)}
+.app-head small{font-size:9px;color:var(--muted);display:block;margin-top:2px}
+.app-body{padding:8px}
+.box{background:var(--panel);border:1.5px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
+.box:last-child{margin-bottom:0}
 .label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:6px 0 4px;display:block}
-select,input[type=text]{width:100%;padding:6px;border:1.5px solid var(--border);border-radius:5px;font-size:11px;margin-bottom:4px;background:#fff;font-family:inherit}
-#drop{border:2px dashed #93c5fd;background:#fff;border-radius:8px;padding:14px;text-align:center;cursor:pointer}
-.chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.chip{padding:3px 8px;border:1.5px solid var(--border);border-radius:12px;font-size:10px;background:#fff;cursor:pointer;font-weight:600}
-.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-.path-display{background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:6px;font-size:10px;color:#1e40af;margin-top:6px;word-break:break-word;line-height:1.5}
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
-.stat-item{background:#fff;border:1.5px solid var(--border-strong);border-radius:6px;padding:5px;text-align:center;font-size:9px;color:var(--muted)}
-.stat-val{font-weight:800;font-size:13px;color:var(--text)}
-.preview-area{background:#fff;border:1.5px solid var(--border-strong);border-radius:8px;padding:8px;min-height:200px;display:flex;flex-direction:column}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px}
+select{width:100%;padding:6px;border:1.5px solid var(--border);border-radius:5px;font-size:11px;margin-bottom:4px;background:#fff;font-family:inherit}
+#drop{border:2px dashed #93c5fd;background:#fff;border-radius:8px;padding:20px 10px;text-align:center;cursor:pointer;transition:.2s}
+#drop:hover{border-color:var(--primary);background:#eff6ff}
+.path-display{background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:8px;font-size:10px;color:#1e40af;margin-top:6px;word-break:break-word;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;margin-top:8px}
 .thumb{position:relative;aspect-ratio:3/4;border:1.5px solid var(--border);border-radius:5px;overflow:hidden;background:#eee}
 .thumb img{width:100%;height:100%;object-fit:cover}
-.thumb-num{position:absolute;top:2px;left:2px;background:var(--primary);color:#fff;font-size:9px;padding:1px 4px;border-radius:4px}
-.thumb-del{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:50%;cursor:pointer}
-.thumb-size{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);color:#fff;font-size:8px;text-align:center}
-#emptyMsg{min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:4px}
-.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.btn{flex:1;min-width:80px;padding:8px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
-.btn-pri{background:var(--primary);color:#fff}.btn-suc{background:var(--success);color:#fff}
-.btn-cam{background:#f59e0b;color:#fff}.btn-drive{background:var(--drive);color:#fff}
-.btn-out{background:#fff;border:1.5px solid var(--border-strong)}.btn:disabled{opacity:.45}
+.thumb-num{position:absolute;top:2px;left:2px;background:var(--primary);color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:700}
+.thumb-del{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(239,68,68,.92);color:#fff;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
+#emptyMsg{min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:4px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.btn{padding:10px;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
+.btn-cam{background:#f59e0b;color:#fff}.btn-drive{background:var(--drive);color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}
 .progress-container{height:4px;background:#e5e7eb;border-radius:2px;margin-top:8px;display:none;overflow:hidden}
-.progress-bar{height:100%;background:var(--primary);width:0%;transition:.2s}
+.progress-bar{height:100%;background:var(--primary);width:0%;transition:.15s}
 .status-text{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;word-break:break-word}
-#resultBox{display:none;margin-top:6px;padding:6px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:10px;text-align:center;word-break:break-word;line-height:1.6}
-#resultBox a{color:var(--primary-dark);font-weight:700}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;padding:12px;z-index:999}
-.modal-overlay.show{display:flex}
-.modal-box{background:#fff;padding:16px;border-radius:10px;width:330px;max-width:100%;text-align:center}
-.modal-btns{display:flex;gap:8px;margin-top:12px}
-.modal-btn{flex:1;padding:8px;border:none;border-radius:5px;font-weight:700;cursor:pointer}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:8px 14px;border-radius:6px;opacity:0;z-index:1000;font-weight:700;max-width:92vw;text-align:center;transition:.25s}
+#resultBox{display:none;margin-top:6px;padding:8px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:10px;text-align:center;word-break:break-word;line-height:1.6}
+#resultBox a{color:var(--primary-dark);font-weight:700;text-decoration:none}
+#resultBox .new-doc{margin-top:8px;padding:6px 12px;background:var(--primary);color:#fff;border:none;border-radius:5px;font-weight:700;cursor:pointer}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:8px 14px;border-radius:6px;opacity:0;z-index:1000;font-weight:700;max-width:92vw;text-align:center;transition:.25s;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .toast.show{opacity:1}.toast.error{background:var(--danger)}
 </style>
 </head>
 <body>
 <div class="app-wrap">
 <div class="app-head">
-  <div><h1>📁 Photo → PDF → Drive</h1><small style="color:var(--muted)">Tahun · Bulan · Afdeling · Jenis</small></div>
-  <button class="gear" onclick="toggleSetup()">⚙️</button>
+  <div>
+    <h1>📁 Dokumen 1KCB</h1>
+    <small>Pilih tujuan → Foto → Kirim</small>
+  </div>
 </div>
-<div class="app-body"><div class="container">
 
-<div>
+<div class="app-body">
   <div class="box" style="background:#fffbeb;border-color:#fbbf24">
     <span class="label">📂 Tujuan Penyimpanan</span>
     <span class="label">Tahun</span><select id="selTahun"></select>
@@ -73,104 +61,39 @@ select,input[type=text]{width:100%;padding:6px;border:1.5px solid var(--border);
   </div>
 
   <div class="box">
-    <div id="drop">📁<br><b style="color:var(--primary)">Klik / Drop Foto</b><br><small style="color:var(--muted)">JPG · PNG · WEBP</small></div>
+    <div id="drop">
+      <div style="font-size:28px;margin-bottom:8px">📁</div>
+      <div style="font-weight:700;color:var(--primary);font-size:13px">Klik / Drop Foto</div>
+      <div style="color:var(--muted);font-size:10px;margin-top:4px">JPG · PNG · WEBP</div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div id="emptyMsg"><span style="font-size:28px">🖼</span><span>Belum ada foto</span></div>
     <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
     <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
   </div>
 
-  <div class="box"><span class="label">Target Ukuran</span>
-    <div class="chips" id="targetChips">
-      <div class="chip" data-v="0.5">500KB</div><div class="chip" data-v="1">1MB</div>
-      <div class="chip active" data-v="5">5MB</div><div class="chip" data-v="0">Min</div>
-    </div>
-  </div>
-
-  <div class="box"><span class="label">Mode Kompresi</span>
-    <div class="chips" id="modeChips">
-      <div class="chip active" data-m="bal">Seimbang</div><div class="chip" data-m="size">Kecil</div><div class="chip" data-m="qual">Kualitas</div>
-    </div>
-    <div style="font-size:10px;display:flex;justify-content:space-between"><span>Resolusi</span><span id="valRes">2000px</span></div>
-    <input type="range" id="inpRes" min="500" max="4000" step="100" value="2000" style="width:100%">
-    <div style="font-size:10px;display:flex;justify-content:space-between;margin-top:4px"><span>Kualitas</span><span id="valQual">70%</span></div>
-    <input type="range" id="inpQual" min="10" max="100" value="70" style="width:100%">
-  </div>
-
-  <div class="box"><span class="label">Output PDF</span>
-    <select id="pdfSize"><option value="a4">A4</option><option value="fit">Sesuai Foto</option></select>
-    <label style="font-size:10px"><input type="checkbox" id="pdfNum"> Nomor halaman</label>
-  </div>
-
-  <div class="box" id="setupBox">
-    <span class="label">🔌 URL Apps Script /exec</span>
-    <input type="text" id="endpointInput" placeholder="https://script.google.com/macros/s/AKfycbzf10iKVLcBQUcKTjb2ZMa0RuTkMo1ZEEpcNvHbmgIKSjvJVhjQvI-DRy8zBO72_97Wdg/exec">
-    <div style="display:flex;gap:6px">
-      <button class="btn btn-out" onclick="saveEndpoint()">💾 Simpan</button>
-      <button class="btn btn-pri" onclick="testEndpoint()">🔍 Tes</button>
-    </div>
-    <div id="epStatus" style="font-size:9px;margin-top:5px;color:#92400e;word-break:break-word"></div>
-  </div>
-</div>
-
-<div>
-  <div class="stats-bar">
-    <div class="stat-item">Foto<div class="stat-val" id="stCount">0</div></div>
-    <div class="stat-item">Asli<div class="stat-val" id="stOrig">-</div></div>
-    <div class="stat-item">Hasil<div class="stat-val" id="stRes">-</div></div>
-    <div class="stat-item">Hemat<div class="stat-val" id="stSave">-</div></div>
-  </div>
-  <div class="preview-area">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <span class="label" style="margin:0">🗂 Preview</span>
-      <button class="btn btn-out" style="flex:none;padding:3px 8px;font-size:9px" onclick="askDeleteAll()">🗑 Hapus</button>
-    </div>
-    <div class="grid" id="grid" style="margin-top:6px"></div>
-    <div id="emptyMsg"><span style="font-size:24px">🖼</span><span>Belum ada foto</span></div>
-  </div>
   <div class="actions">
-    <button class="btn btn-out" onclick="document.getElementById('fileInput').click()">＋ Galeri</button>
     <button class="btn btn-cam" onclick="document.getElementById('cameraInput').click()">📷 Kamera</button>
-    <button class="btn btn-pri" id="btnComp" disabled onclick="processCompress()">🔄 Compress</button>
-    <button class="btn btn-suc" id="btnPdf" disabled onclick="askDownload()">⬇ PDF</button>
-    <button class="btn btn-drive" id="btnDrive" disabled onclick="askSave()">☁️ Kirim</button>
+    <button class="btn btn-drive" id="btnSend" disabled onclick="sendToDrive()">☁️ Kirim ke Drive</button>
   </div>
+
   <div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
   <div class="status-text" id="statusText">Siap.</div>
   <div id="resultBox"></div>
 </div>
-
-</div></div></div>
-
-<div class="modal-overlay" id="pdfModal"><div class="modal-box">
-  <div id="modalTitle" style="font-weight:800;margin-bottom:10px"></div>
-  <input type="text" id="modalFileName" style="text-align:center">
-  <div id="pdfModalInfo" style="font-size:10px;color:#666;margin:8px 0;line-height:1.5"></div>
-  <div class="modal-btns">
-    <button class="modal-btn" style="background:#e5e7eb" onclick="closeModal('pdfModal')">Batal</button>
-    <button class="modal-btn" id="modalGo" style="background:var(--success);color:#fff" onclick="confirmSave()">OK</button>
-  </div>
-</div></div>
-
-<div class="modal-overlay" id="confirmModal"><div class="modal-box">
-  <div style="font-weight:800;margin-bottom:8px">🗑 Hapus semua foto?</div>
-  <div class="modal-btns">
-    <button class="modal-btn" style="background:#e5e7eb" onclick="closeModal('confirmModal')">Batal</button>
-    <button class="modal-btn" style="background:var(--danger);color:#fff" onclick="doDeleteAll()">Hapus</button>
-  </div>
-</div></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const {jsPDF}=window.jspdf;
 
-/* ====== TEMPEL URL /exec DI SINI supaya pengguna tak perlu setting ====== */
-const DEFAULT_ENDPOINT='';
-
+const ENDPOINT='https://script.google.com/macros/s/AKfycbzf10iKVLcBQUcKTjb2ZMa0RuTkMo1ZEEpcNvHbmgIKSjvJVhjQvI-DRy8zBO72_97Wdg/exec';
+const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const DEFAULT_AFDELING=['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
 const DEFAULT_JENIS=['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
-const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
-let photos=[],targetMB=5,mode='bal',busy=false,pdfName='',pendingAction='',nameTouched=false;
+let photos=[],busy=false;
 
 const $=id=>document.getElementById(id);
 const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';
@@ -179,45 +102,30 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const clean=s=>String(s).replace(/[\\/:*?"<>|]+/g,'-').trim();
 const pad=n=>String(n).padStart(2,'0');
 const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('gambar rusak'));i.src=src;});
-const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('gagal baca file'));r.readAsDataURL(f);});
-const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('gagal encode'));r.readAsDataURL(b);});
+const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('gagal baca'));r.readAsDataURL(f);});
+const blobToBase64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('encode gagal'));r.readAsDataURL(b);});
 
 let tT;
-function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),4000);}
+function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast show'+(err?' error':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3500);}
 function setStatus(m){$('statusText').textContent=m;}
 function setProg(p){$('progCont').style.display='block';$('progBar').style.width=Math.min(100,p)+'%';}
-function hideProg(){setTimeout(()=>{$('progCont').style.display='none';$('progBar').style.width='0%';},1400);}
+function hideProg(){setTimeout(()=>{$('progCont').style.display='none';$('progBar').style.width='0%';},1200);}
 
 /* ============ DROPDOWN ============ */
-function fillSel(el,arr,placeholder){
-  const cur=el.value;
-  el.innerHTML='<option value="">'+placeholder+'</option>';
-  arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});
-  if(arr.indexOf(cur)>=0) el.value=cur;
-}
+function fillSel(el,arr){const cur=el.value;el.innerHTML='<option value="">-- Pilih --</option>';arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});if(arr.indexOf(cur)>=0)el.value=cur;}
 function initDropdowns(){
   const now=new Date(),y=now.getFullYear();
   const sT=$('selTahun');sT.innerHTML='<option value="">-- Tahun --</option>';
-  for(let i=y+1;i>=y-5;i--){const o=document.createElement('option');o.value=i;o.textContent=i;sT.appendChild(o);}
-  sT.value=String(y);
-  fillSel($('selBulan'),MONTHS,'-- Bulan --'); $('selBulan').value=MONTHS[now.getMonth()];
-  fillSel($('selAfdeling'),DEFAULT_AFDELING,'-- Afdeling --');
-  fillSel($('selJenisDoc'),DEFAULT_JENIS,'-- Jenis Dokumen --');
-  ['selTahun','selBulan','selAfdeling','selJenisDoc'].forEach(id=>$(id).onchange=()=>{nameTouched=false;updatePath();});
+  for(let i=y+1;i>=y-5;i--){const o=document.createElement('option');o.value=i;o.textContent=i;sT.appendChild(o);}sT.value=String(y);
+  fillSel($('selBulan'),MONTHS);$('selBulan').value=MONTHS[now.getMonth()];
+  fillSel($('selAfdeling'),DEFAULT_AFDELING);fillSel($('selJenisDoc'),DEFAULT_JENIS);
+  ['selTahun','selBulan','selAfdeling','selJenisDoc'].forEach(id=>$(id).onchange=updatePath);
   updatePath();
 }
 function getFolderParams(){return{tahun:$('selTahun').value,bulan:$('selBulan').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value};}
-function pathText(){const p=getFolderParams();const a=[p.tahun,p.bulan,p.afdeling,p.jenisDoc].filter(Boolean);return a.join(' / ');}
-function updatePath(){
-  const t=pathText();
-  $('pathDisplay').innerHTML=t?('📂 '+esc(t)+'<br><b>📄 '+esc(suggestName())+'</b>'):'📂 Pilih Tahun / Bulan / Afdeling / Jenis';
-}
-function suggestName(){
-  const p=getFolderParams(),d=new Date();
-  const stamp=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
-  const base=[p.jenisDoc,p.afdeling].filter(Boolean).join(' - ')||'laporan';
-  return clean(base+' - '+stamp)+'.pdf';
-}
+function pathText(){const p=getFolderParams();return [p.tahun,p.bulan,p.afdeling,p.jenisDoc].filter(Boolean).join(' / ');}
+function suggestName(){const p=getFolderParams(),d=new Date();const stamp=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());return clean([p.jenisDoc,p.afdeling].filter(Boolean).join(' - ')||'laporan')+' - '+stamp+'.pdf';}
+function updatePath(){const t=pathText();$('pathDisplay').innerHTML=t?('📂 '+esc(t)+'<br><b>📄 '+esc(suggestName())+'</b>'):'📂 Pilih Tahun / Bulan / Afdeling / Jenis';}
 
 /* ============ FILE ============ */
 const drop=$('drop');
@@ -228,24 +136,20 @@ $('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
 $('cameraInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
 async function handleFiles(files){
   const list=[...files].filter(f=>f.type.startsWith('image/'));if(!list.length)return;
-  setStatus('Memuat '+list.length+' foto...');
   for(const f of list){
     try{const d=await readAsDataURL(f);const img=await loadImg(d);
       photos.push({id:'p'+Date.now()+Math.random().toString(36).slice(2),name:f.name,origSize:f.size,dataUrl:d,w:img.naturalWidth,h:img.naturalHeight,compData:null,compSize:null});
-    }catch(e){toast('❌ '+f.name+': '+e.message,true);}
+    }catch(e){toast('❌ '+f.name,true);}
   }
-  renderGrid();setStatus(photos.length+' foto siap.');
+  renderGrid();
 }
 function renderGrid(){
   const g=$('grid');g.innerHTML='';
   $('emptyMsg').style.display=photos.length?'none':'flex';
-  const tO=photos.reduce((s,p)=>s+p.origSize,0),tC=photos.reduce((s,p)=>s+(p.compSize||p.origSize),0),done=photos.some(p=>p.compData);
-  $('stCount').textContent=photos.length;$('stOrig').textContent=tO?fmt(tO):'-';
-  $('stRes').textContent=done?fmt(tC):'-';$('stSave').textContent=(tO&&done)?'-'+Math.round((1-tC/tO)*100)+'%':'-';
-  $('btnComp').disabled=$('btnPdf').disabled=$('btnDrive').disabled=(!photos.length||busy);
+  $('btnSend').disabled=(!photos.length||busy);
   photos.forEach((p,i)=>{
     const d=document.createElement('div');d.className='thumb';d.dataset.id=p.id;
-    d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del">×</button><img src="'+(p.compData||p.dataUrl)+'"><div class="thumb-size">'+fmt(p.origSize)+(p.compSize?' → '+fmt(p.compSize):'')+'</div>';
+    d.innerHTML='<span class="thumb-num">'+(i+1)+'</span><button class="thumb-del" title="Hapus">×</button><img src="'+p.dataUrl+'">';
     d.querySelector('.thumb-del').onclick=ev=>{ev.stopPropagation();if(busy)return;photos=photos.filter(x=>x.id!==p.id);renderGrid();};
     g.appendChild(d);
   });
@@ -253,177 +157,69 @@ function renderGrid(){
   window.sortInst=new Sortable(g,{animation:150,onEnd:()=>{const ids=[...g.children].map(el=>el.dataset.id);photos.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));renderGrid();}});
 }
 
-/* ============ SETTING ============ */
-$('targetChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('targetChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');targetMB=parseFloat(c.dataset.v);autoAdjust();};
-$('modeChips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...$('modeChips').children].forEach(x=>x.classList.remove('active'));c.classList.add('active');mode=c.dataset.m;autoAdjust();};
-$('inpRes').oninput=e=>$('valRes').textContent=e.target.value+'px';
-$('inpQual').oninput=e=>$('valQual').textContent=e.target.value+'%';
-function autoAdjust(){
-  if(mode==='qual'){$('inpRes').value=3000;$('inpQual').value=90;}
-  else if(mode==='size'){$('inpRes').value=1200;$('inpQual').value=50;}
-  else{if(targetMB<=1){$('inpRes').value=1500;$('inpQual').value=60;}else{$('inpRes').value=2000;$('inpQual').value=70;}}
-  $('valRes').textContent=$('inpRes').value+'px';$('valQual').textContent=$('inpQual').value+'%';
-}
-autoAdjust();
-
-/* ============ COMPRESS ============ */
-async function compressImage(p,mR,q){
+/* ============ COMPRESS (preset auto) ============ */
+async function compressImage(p){
   const img=await loadImg(p.dataUrl);let w=img.naturalWidth,h=img.naturalHeight;
-  if(Math.max(w,h)>mR){const r=mR/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
+  const maxRes=2000;
+  if(Math.max(w,h)>maxRes){const r=maxRes/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
   const cv=document.createElement('canvas');cv.width=w;cv.height=h;
-  const ctx=cv.getContext('2d');
-  const draw=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);};draw();
-  let qq=q/100,du=cv.toDataURL('image/jpeg',qq),sz=Math.round(du.length*0.75);
-  const tb=targetMB>0?targetMB*1048576:Infinity;let g=0;
-  while(sz>tb&&qq>0.2&&g++<12){qq=Math.max(0.2,qq-0.08);du=cv.toDataURL('image/jpeg',qq);sz=Math.round(du.length*0.75);}
-  g=0;
-  while(sz>tb&&Math.max(w,h)>600&&g++<6){w=Math.round(w*0.85);h=Math.round(h*0.85);cv.width=w;cv.height=h;draw();du=cv.toDataURL('image/jpeg',qq);sz=Math.round(du.length*0.75);}
+  const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+  let q=0.7,du=cv.toDataURL('image/jpeg',q),sz=Math.round(du.length*0.75);
+  const tb=5*1048576;let g=0;
+  while(sz>tb&&q>0.2&&g++<12){q=Math.max(0.2,q-0.08);du=cv.toDataURL('image/jpeg',q);sz=Math.round(du.length*0.75);}
   return{dataUrl:du,size:sz,w,h};
 }
-async function doCompress(onlyMissing){
-  const mR=+$('inpRes').value,ql=+$('inpQual').value;
-  const list=onlyMissing?photos.filter(p=>!p.compData):photos;
-  for(let i=0;i<list.length;i++){
-    setStatus('Compress '+(i+1)+'/'+list.length+'...');setProg((i+1)/list.length*100);await wait(20);
-    try{const r=await compressImage(list[i],mR,ql);Object.assign(list[i],{compData:r.dataUrl,compSize:r.size,w:r.w,h:r.h});}
-    catch(e){list[i].compData=list[i].dataUrl;list[i].compSize=list[i].origSize;}
-    renderGrid();
+async function doCompress(){
+  for(let i=0;i<photos.length;i++){
+    setStatus('Menyiapkan '+(i+1)+'/'+photos.length+'...');setProg((i+1)/photos.length*40);await wait(15);
+    try{const r=await compressImage(photos[i]);Object.assign(photos[i],{compData:r.dataUrl,compSize:r.size,w:r.w,h:r.h});}
+    catch(e){photos[i].compData=photos[i].dataUrl;photos[i].compSize=photos[i].origSize;}
   }
 }
-async function processCompress(){if(busy||!photos.length)return;busy=true;renderGrid();await doCompress(false);busy=false;renderGrid();setStatus('✅ Kompresi selesai');hideProg();}
 
 /* ============ PDF ============ */
 async function buildPdf(){
-  if(photos.some(p=>!p.compData))await doCompress(true);
-  const sz=$('pdfSize').value,num=$('pdfNum').checked;let pdf=null;
+  if(photos.some(p=>!p.compData))await doCompress();
+  let pdf=null;
   for(let i=0;i<photos.length;i++){
     const p=photos[i],land=p.w>p.h;
-    if(sz==='fit'){
-      const W=p.w*0.2646,H=p.h*0.2646;
-      if(i===0)pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:[W,H]});else pdf.addPage([W,H],land?'l':'p');
-      pdf.addImage(p.compData,'JPEG',0,0,W,H,undefined,'FAST');
-    }else{
-      if(i===0)pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:'a4'});else pdf.addPage('a4',land?'l':'p');
-      const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
-      const r=Math.min(PW/p.w,PH/p.h),w=p.w*r,h=p.h*r;
-      pdf.addImage(p.compData,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
-      if(num){pdf.setFontSize(8);pdf.setTextColor(150);pdf.text((i+1)+' / '+photos.length,PW/2,PH-4,{align:'center'});}
-    }
-    setStatus('Menyusun halaman '+(i+1)+'/'+photos.length);setProg((i+1)/photos.length*50);await wait(10);
+    if(i===0)pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:'a4'});else pdf.addPage('a4',land?'l':'p');
+    const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
+    const r=Math.min(PW/p.w,PH/p.h),w=p.w*r,h=p.h*r;
+    pdf.addImage(p.compData,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
+    setStatus('Menyusun PDF '+(i+1)+'/'+photos.length);setProg(40+(i+1)/photos.length*20);await wait(10);
   }
   return pdf;
 }
 
-/* ============ MODAL ============ */
-function openModal(id){$(id).classList.add('show');}
-function closeModal(id){$(id).classList.remove('show');}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
-function askDeleteAll(){if(photos.length&&!busy)openModal('confirmModal');}
-function doDeleteAll(){photos=[];renderGrid();closeModal('confirmModal');$('resultBox').style.display='none';setStatus('Dihapus.');}
-$('modalFileName').addEventListener('input',()=>nameTouched=true);
-$('modalFileName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmSave();if(e.key==='Escape')closeModal('pdfModal');});
-
-function askDownload(){
-  if(!photos.length||busy)return;pendingAction='download';
-  $('modalTitle').textContent='⬇ Download PDF';$('modalGo').textContent='⬇ Download';
-  $('pdfModalInfo').textContent=photos.length+' halaman';
-  if(!nameTouched)$('modalFileName').value=suggestName();
-  openModal('pdfModal');
-}
-function askSave(){
-  if(!photos.length||busy)return;
-  const p=getFolderParams();
-  if(!p.tahun||!p.bulan||!p.afdeling||!p.jenisDoc){toast('❌ Lengkapi Tahun / Bulan / Afdeling / Jenis Dokumen',true);return;}
-  if(!getEndpoint()){toast('❌ Isi URL Apps Script dulu (⚙️)',true);toggleSetup(true);return;}
-  pendingAction='drive';
-  $('modalTitle').textContent='☁️ Kirim ke Google Drive';$('modalGo').textContent='☁️ Kirim';
-  $('pdfModalInfo').innerHTML='📂 '+esc(pathText())+'<br>'+photos.length+' halaman';
-  if(!nameTouched)$('modalFileName').value=suggestName();
-  openModal('pdfModal');
-}
-function confirmSave(){
-  let n=clean($('modalFileName').value||'')||'laporan';
-  if(!/\.pdf$/i.test(n))n+='.pdf';
-  pdfName=n;closeModal('pdfModal');
-  if(pendingAction==='download')downloadPdf();else sendToDrive();
-}
-async function downloadPdf(){
-  if(busy)return;busy=true;renderGrid();
-  try{const pdf=await buildPdf();const blob=pdf.output('blob');pdf.save(pdfName);setProg(100);setStatus('✅ '+pdfName+' ('+fmt(blob.size)+')');toast('✅ PDF dibuat');}
-  catch(e){setStatus('❌ '+e.message);toast('❌ '+e.message,true);}
-  busy=false;renderGrid();hideProg();
-}
-
-/* ============ DRIVE ============ */
-function getEndpoint(){return (DEFAULT_ENDPOINT||'').trim()||(localStorage.getItem('gas_endpoint')||'').trim();}
-function saveEndpoint(){
-  const u=$('endpointInput').value.trim();
-  if(!u){localStorage.removeItem('gas_endpoint');refreshSetupUI();toast('URL dihapus');return;}
-  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){toast('❌ URL harus berakhiran /exec',true);return;}
-  localStorage.setItem('gas_endpoint',u);refreshSetupUI();toast('✅ Tersimpan, klik Tes');
-}
-function toggleSetup(force){const b=$('setupBox');b.style.display=(force===true||b.style.display==='none')?'block':'none';}
-function refreshSetupUI(){
-  if((DEFAULT_ENDPOINT||'').trim()){$('endpointInput').value=DEFAULT_ENDPOINT;$('endpointInput').disabled=true;$('setupBox').style.display='none';}
-  else{$('endpointInput').value=localStorage.getItem('gas_endpoint')||'';$('setupBox').style.display=getEndpoint()?'none':'block';}
-}
-async function callEndpoint(url,payload){
-  const opt=payload?{method:'POST',body:JSON.stringify(payload)}:{method:'GET'};
-  let res;try{res=await fetch(url,opt);}catch(e){throw new Error('Tidak bisa terhubung ke Apps Script');}
-  const txt=await res.text();let j;
-  try{j=JSON.parse(txt);}catch(e){throw new Error('Respon bukan JSON. Cek: Who has access = Anyone');}
-  if(!j.ok)throw new Error(j.error||'Error di Apps Script');
-  return j;
-}
-async function testEndpoint(){
-  const u=$('endpointInput').value.trim()||getEndpoint();
-  if(!u){toast('❌ Isi URL dulu',true);return;}
-  $('epStatus').textContent='⏳ Menguji...';
-  try{
-    const j=await callEndpoint(u);
-    if(j.version!=='v3'){$('epStatus').textContent='⚠️ Terhubung tapi versi lama ('+(j.version||'?')+'). Deploy → Manage deployments → New version.';toast('⚠️ Apps Script masih versi lama',true);return;}
-    $('epStatus').textContent='✅ Terhubung · '+j.version+' · folder induk: '+(j.root||'-');
-    if(j.config){
-      if(j.config.afdeling)fillSel($('selAfdeling'),j.config.afdeling,'-- Afdeling --');
-      if(j.config.jenisDoc)fillSel($('selJenisDoc'),j.config.jenisDoc,'-- Jenis Dokumen --');
-      updatePath();
-    }
-    toast('✅ Koneksi OK');
-  }catch(e){$('epStatus').textContent='❌ '+e.message;toast('❌ '+e.message,true);}
-}
+/* ============ KIRIM ============ */
 async function sendToDrive(){
-  if(busy)return;busy=true;renderGrid();$('resultBox').style.display='none';
+  if(busy||!photos.length)return;
+  const p=getFolderParams();
+  if(!p.tahun||!p.bulan||!p.afdeling||!p.jenisDoc){toast('❌ Lengkapi Tahun/Bulan/Afdeling/Jenis',true);return;}
+  busy=true;renderGrid();$('resultBox').style.display='none';
   try{
-    const p=getFolderParams();
     const pdf=await buildPdf();const blob=pdf.output('blob');
-    if(blob.size>25*1048576)throw new Error('PDF terlalu besar ('+fmt(blob.size)+'), turunkan target ukuran');
-    setStatus('Menyiapkan '+fmt(blob.size)+'...');setProg(60);
+    if(blob.size>25*1048576)throw new Error('PDF terlalu besar: '+fmt(blob.size));
+    setStatus('☁️ Mengirim '+fmt(blob.size)+'...');setProg(70);
     const b64=await blobToBase64(blob);
-    setStatus('☁️ Mengirim ke Drive, jangan tutup halaman...');setProg(80);
-    const j=await callEndpoint(getEndpoint(),{name:pdfName,mimeType:'application/pdf',data:b64,tahun:p.tahun,bulan:p.bulan,afdeling:p.afdeling,jenisDoc:p.jenisDoc});
+    const j=await fetch(ENDPOINT,{method:'POST',body:JSON.stringify({name:suggestName(),mimeType:'application/pdf',data:b64,tahun:p.tahun,bulan:p.bulan,afdeling:p.afdeling,jenisDoc:p.jenisDoc})}).then(r=>r.json());
+    if(!j.ok)throw new Error(j.error||'Gagal');
     setProg(100);
-    if(j.version!=='v3'||!j.path){
-      setStatus('⚠️ Terkirim tapi Apps Script versi lama → file bisa di luar folder');
-      toast('⚠️ Deploy New version dulu, file mungkin di luar folder',true);
-    }else{
-      setStatus('✅ Tersimpan di folder');
-      toast('✅ Berhasil masuk folder');
-    }
+    setStatus('✅ Tersimpan');toast('✅ Berhasil dikirim');
     const rb=$('resultBox');rb.style.display='block';
-    rb.innerHTML='✅ <b>'+esc(j.name||pdfName)+'</b> ('+fmt(blob.size)+')<br>📂 '+esc(j.path||pathText())+
-      (j.url?'<br><a href="'+esc(j.url)+'" target="_blank" rel="noopener">Buka file ↗</a>':'')+
-      (j.folderUrl?' · <a href="'+esc(j.folderUrl)+'" target="_blank" rel="noopener">Buka folder ↗</a>':'');
+    rb.innerHTML='✅ <b>'+esc(j.name||suggestName())+'</b><br>📂 '+esc(j.path||pathText())+
+      (j.url?' · <a href="'+esc(j.url)+'" target="_blank">Buka ↗</a>':'')+
+      '<br><button class="new-doc" onclick="newDoc()">🆕 Dokumen Baru</button>';
+    photos=[];renderGrid();
   }catch(e){setStatus('❌ '+e.message);toast('❌ '+e.message,true);}
   busy=false;renderGrid();hideProg();
 }
+function newDoc(){photos=[];renderGrid();$('resultBox').style.display='none';setStatus('Siap.');window.scrollTo(0,0);}
 
 /* ============ INIT ============ */
-initDropdowns();refreshSetupUI();renderGrid();
-(async function(){if(getEndpoint()){try{
-  const j=await callEndpoint(getEndpoint());
-  if(j.config){if(j.config.afdeling)fillSel($('selAfdeling'),j.config.afdeling,'-- Afdeling --');if(j.config.jenisDoc)fillSel($('selJenisDoc'),j.config.jenisDoc,'-- Jenis Dokumen --');updatePath();}
-  if(j.version!=='v3')$('epStatus').textContent='⚠️ Apps Script versi lama ('+(j.version||'?')+')';
-}catch(e){}}})();
+initDropdowns();renderGrid();
+(async()=>{try{const j=await fetch(ENDPOINT).then(r=>r.json());if(j.config){if(j.config.afdeling)fillSel($('selAfdeling'),j.config.afdeling);if(j.config.jenisDoc)fillSel($('selJenisDoc'),j.config.jenisDoc);updatePath();}}catch(e){}})();
 </script>
 </body>
 </html>
