@@ -6,7 +6,7 @@
 <title>Dokumen 1KCB</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--primary:#2563eb;--primary-dark:#1d4ed8;--border:#cbd5e0;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4}
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--border:#cbd5e0;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#4285F4;--cam:#f59e0b}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:8px;font-size:13px;color:var(--text);background:#f1f5f9}
 .app{border:2px solid var(--primary);border-radius:12px;background:#fff;overflow:hidden;max-width:480px;margin:0 auto}
@@ -16,28 +16,58 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;p
 .box{background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:10px;margin-bottom:10px}
 .lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:6px 0 4px;display:block}
 select{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;background:#fff;margin-bottom:4px}
+select:disabled{background:#f1f5f9;color:#94a3b8}
+
+.foto-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.foto-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 8px;border:2px solid var(--border);border-radius:10px;background:#fff;text-align:center;cursor:pointer;font-family:inherit;color:inherit}
+.foto-btn:active{background:#eff6ff;border-color:var(--primary)}
+.foto-btn .ico{font-size:24px;margin-bottom:2px}
+.foto-btn .txt{font-size:12px;font-weight:700}
+.foto-btn .sub{font-size:9px;color:var(--muted)}
+
+/* Ringkasan foto — TIDAK ada thumbnail, cuma teks */
+.foto-summary{display:flex;align-items:center;justify-content:space-between;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.foto-summary.empty{background:#f9fafb;border-color:var(--border)}
+.foto-summary .fs-text{font-size:13px;font-weight:700;color:var(--primary-dark)}
+.foto-summary.empty .fs-text{color:#9ca3af;font-weight:500}
+.foto-summary .fs-clear{background:#fff;border:1px solid var(--danger);color:var(--danger);border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer}
+
 .send-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:800;background:var(--drive);touch-action:manipulation}
-.send-btn:disabled{opacity:.5}
-.send-btn.st-done{background:var(--success)}
+.send-btn:disabled{opacity:.5;cursor:not-allowed}
+.send-btn.st-send{background:#64748b;cursor:wait}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;display:inline-block;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 .status{font-size:11px;color:var(--muted);text-align:center;margin:8px 0;min-height:16px}
 
 /* Hasil Upload - Tengah Layar */
-#resultBox{display:none;padding:16px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;margin-top:12px;text-align:center}
-.result-title{font-size:15px;font-weight:700;color:#166534;margin-bottom:6px}
-.result-path{font-size:12px;color:#166534;margin-bottom:12px;line-height:1.5}
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2500;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+#resultBox{background:#f0fdf4;border:2px solid #86efac;border-radius:14px;padding:20px;text-align:center;max-width:360px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.result-icon{font-size:36px;margin-bottom:6px}
+.result-title{font-size:16px;font-weight:800;color:#166534;margin-bottom:8px}
+.result-path{font-size:12px;color:#166534;margin-bottom:16px;line-height:1.6;word-break:break-word}
 .result-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.result-btn{padding:10px 16px;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer}
+.result-btn{padding:11px 18px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
 .result-btn.primary{background:var(--primary);color:#fff}
 .result-btn.secondary{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 16px;border-radius:8px;opacity:0;z-index:3000;font-weight:700;max-width:90vw;text-align:center;transition:.25s}
+
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 16px;border-radius:8px;opacity:0;z-index:3000;font-weight:700;max-width:90vw;text-align:center;transition:.25s}
 .toast.show{opacity:1}.toast.err{background:var(--danger)}
+
+/* Kamera Live */
+.cam-modal{position:fixed;inset:0;width:100%;height:100vh;height:100dvh;overflow:hidden;display:none;flex-direction:column;background:#000;z-index:2000}
+.cam-modal.on{display:flex}
+.cam-modal video{display:block;flex:1 1 0%;min-height:0;width:100%;height:0;object-fit:contain;background:#000}
+.cam-bar{position:relative;z-index:3;flex:0 0 auto;display:flex;gap:10px;width:100%;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));background:#18181b}
+.cam-bar button{flex:1;min-height:52px;padding:12px;border:none;border-radius:8px;font-size:16px;font-weight:800;cursor:pointer}
+.cam-shot{background:#10b981;color:#fff}
+.cam-x{background:#3f3f46;color:#fff}
+.cam-info{position:absolute;top:12px;left:0;right:0;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 3px #000;pointer-events:none;z-index:2}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="head">
-    <h1>📁 Dokumen 1KCB</h1>
-  </div>
+  <div class="head"><h1>📁 Dokumen 1KCB</h1></div>
   <div class="body">
 
     <div class="box">
@@ -49,99 +79,220 @@ select{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:6px
       <span class="lbl">Jenis Dokumen</span><select id="selJenisDoc"></select>
     </div>
 
-    <button class="send-btn" id="btnSend" disabled>☁️ Kirim ke Drive</button>
-    <div class="status" id="statusText">Siap.</div>
+    <div class="foto-btns">
+      <button type="button" class="foto-btn" id="btnBukaKamera">
+        <span class="ico">📷</span><span class="txt">Kamera</span><span class="sub">Ambil foto</span>
+      </button>
+      <label class="foto-btn">
+        <span class="ico">🖼️</span><span class="txt">Galeri</span><span class="sub">Pilih File</span>
+        <input type="file" accept="image/*" multiple id="galIn" style="display:none">
+      </label>
+    </div>
+    <input type="file" accept="image/*" capture="environment" id="camFallback" style="display:none">
 
-    <!-- Hasil Upload (Muncul di Tengah) -->
-    <div id="resultBox">
-      <div class="result-title">✅ Berhasil dikirim!</div>
-      <div class="result-path" id="resultPath"></div>
-      <div class="result-actions">
-        <button class="result-btn primary" onclick="bukaFile()">📄 Buka File</button>
-        <button class="result-btn secondary" onclick="newDoc()">🆕 Dokumen Baru</button>
-      </div>
+    <div class="foto-summary empty" id="fotoSummary">
+      <span class="fs-text" id="fsText">Belum ada foto</span>
+      <button class="fs-clear" id="btnHapus" onclick="hapusSemua()" style="display:none">Hapus</button>
     </div>
 
+    <button class="send-btn" id="btnSend" disabled>☁️ Kirim ke Drive</button>
+    <div class="status" id="statusText">Siap.</div>
   </div>
 </div>
+
+<div class="overlay" id="overlay">
+  <div id="resultBox">
+    <div class="result-icon">✅</div>
+    <div class="result-title">Berhasil dikirim!</div>
+    <div class="result-path" id="resultPath"></div>
+    <div class="result-actions">
+      <button class="result-btn primary" onclick="bukaFile()">📄 Buka File</button>
+      <button class="result-btn secondary" onclick="newDoc()">🆕 Dokumen Baru</button>
+    </div>
+  </div>
+</div>
+
+<div class="cam-modal" id="camModal">
+  <div class="cam-info" id="camInfo">Arahkan kamera lalu klik Jepret</div>
+  <video id="camVideo" autoplay playsinline muted></video>
+  <div class="cam-bar">
+    <button type="button" class="cam-x" onclick="tutupKamera()">✕ Tutup</button>
+    <button type="button" class="cam-shot" onclick="ambilJepretan()">📸 JEPRET</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const {jsPDF}=window.jspdf;
-const EP='https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
-const MO=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-const PE=['Periode I','Periode II'];
-const AF=['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
-const JD=['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
+const { jsPDF } = window.jspdf;
+const EP = 'https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
+const MO = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const PE = ['Periode I','Periode II'];
+const AF = ['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
+const JD = ['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
 
-let photos=[],busy=false,lastFileUrl='',lastFolderUrl='';
+let photos = [], busy = false, streamObj = null, lastFileUrl = '';
 
-const $=id=>document.getElementById(id);
-const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';
-const pad=n=>String(n).padStart(2,'0');
-const clean=s=>String(s).replace(/[\\/:*?"<>|]+/g,'-').trim();
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const $ = id => document.getElementById(id);
+const fmt = b => b >= 1048576 ? (b/1048576).toFixed(2)+' MB' : (b/1024).toFixed(0)+' KB';
+const pad = n => String(n).padStart(2,'0');
+const clean = s => String(s).replace(/[\\/:*?"<>|]+/g,'-').trim();
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const loadImg = src => new Promise((y,n) => { const i=new Image(); i.onload=()=>y(i); i.onerror=()=>n(new Error('rusak')); i.src=src; });
+const readDU = f => new Promise((y,n) => { const r=new FileReader(); r.onload=()=>y(r.result); r.onerror=()=>n(r.error); r.readAsDataURL(f); });
+const toB64 = b => new Promise((y,n) => { const r=new FileReader(); r.onload=()=>y(String(r.result).split(',')[1]); r.onerror=()=>n(r.error); r.readAsDataURL(b); });
 
 let tT;
-function toast(m,e){const t=$('toast');t.textContent=m;t.className='toast show'+(e?' err':'');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3500);}
-function stat(m){$('statusText').textContent=m;}
+function toast(m, e){ const t=$('toast'); t.textContent=m; t.className='toast show'+(e?' err':''); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3500); }
+function stat(m){ $('statusText').textContent=m; }
+
+function setBtn(state, label){
+  const b = $('btnSend');
+  if(state === 'idle'){
+    b.className='send-btn'; b.disabled=(!photos.length||busy);
+    b.innerHTML='☁️ Kirim ke Drive'; b.onclick=sendToDrive;
+  } else {
+    b.className='send-btn st-send'; b.disabled=true;
+    b.innerHTML='<span class="spin"></span><span>'+(label||'Mengirim…')+'</span>';
+  }
+}
 
 /* Dropdown */
-function fill(el,a,ph){el.innerHTML='<option value="">'+ph+'</option>';a.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});}
-(function init(){
-  const d=new Date(),y=d.getFullYear(),sT=$('selTahun');
-  for(let i=y+1;i>=y-5;i--){const o=document.createElement('option');o.value=i;o.textContent=i;sT.appendChild(o);}
+function fill(el,a,ph){ el.innerHTML='<option value="">'+ph+'</option>'; a.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);}); }
+(function initDD(){
+  const d=new Date(), y=d.getFullYear(), sT=$('selTahun');
+  for(let i=y+1;i>=y-5;i--){ const o=document.createElement('option'); o.value=i; o.textContent=i; sT.appendChild(o); }
   sT.value=y;
   fill($('selBulan'),MO,'-- Bulan --'); $('selBulan').value=MO[d.getMonth()];
   fill($('selAfdeling'),AF,'-- Afdeling --');
   fill($('selJenisDoc'),JD,'-- Jenis Dokumen --');
   $('selBulan').onchange=onBulan; onBulan();
 })();
-function onBulan(){const s=$('selPeriode'),b=$('selBulan').value;if(!b){s.disabled=true;s.innerHTML='<option value="">-- Pilih bulan dulu --</option>';}else{s.disabled=false;fill(s,PE,'-- Periode --');}}
-function fp(){return{tahun:$('selTahun').value,bulan:$('selBulan').value,periode:$('selPeriode').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value};}
-function sName(){const p=fp(),d=new Date(),st=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'laporan')+' - '+st+'.pdf';}
+function onBulan(){ const s=$('selPeriode'),b=$('selBulan').value; if(!b){s.disabled=true;s.innerHTML='<option value="">-- Pilih bulan dulu --</option>';} else {s.disabled=false;fill(s,PE,'-- Periode --');} }
+function fp(){ return { tahun:$('selTahun').value, bulan:$('selBulan').value, periode:$('selPeriode').value, afdeling:$('selAfdeling').value, jenisDoc:$('selJenisDoc').value }; }
+function sName(){ const p=fp(), d=new Date(), st=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'laporan')+' - '+st+'.pdf'; }
 
-/* Buka File */
-function bukaFile(){ if(lastFileUrl) window.open(lastFileUrl,'_blank'); }
-function newDoc(){ $('resultBox').style.display='none'; lastFileUrl=''; lastFolderUrl=''; stat('Siap.'); }
+/* Ringkasan foto (tanpa thumbnail) */
+function updateSummary(){
+  const box=$('fotoSummary'), txt=$('fsText'), del=$('btnHapus');
+  if(photos.length===0){
+    box.classList.add('empty'); txt.textContent='Belum ada foto'; del.style.display='none';
+  } else {
+    box.classList.remove('empty');
+    txt.textContent='📸 '+photos.length+' foto siap dikirim';
+    del.style.display='inline-block';
+  }
+  $('btnSend').disabled = (!photos.length || busy);
+}
+function hapusSemua(){ if(busy) return; photos=[]; updateSummary(); stat('Foto dihapus.'); }
+
+/* Kamera Live */
+$('btnBukaKamera').onclick = bukaKamera;
+$('galIn').onchange = e => { addFiles(e.target.files); e.target.value=''; };
+$('camFallback').onchange = e => { addFiles(e.target.files); e.target.value=''; };
+
+async function bukaKamera(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ $('camFallback').click(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1920}, height:{ideal:1080} }, audio:false });
+    streamObj = stream; $('camVideo').srcObject = stream; $('camModal').classList.add('on');
+    $('camInfo').textContent = 'Kamera aktif · Foto ke-'+(photos.length+1);
+  } catch(err) {
+    try {
+      const streamFront = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
+      streamObj = streamFront; $('camVideo').srcObject = streamFront; $('camModal').classList.add('on');
+    } catch(e2){ $('camFallback').click(); }
+  }
+}
+function tutupKamera(){ if(streamObj){ streamObj.getTracks().forEach(t=>t.stop()); streamObj=null; } $('camModal').classList.remove('on'); }
+function ambilJepretan(){
+  const v=$('camVideo'); if(!v.videoWidth){ toast('Kamera belum siap',true); return; }
+  const c=document.createElement('canvas'); c.width=v.videoWidth; c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0);
+  const du=c.toDataURL('image/jpeg',0.88);
+  photos.push({ id:'p'+Date.now()+Math.random().toString(36).slice(2), dataUrl:du, w:c.width, h:c.height, comp:null });
+  updateSummary();
+  toast('📸 Foto '+photos.length+' diambil!');
+  $('camInfo').textContent = '✅ '+photos.length+' foto. Jepret lagi atau Tutup.';
+}
+
+/* File handling */
+async function addFiles(files){
+  const l=[...files].filter(f=>f.type.startsWith('image/')); if(!l.length) return;
+  stat('Memuat '+l.length+' foto…');
+  for(const f of l){
+    try {
+      const du=await readDU(f), img=await loadImg(du);
+      photos.push({ id:'p'+Date.now()+Math.random().toString(36).slice(2), dataUrl:du, w:img.naturalWidth, h:img.naturalHeight, comp:null });
+    } catch(e){ toast('❌ Gagal: '+f.name, true); }
+  }
+  updateSummary(); stat(photos.length+' foto siap dikirim.');
+}
+
+/* Kompres */
+async function compress(p){
+  const img=await loadImg(p.dataUrl); let w=img.naturalWidth,h=img.naturalHeight;
+  const mx=1600; if(Math.max(w,h)>mx){ const r=mx/Math.max(w,h); w=Math.round(w*r); h=Math.round(h*r); }
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+  let q=0.65, du=c.toDataURL('image/jpeg',q), sz=Math.round(du.length*0.75), g=0;
+  while(sz>3*1048576 && q>0.15 && g++<12){ q-=0.06; du=c.toDataURL('image/jpeg',q); sz=Math.round(du.length*0.75); }
+  return { dataUrl:du, w, h };
+}
 
 /* Kirim */
 async function sendToDrive(){
-  if(busy) return;
+  if(busy || !photos.length) return;
   const p=fp();
   if(!p.tahun||!p.bulan||!p.periode||!p.afdeling||!p.jenisDoc){ toast('❌ Lengkapi semua pilihan',true); return; }
 
-  busy=true; $('resultBox').style.display='none'; stat('☁️ Mengirim...');
+  busy=true; setBtn('send','Menyiapkan…');
   try{
-    // Karena tidak ada foto, kita buat PDF kosong sederhana
-    const pdf=new jsPDF({unit:'mm',format:'a4'});
-    pdf.text('Dokumen 1KCB',105,50,{align:'center'});
+    for(let i=0;i<photos.length;i++){
+      setBtn('send','Kompres '+(i+1)+'/'+photos.length);
+      if(!photos[i].comp) photos[i].comp = await compress(photos[i]);
+    }
+    let pdf=null;
+    for(let i=0;i<photos.length;i++){
+      setBtn('send','Menyusun PDF '+(i+1)+'/'+photos.length);
+      const c=photos[i].comp, land=c.w>c.h;
+      if(i===0) pdf=new jsPDF({ orientation:land?'l':'p', unit:'mm', format:'a4' });
+      else pdf.addPage('a4', land?'l':'p');
+      const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
+      const r=Math.min(PW/c.w,PH/c.h), w=c.w*r, h=c.h*r;
+      pdf.addImage(c.dataUrl,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
+      await wait(5);
+    }
     const blob=pdf.output('blob');
-    const b64=await new Promise((y,n)=>{const r=new FileReader();r.onload=()=>y(String(r.result).split(',')[1]);r.onerror=()=>n(r.error);r.readAsDataURL(blob);});
-    const fn=sName();
+    if(blob.size > 12*1048576) throw new Error('PDF '+fmt(blob.size)+' terlalu besar');
 
-    const res=await fetch(EP,{method:'POST',body:JSON.stringify({
-      name:fn,mimeType:'application/pdf',data:b64,
-      tahun:p.tahun,bulan:p.bulan,periode:p.periode,afdeling:p.afdeling,jenisDoc:p.jenisDoc
+    setBtn('send','Mengirim '+fmt(blob.size)+'…');
+    const b64=await toB64(blob); const fn=sName();
+
+    const res=await fetch(EP,{ method:'POST', body:JSON.stringify({
+      name:fn, mimeType:'application/pdf', data:b64,
+      tahun:p.tahun, bulan:p.bulan, periode:p.periode, afdeling:p.afdeling, jenisDoc:p.jenisDoc
     })});
-    const j=await res.json();
-    if(!j.ok) throw new Error(j.error||'Gagal');
+    const txt=await res.text();
+    let j; try{ j=JSON.parse(txt); }catch(e){ throw new Error('Server error'); }
+    if(!j.ok) throw new Error(j.error||'Gagal menyimpan');
 
-    lastFileUrl=j.url||'';
-    lastFolderUrl=j.folderUrl||'';
-
-    stat('✅ Tersimpan');
-    toast('✅ Berhasil dikirim!');
-    $('resultBox').style.display='block';
-    $('resultPath').innerHTML='📂 '+esc(j.path||'')+'<br><b>'+esc(j.name||fn)+'</b>';
+    lastFileUrl = j.url || '';
+    stat('✅ Tersimpan'); toast('✅ Berhasil dikirim!');
+    $('resultPath').innerHTML = '📂 '+esc(j.path||'')+'<br><b>'+esc(j.name||fn)+'</b>';
+    $('overlay').classList.add('show');
+    photos=[]; updateSummary();
   }catch(e){
     stat('❌ '+e.message); toast('❌ '+e.message,true);
   }
-  busy=false;
+  busy=false; setBtn('idle');
 }
 
-$('btnSend').onclick=sendToDrive;
+function bukaFile(){ if(lastFileUrl) window.open(lastFileUrl,'_blank'); }
+function newDoc(){ $('overlay').classList.remove('show'); stat('Siap.'); }
+
+updateSummary(); setBtn('idle');
 </script>
 </body>
 </html>
