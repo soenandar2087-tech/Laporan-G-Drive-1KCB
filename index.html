@@ -52,11 +52,18 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
 .notice-icon{font-size:32px;color:var(--success);font-weight:800;margin-bottom:8px}
 .notice-text{color:var(--primary-dark);font-size:15px;font-weight:800;line-height:1.4}
 
-/* KAMERA SEPERTI SS KAMU */
+/* KAMERA */
 .cam{position:fixed;inset:0;z-index:3000;display:none;flex-direction:column;background:#000;width:100%;height:100%;height:100dvh;overflow:hidden}
 .cam.open{display:flex}
 .cam-stage{position:relative;flex:1 1 0;min-height:0;overflow:hidden;background:#000}
 .cam-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center center}
+.a4-frame{position:absolute;z-index:4;border:3px solid #ff2b2b;box-shadow:0 0 0 200vmax rgba(0,0,0,.32),inset 0 0 0 1px rgba(255,255,255,.25);pointer-events:none}
+.a4-label{position:absolute;top:7px;left:50%;transform:translateX(-50%);padding:4px 9px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:800;white-space:nowrap}
+.corner{position:absolute;width:22px;height:22px}
+.corner.tl{left:-3px;top:-3px;border-left:5px solid #ff0000;border-top:5px solid #ff0000}
+.corner.tr{right:-3px;top:-3px;border-right:5px solid #ff0000;border-top:5px solid #ff0000}
+.corner.bl{left:-3px;bottom:-3px;border-left:5px solid #ff0000;border-bottom:5px solid #ff0000}
+.corner.br{right:-3px;bottom:-3px;border-right:5px solid #ff0000;border-bottom:5px solid #ff0000}
 .cam-bottom{flex:0 0 auto;background:#000;padding:8px 16px calc(18px + env(safe-area-inset-bottom,0px))}
 .zoom-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .zoom-row span{color:#fff;font-size:12px;font-weight:700;min-width:28px}
@@ -70,17 +77,14 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
 .cam-shutter:active{transform:scale(.94)}
 .cam-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;background:var(--primary);color:#fff;border-radius:10px;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center}
 .cam-badge.show{display:flex}
-.cam-torch{position:absolute;top:12px;right:12px;z-index:3;width:42px;height:42px;border:none;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:18px}
+.cam-torch{position:absolute;top:12px;right:12px;z-index:5;width:42px;height:42px;border:none;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:18px}
 .cam-torch.on{background:#f59e0b;color:#111}
 .hidden{display:none!important}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="head">
-    <h1>📁 Dokumen 1KCB</h1>
-    <small>Pilih tujuan → Foto → Kirim · PDF A4 penuh</small>
-  </header>
+  <header class="head"><h1>📁 Dokumen 1KCB</h1><small>Pilih tujuan → Foto → Kirim · PDF A4 penuh</small></header>
   <main class="body">
     <section class="box">
       <span class="label">📂 Tujuan Penyimpanan</span>
@@ -90,27 +94,16 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
       <span class="label">Afdeling</span><select id="selAfdeling"></select>
       <span class="label">Jenis Dokumen</span><select id="selJenisDoc"></select>
     </section>
-
     <section class="photo-actions">
-      <button type="button" class="photo-button" id="btnCam">
-        <span class="icon">📷</span><span class="title">Kamera</span><span class="sub">Ambil foto langsung</span>
-      </button>
-      <label class="photo-button">
-        <span class="icon">🖼️</span><span class="title">Galeri</span><span class="sub">Pilih foto</span>
-        <input type="file" id="galIn" accept="image/*" multiple>
-      </label>
+      <button type="button" class="photo-button" id="btnCam"><span class="icon">📷</span><span class="title">Kamera</span><span class="sub">Ambil foto langsung</span></button>
+      <label class="photo-button"><span class="icon">🖼️</span><span class="title">Galeri</span><span class="sub">Pilih foto</span><input type="file" id="galIn" accept="image/*" multiple></label>
     </section>
     <input type="file" id="camFallback" accept="image/*" capture="environment" hidden>
-
     <section class="preview-box">
-      <div class="preview-head" id="previewHead">
-        <div class="photo-count">📷 <span id="photoCount">0</span> foto siap dikirim</div>
-        <button type="button" class="delete-all" id="btnHapus">Hapus</button>
-      </div>
+      <div class="preview-head" id="previewHead"><div class="photo-count">📷 <span id="photoCount">0</span> foto siap dikirim</div><button type="button" class="delete-all" id="btnHapus">Hapus</button></div>
       <div class="preview-grid" id="grid"></div>
       <div class="empty" id="emptyMsg">Belum ada foto</div>
     </section>
-
     <button type="button" class="send-button" id="btnSend" disabled>☁️ Kirim ke Drive</button>
     <div class="status" id="statusText">Siap.</div>
     <div class="open-file-wrap" id="openWrap"><a class="open-file" id="openLink" href="#" target="_blank" rel="noopener">Buka file ↗</a></div>
@@ -118,8 +111,9 @@ select:disabled{background:#f1f5f9;color:#94a3b8}
 </div>
 
 <div class="cam" id="cam">
-  <div class="cam-stage">
+  <div class="cam-stage" id="camStage">
     <video id="camVideo" autoplay playsinline muted></video>
+    <div class="a4-frame" id="a4Frame"><div class="a4-label">AREA A4</div><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div>
     <button type="button" class="cam-torch hidden" id="btnTorch">🔦</button>
   </div>
   <div class="cam-bottom">
@@ -141,7 +135,6 @@ const MO = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','
 const PE = ['Periode I','Periode II'];
 const AF = ['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
 const JD = ['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
-
 let photos=[], busy=false, btnState='idle', stream=null, videoTrack=null, torchOn=false, zoomVal=1, hwZoom=false, camShotCount=0, noticeT=null;
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2,'0');
@@ -150,7 +143,6 @@ const fmt = b => b>=1048576 ? (b/1048576).toFixed(2)+' MB' : Math.round(b/1024)+
 const loadImg = src => new Promise((y,n)=>{ const i=new Image(); i.onload=()=>y(i); i.onerror=()=>n(new Error('rusak')); i.src=src; });
 const readDU = f => new Promise((y,n)=>{ const r=new FileReader(); r.onload=()=>y(r.result); r.onerror=()=>n(); r.readAsDataURL(f); });
 const toB64 = b => new Promise((y,n)=>{ const r=new FileReader(); r.onload=()=>y(String(r.result).split(',')[1]); r.onerror=()=>n(); r.readAsDataURL(b); });
-
 function stat(m){ $('statusText').textContent=m; }
 function showOk(){ clearTimeout(noticeT); $('notice').classList.add('show'); noticeT=setTimeout(()=>$('notice').classList.remove('show'),1800); }
 function fill(el,arr,ph){ el.innerHTML='<option value="">'+ph+'</option>'; arr.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o); }); }
@@ -163,17 +155,10 @@ function fill(el,arr,ph){ el.innerHTML='<option value="">'+ph+'</option>'; arr.f
   fill($('selJenisDoc'),JD,'-- Pilih jenis dokumen --');
   $('selBulan').onchange=onBulan; onBulan();
 })();
-function onBulan(){
-  const s=$('selPeriode');
-  if(!$('selBulan').value){ s.disabled=true; s.innerHTML='<option value="">-- Pilih bulan dulu --</option>'; }
-  else { s.disabled=false; fill(s,PE,'-- Pilih periode --'); }
-}
+function onBulan(){ const s=$('selPeriode'); if(!$('selBulan').value){ s.disabled=true; s.innerHTML='<option value="">-- Pilih bulan dulu --</option>'; } else { s.disabled=false; fill(s,PE,'-- Pilih periode --'); } }
 function dest(){ return {tahun:$('selTahun').value,bulan:$('selBulan').value,periode:$('selPeriode').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value}; }
 function destOk(p){ return !!(p.tahun&&p.bulan&&p.periode&&p.afdeling&&p.jenisDoc); }
-function fileName(){
-  const p=dest(), d=new Date(), m=MO.indexOf(p.bulan)+1;
-  return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'Dokumen')+' - '+p.tahun+pad(m||d.getMonth()+1)+pad(d.getDate())+'.pdf';
-}
+function fileName(){ const p=dest(), d=new Date(), m=MO.indexOf(p.bulan)+1; return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'Dokumen')+' - '+p.tahun+pad(m||d.getMonth()+1)+pad(d.getDate())+'.pdf'; }
 function render(){
   const g=$('grid'), n=photos.length;
   $('previewHead').classList.toggle('show', n>0);
@@ -200,26 +185,32 @@ function updateBtn(){ if(btnState==='idle') $('btnSend').disabled=!photos.length
 function newDoc(){ photos=[]; $('openWrap').style.display='none'; $('openLink').removeAttribute('href'); stat('Siap.'); render(); setBtn('idle'); window.scrollTo({top:0,behavior:'smooth'}); }
 $('btnHapus').onclick=()=>{ if(busy)return; photos=[]; render(); stat('Foto dihapus.'); };
 
-/* KAMERA */
+/* KAMERA + FRAME A4 */
 $('btnCam').onclick=openCam;
 $('btnCloseCam').onclick=closeCam;
 $('btnCamDone').onclick=closeCam;
 $('btnShot').onclick=shot;
 $('galIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
 $('camFallback').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
-
-function stopCam(){
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
-  videoTrack=null; torchOn=false; zoomVal=1; hwZoom=false;
-  $('camVideo').srcObject=null; $('camVideo').style.transform='none';
-  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-}
+function stopCam(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } videoTrack=null; torchOn=false; zoomVal=1; hwZoom=false; $('camVideo').srcObject=null; $('camVideo').style.transform='none'; if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }
 function closeCam(){ stopCam(); $('cam').classList.remove('open'); }
-function updateCamBadge(){
-  const b=$('camBadge');
-  if(camShotCount>0){ b.textContent=camShotCount; b.classList.add('show'); }
-  else b.classList.remove('show');
+function updateCamBadge(){ const b=$('camBadge'); if(camShotCount>0){ b.textContent=camShotCount; b.classList.add('show'); } else b.classList.remove('show'); }
+function updateA4Frame(){
+  const stage=$('camStage'), frame=$('a4Frame');
+  if(!stage||!frame) return;
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  if(!sw||!sh) return;
+  const portrait = sh>=sw;
+  const ratio = portrait ? 210/297 : 297/210;
+  const padM=14;
+  let w = sw-padM*2, h = w/ratio;
+  if(h>sh-padM*2){ h=sh-padM*2; w=h*ratio; }
+  frame.style.width=w+'px'; frame.style.height=h+'px';
+  frame.style.left=((sw-w)/2)+'px'; frame.style.top=((sh-h)/2)+'px';
+  frame.dataset.orientation = portrait?'portrait':'landscape';
 }
+window.addEventListener('resize',updateA4Frame);
+window.addEventListener('orientationchange',()=>setTimeout(updateA4Frame,300));
 async function openCam(){
   if(busy) return;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ $('camFallback').click(); return; }
@@ -231,58 +222,59 @@ async function openCam(){
     $('zoomRange').value=1; zoomVal=1; v.style.transform='none';
     $('cam').classList.add('open');
     setupZoomTorch();
+    requestAnimationFrame(updateA4Frame); setTimeout(updateA4Frame,300);
     if($('cam').requestFullscreen) $('cam').requestFullscreen().catch(()=>{});
   }catch(e){ stopCam(); $('camFallback').click(); }
 }
 function setupZoomTorch(){
-  const torchBtn=$('btnTorch'); torchBtn.classList.add('hidden'); torchBtn.classList.remove('on'); torchOn=false; hwZoom=false;
-  if(!videoTrack || !videoTrack.getCapabilities) return;
-  const cap = videoTrack.getCapabilities() || {};
-  if(cap.torch) torchBtn.classList.remove('hidden');
-  if(cap.zoom && cap.zoom.max > cap.zoom.min){
-    hwZoom=true;
-    const z=$('zoomRange');
+  const tb=$('btnTorch'); tb.classList.add('hidden'); tb.classList.remove('on'); torchOn=false; hwZoom=false;
+  if(!videoTrack||!videoTrack.getCapabilities) return;
+  const cap=videoTrack.getCapabilities()||{};
+  if(cap.torch) tb.classList.remove('hidden');
+  if(cap.zoom && cap.zoom.max>cap.zoom.min){
+    hwZoom=true; const z=$('zoomRange');
     z.min=cap.zoom.min||1; z.max=Math.min(cap.zoom.max,10); z.step=cap.zoom.step||0.1;
-    z.value=videoTrack.getSettings().zoom || cap.zoom.min || 1;
-    zoomVal=Number(z.value);
-  } else {
-    const z=$('zoomRange'); z.min=1; z.max=10; z.step=0.1; z.value=1;
-  }
+    z.value=videoTrack.getSettings().zoom||cap.zoom.min||1; zoomVal=Number(z.value);
+  } else { const z=$('zoomRange'); z.min=1; z.max=10; z.step=0.1; z.value=1; }
 }
-$('btnTorch').onclick=async ()=>{
-  if(!videoTrack) return;
-  torchOn=!torchOn;
-  try{ await videoTrack.applyConstraints({ advanced:[{ torch: torchOn }] }); $('btnTorch').classList.toggle('on', torchOn); }
-  catch(e){ torchOn=!torchOn; }
-};
+$('btnTorch').onclick=async ()=>{ if(!videoTrack) return; torchOn=!torchOn; try{ await videoTrack.applyConstraints({advanced:[{torch:torchOn}]}); $('btnTorch').classList.toggle('on',torchOn); }catch(e){ torchOn=!torchOn; } };
 $('zoomRange').oninput=async e=>{
   zoomVal=Number(e.target.value)||1;
   $('zoomMin').textContent=Math.round(zoomVal)+'x';
-  if(hwZoom && videoTrack){
-    try{ await videoTrack.applyConstraints({ advanced:[{ zoom: zoomVal }] }); $('camVideo').style.transform='none'; return; }catch(err){}
-  }
+  if(hwZoom&&videoTrack){ try{ await videoTrack.applyConstraints({advanced:[{zoom:zoomVal}]}); $('camVideo').style.transform='none'; return; }catch(err){} }
   $('camVideo').style.transform='scale('+zoomVal+')';
 };
 function shot(){
-  const v=$('camVideo'); if(!v.videoWidth) return;
+  const v=$('camVideo'), stage=$('camStage'), frame=$('a4Frame');
+  if(!v.videoWidth) return;
   if(btnState==='done') newDoc();
-  const z=Math.max(1, zoomVal||1);
-  const sw=v.videoWidth/z, sh=v.videoHeight/z;
-  const sx=(v.videoWidth-sw)/2, sy=(v.videoHeight-sh)/2;
-  const c=document.createElement('canvas'); c.width=Math.round(sw); c.height=Math.round(sh);
-  c.getContext('2d').drawImage(v, sx, sy, sw, sh, 0, 0, c.width, c.height);
-  photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:c.toDataURL('image/jpeg',0.86), w:c.width, h:c.height, comp:null });
+  const vw=v.videoWidth, vh=v.videoHeight, sw=stage.clientWidth, sh=stage.clientHeight;
+  const fx=frame.offsetLeft, fy=frame.offsetTop, fw=frame.offsetWidth, fh=frame.offsetHeight;
+  const s0=Math.max(sw/vw, sh/vh);
+  let sx,sy,sW,sH;
+  if(!hwZoom){
+    const z=Math.max(1,zoomVal||1), eff=s0*z;
+    const offX=(vw*eff-sw)/2, offY=(vh*eff-sh)/2;
+    sx=(fx+offX)/eff; sy=(fy+offY)/eff; sW=fw/eff; sH=fh/eff;
+  } else {
+    const offX=(vw*s0-sw)/2, offY=(vh*s0-sh)/2;
+    sx=(fx+offX)/s0; sy=(fy+offY)/s0; sW=fw/s0; sH=fh/s0;
+  }
+  sx=Math.max(0,sx); sy=Math.max(0,sy);
+  sW=Math.min(sW,vw-sx); sH=Math.min(sH,vh-sy);
+  const land=frame.dataset.orientation==='landscape';
+  const c=document.createElement('canvas');
+  if(land){ c.width=2376; c.height=1680; } else { c.width=1680; c.height=2376; }
+  c.getContext('2d').drawImage(v,sx,sy,sW,sH,0,0,c.width,c.height);
+  photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:c.toDataURL('image/jpeg',0.88), w:c.width, h:c.height, comp:null });
   camShotCount++; updateCamBadge(); render();
+  frame.style.borderColor='#fff'; setTimeout(()=>frame.style.borderColor='#ff2b2b',120);
 }
 async function addFiles(list){
   const files=[...list||[]].filter(f=>f.type.startsWith('image/')); if(!files.length) return;
   if(btnState==='done') newDoc();
   for(const f of files){
-    try{
-      const du=await readDU(f), img=await loadImg(du);
-      photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:du, w:img.naturalWidth, h:img.naturalHeight, comp:null });
-      render();
-    }catch(e){}
+    try{ const du=await readDU(f), img=await loadImg(du); photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:du, w:img.naturalWidth, h:img.naturalHeight, comp:null }); render(); }catch(e){}
   }
 }
 async function compress(p){
@@ -300,20 +292,16 @@ async function sendToDrive(){
   if(!destOk(p)){ stat('❌ Lengkapi Tahun, Bulan, Periode, Afdeling, dan Jenis'); return; }
   busy=true; $('openWrap').style.display='none'; setBtn('sending','Menyiapkan…');
   try{
-    for(let i=0;i<photos.length;i++){
-      setBtnLabel('Kompres '+(i+1)+'/'+photos.length);
-      if(!photos[i].comp) photos[i].comp=await compress(photos[i]);
-    }
+    for(let i=0;i<photos.length;i++){ setBtnLabel('Kompres '+(i+1)+'/'+photos.length); if(!photos[i].comp) photos[i].comp=await compress(photos[i]); }
     let pdf=null;
     for(let i=0;i<photos.length;i++){
       setBtnLabel('Menyusun PDF '+(i+1)+'/'+photos.length);
       const c=photos[i].comp, land=c.w>c.h;
-      // A4 FULL PAGE
       if(i===0) pdf=new jsPDF({orientation:land?'l':'p', unit:'mm', format:'a4'});
       else pdf.addPage('a4', land?'l':'p');
       const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
-      // isi penuh halaman, tanpa margin
-      pdf.addImage(c.dataUrl,'JPEG',0,0,PW,PH,undefined,'FAST');
+      const r=Math.min(PW/c.w,PH/c.h), w=c.w*r, h=c.h*r;
+      pdf.addImage(c.dataUrl,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
     }
     const blob=pdf.output('blob');
     setBtnLabel('Mengirim '+fmt(blob.size)+'…');
