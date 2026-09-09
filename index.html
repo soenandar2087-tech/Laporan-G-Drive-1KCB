@@ -2,1370 +2,417 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Dokumen 1KCB</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 :root{
-  --primary:#2563eb;
-  --primary-dark:#1d4ed8;
-  --border:#cbd5e1;
-  --text:#1f2937;
-  --muted:#6b7280;
-  --danger:#ef4444;
-  --success:#10b981;
-  --drive:#4285f4;
-  --camera:#f59e0b;
+  --primary:#2563eb; --primary-dark:#1d4ed8; --border:#cbd5e1;
+  --text:#1f2937; --muted:#6b7280; --danger:#ef4444;
+  --success:#10b981; --drive:#2563eb;
 }
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  padding:5px;
-  background:#f1f5f9;
-  color:var(--text);
-  font-size:12px;
+  padding:6px;background:#f1f5f9;color:var(--text);font-size:12px;
   -webkit-tap-highlight-color:transparent;
 }
+.app{max-width:520px;margin:auto;background:#fff;border:2px solid var(--primary);border-radius:13px;overflow:hidden}
+.head{padding:11px 14px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid var(--primary)}
+.head h1{font-size:16px;color:var(--primary-dark);font-weight:800}
+.head small{display:block;margin-top:2px;color:var(--muted);font-size:10px}
+.body{padding:10px}
+.box{padding:10px;margin-bottom:10px;background:#fffbeb;border:1.5px solid #fbbf24;border-radius:9px}
+.label{display:block;margin:7px 0 3px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}
+select{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:13px;font-family:inherit}
+select:disabled{background:#f1f5f9;color:#94a3b8}
 
-button,select,input{
-  font-family:inherit;
-}
-
-.app{
-  width:100%;
-  max-width:520px;
-  margin:auto;
-  background:#fff;
-  border:2px solid var(--primary);
-  border-radius:13px;
-  overflow:hidden;
-}
-
-.head{
-  padding:11px 14px;
-  background:linear-gradient(135deg,#eff6ff,#dbeafe);
-  border-bottom:2px solid var(--primary);
-}
-
-.head h1{
-  font-size:16px;
-  color:var(--primary-dark);
-  font-weight:800;
-}
-
-.head small{
-  display:block;
-  margin-top:2px;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.body{
-  padding:10px;
-}
-
-.box{
-  padding:10px;
-  margin-bottom:10px;
-  background:#fffbeb;
-  border:1.5px solid #fbbf24;
-  border-radius:9px;
-}
-
-.label{
-  display:block;
-  margin:7px 0 3px;
-  color:var(--muted);
-  font-size:10px;
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-select{
-  width:100%;
-  padding:9px;
-  border:1.5px solid var(--border);
-  border-radius:6px;
-  background:#fff;
-  font-size:13px;
-}
-
-select:disabled{
-  background:#f1f5f9;
-  color:#94a3b8;
-}
-
-/* Tombol kamera dan galeri */
-.photo-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:10px;
-}
-
+.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .photo-button{
-  position:relative;
-  min-height:90px;
-  padding:12px 7px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:#fff;
-  border:2px solid var(--border);
-  border-radius:10px;
-  color:var(--text);
-  cursor:pointer;
-  touch-action:manipulation;
-  overflow:hidden;
+  position:relative;min-height:88px;padding:12px 7px;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;background:#fff;border:2px solid var(--border);
+  border-radius:10px;color:var(--text);cursor:pointer;overflow:hidden;font-family:inherit;
 }
+.photo-button:active{transform:scale(.98);background:#eff6ff;border-color:var(--primary)}
+.photo-button .icon{font-size:25px;margin-bottom:3px}
+.photo-button .title{font-size:12px;font-weight:800}
+.photo-button .sub{margin-top:2px;color:var(--muted);font-size:9px}
+.photo-button input{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:80px;cursor:pointer}
 
-.photo-button:active{
-  transform:scale(.98);
-  background:#eff6ff;
-  border-color:var(--primary);
-}
+.preview-box{margin-bottom:10px;padding:9px;background:#fff;border:1.5px solid #93c5fd;border-radius:9px}
+.preview-head{display:none;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.preview-head.show{display:flex}
+.photo-count{color:var(--primary-dark);font-size:13px;font-weight:800}
+.delete-all{padding:7px 13px;background:#fff;border:1.5px solid var(--danger);border-radius:6px;color:var(--danger);font-size:11px;font-weight:700}
+.preview-grid{display:none;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;max-height:220px;overflow-y:auto}
+.preview-grid.show{display:grid}
+.thumb{position:relative;aspect-ratio:3/4;overflow:hidden;background:#e5e7eb;border:1.5px solid var(--border);border-radius:6px}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-number{position:absolute;top:3px;left:3px;min-width:19px;padding:2px 5px;background:var(--primary);border-radius:4px;color:#fff;font-size:9px;font-weight:800;text-align:center}
+.thumb-delete{position:absolute;top:3px;right:3px;width:23px;height:23px;display:flex;align-items:center;justify-content:center;background:rgba(239,68,68,.94);border:none;border-radius:50%;color:#fff;font-size:13px;font-weight:800}
+.empty{padding:16px 8px;color:#9ca3af;text-align:center;font-size:11px}
 
-.photo-button .icon{
-  display:block;
-  margin-bottom:3px;
-  font-size:25px;
-}
-
-.photo-button .title{
-  display:block;
-  font-size:12px;
-  font-weight:800;
-}
-
-.photo-button .sub{
-  display:block;
-  margin-top:2px;
-  color:var(--muted);
-  font-size:9px;
-}
-
-/* Input galeri memenuhi tombol agar stabil di HP */
-.photo-button input{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  cursor:pointer;
-  font-size:100px;
-}
-
-/* Preview */
-.preview-box{
-  margin-bottom:10px;
-  padding:9px;
-  background:#fff;
-  border:1.5px solid #93c5fd;
-  border-radius:9px;
-}
-
-.preview-head{
-  min-height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.photo-count{
-  color:var(--primary-dark);
-  font-size:13px;
-  font-weight:800;
-}
-
-.delete-all{
-  padding:7px 13px;
-  background:#fff;
-  border:1.5px solid var(--danger);
-  border-radius:6px;
-  color:var(--danger);
-  font-size:11px;
-  font-weight:700;
-  cursor:pointer;
-  touch-action:manipulation;
-}
-
-.preview-scroll{
-  max-height:220px;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-}
-
-.preview-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(72px,1fr));
-  gap:7px;
-  padding-top:7px;
-  border-top:1px solid #dbeafe;
-}
-
-.thumb{
-  position:relative;
-  aspect-ratio:3/4;
-  overflow:hidden;
-  background:#e5e7eb;
-  border:1.5px solid var(--border);
-  border-radius:6px;
-}
-
-.thumb img{
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.thumb-number{
-  position:absolute;
-  top:3px;
-  left:3px;
-  min-width:19px;
-  padding:2px 5px;
-  background:var(--primary);
-  border-radius:4px;
-  color:#fff;
-  font-size:9px;
-  font-weight:800;
-  text-align:center;
-}
-
-.thumb-delete{
-  position:absolute;
-  top:3px;
-  right:3px;
-  width:23px;
-  height:23px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(239,68,68,.94);
-  border:none;
-  border-radius:50%;
-  color:#fff;
-  font-size:13px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.empty{
-  padding:17px 8px;
-  color:#9ca3af;
-  text-align:center;
-  font-size:11px;
-}
-
-/* Tombol kirim */
 .send-button{
-  width:100%;
-  min-height:51px;
-  padding:13px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  background:var(--drive);
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  font-size:14px;
-  font-weight:800;
-  cursor:pointer;
-  touch-action:manipulation;
+  width:100%;min-height:51px;padding:13px;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--drive);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:800;
 }
+.send-button:disabled{background:#93c5fd;cursor:not-allowed}
+.send-button.sending{background:#1d4ed8}
+.send-button.done{background:var(--success)}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;flex:0 0 auto}
+@keyframes rot{to{transform:rotate(360deg)}}
+.status{min-height:15px;margin-top:7px;color:var(--muted);font-size:10px;text-align:center}
+.open-file-wrap{display:none;margin-top:8px;text-align:center}
+.open-file{display:inline-block;padding:8px 16px;color:var(--primary-dark);font-size:13px;font-weight:800;text-decoration:none}
 
-.send-button:disabled{
-  background:#9ec0f4;
-  cursor:not-allowed;
+/* Notif sukses — tengah, warna tema biru */
+.notice{
+  position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;
+  padding:20px;background:rgba(37,99,235,.18);
 }
-
-.send-button.sending{
-  background:#64748b;
-}
-
-.send-button.done{
-  background:var(--success);
-}
-
-.send-button:active:not(:disabled){
-  transform:scale(.99);
-}
-
-.status{
-  min-height:15px;
-  margin-top:7px;
-  color:var(--muted);
-  font-size:10px;
-  text-align:center;
-}
-
-/* Hanya tombol buka file, tanpa nama/path */
-.open-file-wrap{
-  display:none;
-  margin-top:7px;
-  text-align:center;
-}
-
-.open-file{
-  display:inline-block;
-  padding:7px 17px;
-  color:var(--primary-dark);
-  font-size:12px;
-  font-weight:800;
-  text-decoration:none;
-}
-
-/* Notifikasi tengah */
-.notice-layer{
-  position:fixed;
-  inset:0;
-  z-index:4000;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  pointer-events:none;
-}
-
-.notice-layer.show{
-  display:flex;
-}
-
+.notice.show{display:flex}
 .notice-card{
-  min-width:200px;
-  max-width:290px;
-  padding:20px 24px;
-  background:#fff;
-  border:2px solid #1e3a5f;
-  border-radius:16px;
-  box-shadow:0 10px 28px rgba(15,23,42,.22);
-  color:#111827;
-  font-size:15px;
-  line-height:1.45;
-  text-align:center;
+  min-width:210px;max-width:280px;padding:22px 24px;background:#fff;
+  border:2.5px solid var(--primary);border-radius:16px;
+  box-shadow:0 12px 32px rgba(37,99,235,.25);text-align:center;
 }
-
-.notice-spinner{
-  width:34px;
-  height:34px;
-  margin:0 auto 12px;
-  border:4px solid #d1d5db;
-  border-top-color:#374151;
-  border-radius:50%;
-  animation:rotate .75s linear infinite;
-}
-
-.notice-icon{
-  display:none;
-  margin-bottom:7px;
-  color:var(--success);
-  font-size:27px;
-  font-weight:800;
-}
-
-.notice-layer.success .notice-spinner,
-.notice-layer.error .notice-spinner{
-  display:none;
-}
-
-.notice-layer.success .notice-icon{
-  display:block;
-}
-
-.notice-layer.error .notice-icon{
-  display:block;
-  color:var(--danger);
-}
-
-@keyframes rotate{
-  to{transform:rotate(360deg)}
-}
+.notice-icon{font-size:32px;color:var(--success);font-weight:800;line-height:1;margin-bottom:8px}
+.notice-text{color:var(--primary-dark);font-size:15px;font-weight:800;line-height:1.4}
 
 /* Kamera fullscreen */
-.camera-modal{
-  position:fixed;
-  inset:0;
-  z-index:3000;
-  width:100%;
-  height:100vh;
-  height:100dvh;
-  display:none;
-  flex-direction:column;
-  overflow:hidden;
-  background:#000;
+.cam{
+  position:fixed;inset:0;z-index:3000;width:100%;height:100vh;height:100dvh;
+  display:none;flex-direction:column;background:#000;overflow:hidden;
 }
-
-.camera-modal.open{
-  display:flex;
+.cam.open{display:flex}
+.cam-info{position:absolute;z-index:2;top:12px;left:10px;right:10px;color:#fff;font-size:12px;font-weight:700;text-align:center;text-shadow:0 1px 4px #000;pointer-events:none}
+.cam video{flex:1 1 0;width:100%;height:0;min-height:0;object-fit:cover;background:#000}
+.cam-tools{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:rgba(0,0,0,.75);
 }
-
-.camera-info{
-  position:absolute;
-  z-index:2;
-  top:12px;
-  left:10px;
-  right:10px;
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-  text-align:center;
-  text-shadow:0 1px 4px #000;
-  pointer-events:none;
+.cam-tools button{
+  width:44px;height:44px;border:none;border-radius:50%;background:#334155;color:#fff;font-size:18px;
 }
-
-.camera-modal video{
-  flex:1 1 0;
-  width:100%;
-  height:0;
-  min-height:0;
-  object-fit:contain;
-  background:#000;
+.cam-tools button.on{background:#f59e0b;color:#111}
+.cam-tools input[type=range]{flex:1;accent-color:#60a5fa}
+.cam-bar{
+  flex:0 0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:10px;
+  padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));background:#0f172a;
 }
-
-.camera-controls{
-  flex:0 0 auto;
-  display:grid;
-  grid-template-columns:1fr 1.5fr;
-  gap:10px;
-  padding:12px;
-  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
-  background:#18181b;
-}
-
-.camera-controls button{
-  min-height:54px;
-  padding:11px;
-  border:none;
-  border-radius:9px;
-  font-size:15px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.close-camera{
-  background:#3f3f46;
-  color:#fff;
-}
-
-.take-photo{
-  background:var(--success);
-  color:#fff;
-}
+.cam-bar button{min-height:54px;border:none;border-radius:9px;font-size:15px;font-weight:800}
+.cam-close{background:#334155;color:#fff}
+.cam-shot{background:var(--success);color:#fff}
+.hidden{display:none!important}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
   <header class="head">
     <h1>📁 Dokumen 1KCB</h1>
-    <small>Pilih tujuan → Foto → Kirim</small>
+    <small>Pilih tujuan → Foto → Kirim · PDF A4</small>
   </header>
-
   <main class="body">
-
-    <!-- Tujuan -->
     <section class="box">
       <span class="label">📂 Tujuan Penyimpanan</span>
-
-      <span class="label">Tahun</span>
-      <select id="selTahun"></select>
-
-      <span class="label">Bulan</span>
-      <select id="selBulan"></select>
-
+      <span class="label">Tahun</span><select id="selTahun"></select>
+      <span class="label">Bulan</span><select id="selBulan"></select>
       <span class="label">Periode</span>
-      <select id="selPeriode" disabled>
-        <option value="">-- Pilih bulan dulu --</option>
-      </select>
-
-      <span class="label">Afdeling</span>
-      <select id="selAfdeling"></select>
-
-      <span class="label">Jenis Dokumen</span>
-      <select id="selJenisDoc"></select>
+      <select id="selPeriode" disabled><option value="">-- Pilih bulan dulu --</option></select>
+      <span class="label">Afdeling</span><select id="selAfdeling"></select>
+      <span class="label">Jenis Dokumen</span><select id="selJenisDoc"></select>
     </section>
 
-    <!-- Kamera dan galeri -->
     <section class="photo-actions">
-
-      <button type="button" class="photo-button" id="openCameraButton">
-        <span class="icon">📷</span>
-        <span class="title">Kamera</span>
+      <button type="button" class="photo-button" id="btnCam">
+        <span class="icon">📷</span><span class="title">Kamera</span>
         <span class="sub">Ambil foto langsung</span>
       </button>
-
       <label class="photo-button">
-        <span class="icon">🖼️</span>
-        <span class="title">Galeri</span>
+        <span class="icon">🖼️</span><span class="title">Galeri</span>
         <span class="sub">Pilih foto</span>
-        <input type="file" id="galleryInput" accept="image/*" multiple>
+        <input type="file" id="galIn" accept="image/*" multiple>
       </label>
-
     </section>
+    <input type="file" id="camFallback" accept="image/*" capture="environment" hidden>
 
-    <!-- Fallback kamera bawaan HP -->
-    <input
-      type="file"
-      id="cameraFallback"
-      accept="image/*"
-      capture="environment"
-      hidden
-    >
-
-    <!-- Preview -->
     <section class="preview-box">
-
-      <div class="preview-head">
-        <div class="photo-count">
-          📷 <span id="photoCount">0</span> foto siap dikirim
-        </div>
-
-        <button
-          type="button"
-          class="delete-all"
-          id="deleteAllButton"
-          style="display:none"
-        >
-          Hapus
-        </button>
+      <div class="preview-head" id="previewHead">
+        <div class="photo-count">📷 <span id="photoCount">0</span> foto siap dikirim</div>
+        <button type="button" class="delete-all" id="btnHapus">Hapus</button>
       </div>
-
-      <div class="preview-scroll">
-        <div class="preview-grid" id="previewGrid"></div>
-
-        <div class="empty" id="emptyMessage">
-          Belum ada foto
-        </div>
-      </div>
-
+      <div class="preview-grid" id="grid"></div>
+      <div class="empty" id="emptyMsg">Belum ada foto</div>
     </section>
 
-    <!-- Kirim/Dokumen baru -->
-    <button type="button" class="send-button" id="sendButton" disabled>
-      ☁️ Kirim ke Drive
-    </button>
-
+    <button type="button" class="send-button" id="btnSend" disabled>☁️ Kirim ke Drive</button>
     <div class="status" id="statusText">Siap.</div>
-
-    <!-- Hanya buka file, tanpa keterangan panjang -->
-    <div class="open-file-wrap" id="openFileWrap">
-      <a
-        class="open-file"
-        id="openFileLink"
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Buka file ↗
-      </a>
+    <div class="open-file-wrap" id="openWrap">
+      <a class="open-file" id="openLink" href="#" target="_blank" rel="noopener">Buka file ↗</a>
     </div>
-
   </main>
 </div>
 
-<!-- Kamera -->
-<div class="camera-modal" id="cameraModal">
-
-  <div class="camera-info" id="cameraInfo">
-    Arahkan kamera lalu tekan Jepret
+<div class="cam" id="cam">
+  <div class="cam-info" id="camInfo">Arahkan kamera lalu tekan Jepret</div>
+  <video id="camVideo" autoplay playsinline muted></video>
+  <div class="cam-tools" id="camTools">
+    <button type="button" id="btnTorch" class="hidden" title="Senter">🔦</button>
+    <input type="range" id="zoomRange" min="1" max="1" step="0.1" value="1" class="hidden">
   </div>
-
-  <video id="cameraVideo" autoplay playsinline muted></video>
-
-  <div class="camera-controls">
-    <button type="button" class="close-camera" id="closeCameraButton">
-      ✕ Tutup
-    </button>
-
-    <button type="button" class="take-photo" id="takePhotoButton">
-      📸 JEPRET
-    </button>
+  <div class="cam-bar">
+    <button type="button" class="cam-close" id="btnCloseCam">✕ Tutup</button>
+    <button type="button" class="cam-shot" id="btnShot">📸 JEPRET</button>
   </div>
-
 </div>
 
-<!-- Notifikasi tengah -->
-<div class="notice-layer" id="noticeLayer">
+<div class="notice" id="notice">
   <div class="notice-card">
-    <div class="notice-spinner"></div>
-    <div class="notice-icon" id="noticeIcon">✓</div>
-    <div id="noticeText">Memproses dokumen...</div>
+    <div class="notice-icon">✓</div>
+    <div class="notice-text">Dokumen<br>Berhasil Dikirim</div>
   </div>
 </div>
 
 <script>
 const jsPDF = window.jspdf && window.jspdf.jsPDF;
+const EP = 'https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
+const MO = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const PE = ['Periode I','Periode II'];
+const AF = ['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
+const JD = ['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
 
-const ENDPOINT =
-  'https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
-
-const MONTHS = [
-  'Januari','Februari','Maret','April','Mei','Juni',
-  'Juli','Agustus','September','Oktober','November','Desember'
-];
-
-const PERIODS = [
-  'Periode I',
-  'Periode II'
-];
-
-const AFDELINGS = [
-  'Afdeling I',
-  'Afdeling II',
-  'Afdeling III',
-  'Afdeling IV',
-  'Afdeling V',
-  'Afdeling VI'
-];
-
-const DOCUMENT_TYPES = [
-  'Peta Realisasi Pemeliharaan',
-  'Dokumentasi Pemeliharaan',
-  'Peta Realisasi Pemupukan',
-  'Dokumentasi Pemupukan',
-  'SP Angkutan Pupuk',
-  'Slip Mobilisasi Tenaga Pemupukan',
-  'Lampiran Angkutan TBS PKS I',
-  'Lampiran Angkutan TBS PKS II',
-  'Lampiran Serak Jangkos',
-  'SP Angkutan Jangkos',
-  'Lampiran Pok TBS',
-  'Dokumentasi Mobilisasi Pemeliharaan',
-  'Dokumentasi Mobilisasi Pemupukan',
-  'Slip Mobilisasi Tenaga Pemeliharaan'
-];
-
-let photos = [];
-let busy = false;
-let buttonState = 'idle';
-let cameraStream = null;
-let noticeTimer = null;
-
+let photos=[], busy=false, btnState='idle', stream=null, videoTrack=null, torchOn=false, noticeT=null;
 const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+const clean = s => String(s).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim();
+const fmt = b => b>=1048576 ? (b/1048576).toFixed(2)+' MB' : Math.round(b/1024)+' KB';
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+const loadImg = src => new Promise((y,n)=>{ const i=new Image(); i.onload=()=>y(i); i.onerror=()=>n(new Error('rusak')); i.src=src; });
+const readDU = f => new Promise((y,n)=>{ const r=new FileReader(); r.onload=()=>y(r.result); r.onerror=()=>n(); r.readAsDataURL(f); });
+const toB64 = b => new Promise((y,n)=>{ const r=new FileReader(); r.onload=()=>y(String(r.result).split(',')[1]); r.onerror=()=>n(); r.readAsDataURL(b); });
 
-const formatSize = bytes => {
-  return bytes >= 1048576
-    ? (bytes / 1048576).toFixed(2) + ' MB'
-    : Math.round(bytes / 1024) + ' KB';
-};
+function stat(m){ $('statusText').textContent=m; }
+function showOk(){
+  clearTimeout(noticeT);
+  $('notice').classList.add('show');
+  noticeT=setTimeout(()=>$('notice').classList.remove('show'),1800);
+}
 
-const pad = value => String(value).padStart(2, '0');
+function fill(el,arr,ph){
+  el.innerHTML='<option value="">'+ph+'</option>';
+  arr.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o); });
+}
+(function initDD(){
+  const d=new Date(), y=d.getFullYear(), sT=$('selTahun');
+  for(let i=y+1;i>=y-5;i--){ const o=document.createElement('option'); o.value=i; o.textContent=i; sT.appendChild(o); }
+  sT.value=String(y);
+  fill($('selBulan'),MO,'-- Pilih bulan --'); $('selBulan').value=MO[d.getMonth()];
+  fill($('selAfdeling'),AF,'-- Pilih afdeling --');
+  fill($('selJenisDoc'),JD,'-- Pilih jenis dokumen --');
+  $('selBulan').onchange=onBulan; onBulan();
+})();
+function onBulan(){
+  const s=$('selPeriode');
+  if(!$('selBulan').value){ s.disabled=true; s.innerHTML='<option value="">-- Pilih bulan dulu --</option>'; }
+  else { s.disabled=false; fill(s,PE,'-- Pilih periode --'); }
+}
+function dest(){ return {tahun:$('selTahun').value,bulan:$('selBulan').value,periode:$('selPeriode').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value}; }
+function destOk(p){ return !!(p.tahun&&p.bulan&&p.periode&&p.afdeling&&p.jenisDoc); }
+function fileName(){
+  const p=dest(), d=new Date(), m=MO.indexOf(p.bulan)+1;
+  const stamp=p.tahun+pad(m||d.getMonth()+1)+pad(d.getDate());
+  return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'Dokumen')+' - '+stamp+'.pdf';
+}
 
-const cleanName = value => {
-  return String(value)
-    .replace(/[\\/:*?"<>|]+/g, '-')
-    .replace(/\s+/g, ' ')
-    .trim();
-};
-
-const loadImage = source => {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Gambar tidak dapat dibaca'));
-    image.src = source;
+function render(){
+  const g=$('grid'), n=photos.length;
+  $('previewHead').classList.toggle('show', n>0);
+  g.classList.toggle('show', n>0);
+  $('emptyMsg').style.display = n ? 'none' : 'block';
+  $('photoCount').textContent = n;
+  g.innerHTML='';
+  photos.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='thumb';
+    d.innerHTML='<img src="'+p.dataUrl+'" alt=""><span class="thumb-number">'+(i+1)+'</span><button type="button" class="thumb-delete">×</button>';
+    d.querySelector('.thumb-delete').onclick=()=>{ if(busy)return; photos=photos.filter(x=>x.id!==p.id); render(); };
+    g.appendChild(d);
   });
-};
+  updateBtn();
+}
 
-const readFileAsDataURL = file => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Gagal membaca foto'));
-    reader.readAsDataURL(file);
-  });
-};
-
-const blobToBase64 = blob => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      resolve(String(reader.result).split(',')[1]);
-    };
-
-    reader.onerror = () => reject(new Error('Gagal menyiapkan dokumen'));
-    reader.readAsDataURL(blob);
-  });
-};
-
-/* ================= NOTIFIKASI TENGAH ================= */
-
-function showNotice(message, type = 'loading', autoClose = 0) {
-  clearTimeout(noticeTimer);
-
-  const layer = $('noticeLayer');
-  const icon = $('noticeIcon');
-
-  layer.className = 'notice-layer show ' + type;
-  $('noticeText').textContent = message;
-
-  if (type === 'success') {
-    icon.textContent = '✓';
-  } else if (type === 'error') {
-    icon.textContent = '✕';
-  }
-
-  if (autoClose > 0) {
-    noticeTimer = setTimeout(hideNotice, autoClose);
+function setBtn(state,label){
+  const b=$('btnSend'); btnState=state;
+  if(state==='idle'){
+    b.className='send-button'; b.disabled=!photos.length||busy;
+    b.innerHTML='☁️ Kirim ke Drive'; b.onclick=sendToDrive;
+  } else if(state==='sending'){
+    b.className='send-button sending'; b.disabled=true;
+    b.innerHTML='<span class="spin"></span><span>'+(label||'Mengirim…')+'</span>'; b.onclick=null;
+  } else {
+    b.className='send-button done'; b.disabled=false;
+    b.innerHTML='🆕 Dokumen Baru'; b.onclick=newDoc;
   }
 }
-
-function hideNotice() {
-  $('noticeLayer').className = 'notice-layer';
+function setBtnLabel(t){ if(btnState==='sending'){ const s=$('btnSend').querySelector('span:last-child'); if(s)s.textContent=t; } }
+function updateBtn(){ if(btnState==='idle') $('btnSend').disabled=!photos.length||busy; }
+function newDoc(){
+  photos=[]; $('openWrap').style.display='none'; $('openLink').removeAttribute('href');
+  stat('Siap.'); render(); setBtn('idle'); window.scrollTo({top:0,behavior:'smooth'});
 }
+$('btnHapus').onclick=()=>{ if(busy)return; photos=[]; render(); stat('Foto dihapus.'); };
 
-/* ================= DROPDOWN ================= */
+/* ===== KAMERA ===== */
+$('btnCam').onclick=openCam;
+$('btnCloseCam').onclick=closeCam;
+$('btnShot').onclick=shot;
+$('galIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
+$('camFallback').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
 
-function fillSelect(element, values, placeholder) {
-  element.innerHTML = '<option value="">' + placeholder + '</option>';
-
-  values.forEach(value => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = value;
-    element.appendChild(option);
-  });
+function stopCam(){
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  videoTrack=null; torchOn=false;
+  $('camVideo').srcObject=null;
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
 }
+function closeCam(){ stopCam(); $('cam').classList.remove('open'); }
 
-function initializeDropdowns() {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-
-  const yearSelect = $('selTahun');
-
-  for (let year = currentYear + 1; year >= currentYear - 5; year--) {
-    const option = document.createElement('option');
-    option.value = String(year);
-    option.textContent = String(year);
-    yearSelect.appendChild(option);
-  }
-
-  yearSelect.value = String(currentYear);
-
-  fillSelect($('selBulan'), MONTHS, '-- Pilih bulan --');
-  $('selBulan').value = MONTHS[now.getMonth()];
-
-  fillSelect($('selAfdeling'), AFDELINGS, '-- Pilih afdeling --');
-  fillSelect(
-    $('selJenisDoc'),
-    DOCUMENT_TYPES,
-    '-- Pilih jenis dokumen --'
-  );
-
-  $('selBulan').addEventListener('change', updatePeriod);
-  updatePeriod();
-}
-
-function updatePeriod() {
-  const periodSelect = $('selPeriode');
-
-  if (!$('selBulan').value) {
-    periodSelect.disabled = true;
-    periodSelect.innerHTML =
-      '<option value="">-- Pilih bulan dulu --</option>';
-    return;
-  }
-
-  periodSelect.disabled = false;
-  fillSelect(periodSelect, PERIODS, '-- Pilih periode --');
-}
-
-function getDestination() {
-  return {
-    tahun: $('selTahun').value,
-    bulan: $('selBulan').value,
-    periode: $('selPeriode').value,
-    afdeling: $('selAfdeling').value,
-    jenisDoc: $('selJenisDoc').value
-  };
-}
-
-function destinationIsComplete(data) {
-  return Boolean(
-    data.tahun &&
-    data.bulan &&
-    data.periode &&
-    data.afdeling &&
-    data.jenisDoc
-  );
-}
-
-function createFileName() {
-  const data = getDestination();
-  const now = new Date();
-
-  const monthNumber = MONTHS.indexOf(data.bulan) + 1;
-
-  const dateStamp =
-    data.tahun +
-    pad(monthNumber || now.getMonth() + 1) +
-    pad(now.getDate());
-
-  const baseName = [
-    data.jenisDoc,
-    data.afdeling,
-    data.periode
-  ].filter(Boolean).join(' - ');
-
-  return cleanName(baseName || 'Dokumen') +
-    ' - ' + dateStamp + '.pdf';
-}
-
-/* ================= PREVIEW FOTO ================= */
-
-function renderPreview() {
-  const grid = $('previewGrid');
-
-  grid.innerHTML = '';
-  $('photoCount').textContent = photos.length;
-
-  $('deleteAllButton').style.display =
-    photos.length ? 'inline-block' : 'none';
-
-  $('emptyMessage').style.display =
-    photos.length ? 'none' : 'block';
-
-  grid.style.display =
-    photos.length ? 'grid' : 'none';
-
-  photos.forEach((photo, index) => {
-    const item = document.createElement('div');
-    item.className = 'thumb';
-
-    const image = document.createElement('img');
-    image.src = photo.dataUrl;
-    image.alt = 'Foto ' + (index + 1);
-
-    const number = document.createElement('span');
-    number.className = 'thumb-number';
-    number.textContent = String(index + 1);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'thumb-delete';
-    deleteButton.textContent = '×';
-
-    deleteButton.addEventListener('click', () => {
-      if (busy) return;
-
-      photos = photos.filter(itemPhoto => itemPhoto.id !== photo.id);
-      renderPreview();
-      updateSendButton();
+async function openCam(){
+  if(busy) return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ $('camFallback').click(); return; }
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
     });
-
-    item.appendChild(image);
-    item.appendChild(number);
-    item.appendChild(deleteButton);
-    grid.appendChild(item);
-  });
-
-  updateSendButton();
-}
-
-function deleteAllPhotos() {
-  if (busy) return;
-
-  photos = [];
-  renderPreview();
-  $('statusText').textContent = 'Foto dihapus.';
-}
-
-$('deleteAllButton').addEventListener('click', deleteAllPhotos);
-
-/* ================= TOMBOL KIRIM ================= */
-
-function updateSendButton() {
-  const button = $('sendButton');
-
-  if (buttonState !== 'idle') return;
-
-  button.disabled = busy || photos.length === 0;
-}
-
-function setButtonState(state, label = '') {
-  const button = $('sendButton');
-
-  buttonState = state;
-
-  if (state === 'idle') {
-    button.className = 'send-button';
-    button.innerHTML = '☁️ Kirim ke Drive';
-    button.disabled = busy || photos.length === 0;
-    button.onclick = sendToDrive;
-    return;
-  }
-
-  if (state === 'sending') {
-    button.className = 'send-button sending';
-    button.textContent = label || 'Sedang diproses...';
-    button.disabled = true;
-    button.onclick = null;
-    return;
-  }
-
-  if (state === 'done') {
-    button.className = 'send-button done';
-    button.innerHTML = '🆕 Dokumen Baru';
-    button.disabled = false;
-    button.onclick = startNewDocument;
+    videoTrack = stream.getVideoTracks()[0];
+    const v=$('camVideo'); v.srcObject=stream; await v.play().catch(()=>{});
+    $('cam').classList.add('open');
+    $('camInfo').textContent='Kamera aktif · Foto ke-'+(photos.length+1);
+    setupCamControls();
+    const el=$('cam');
+    if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }catch(e){
+    stopCam(); $('camFallback').click();
   }
 }
 
-function startNewDocument() {
-  photos = [];
-  buttonState = 'idle';
-
-  $('openFileWrap').style.display = 'none';
-  $('openFileLink').removeAttribute('href');
-  $('statusText').textContent = 'Siap.';
-
-  renderPreview();
-  setButtonState('idle');
-
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-}
-
-/* ================= KAMERA ================= */
-
-$('openCameraButton').addEventListener('click', openCamera);
-$('closeCameraButton').addEventListener('click', closeCamera);
-$('takePhotoButton').addEventListener('click', takeCameraPhoto);
-
-async function openCamera() {
-  if (busy) return;
-
-  if (
-    !navigator.mediaDevices ||
-    !navigator.mediaDevices.getUserMedia
-  ) {
-    $('cameraFallback').click();
-    return;
-  }
-
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: {
-          ideal: 'environment'
-        },
-        width: {
-          ideal: 1920
-        },
-        height: {
-          ideal: 1080
-        }
-      },
-      audio: false
-    });
-
-    const video = $('cameraVideo');
-    video.srcObject = cameraStream;
-
-    $('cameraModal').classList.add('open');
-    $('cameraInfo').textContent =
-      'Arahkan kamera lalu tekan Jepret';
-
-    await video.play().catch(() => {});
-  } catch (error) {
-    stopCameraStream();
-
-    showNotice(
-      'Kamera langsung gagal. Membuka kamera bawaan...',
-      'error',
-      1800
-    );
-
-    setTimeout(() => {
-      $('cameraFallback').click();
-    }, 200);
+function setupCamControls(){
+  const torchBtn=$('btnTorch'), zoom=$('zoomRange');
+  torchBtn.classList.add('hidden'); zoom.classList.add('hidden');
+  torchBtn.classList.remove('on'); torchOn=false;
+  if(!videoTrack || !videoTrack.getCapabilities) return;
+  const cap = videoTrack.getCapabilities() || {};
+  if(cap.torch){ torchBtn.classList.remove('hidden'); }
+  if(cap.zoom){
+    zoom.classList.remove('hidden');
+    zoom.min = cap.zoom.min || 1;
+    zoom.max = cap.zoom.max || 1;
+    zoom.step = cap.zoom.step || 0.1;
+    zoom.value = videoTrack.getSettings().zoom || cap.zoom.min || 1;
   }
 }
 
-function stopCameraStream() {
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(track => track.stop());
-    cameraStream = null;
-  }
+$('btnTorch').onclick=async ()=>{
+  if(!videoTrack) return;
+  torchOn=!torchOn;
+  try{
+    await videoTrack.applyConstraints({ advanced:[{ torch: torchOn }] });
+    $('btnTorch').classList.toggle('on', torchOn);
+  }catch(e){ torchOn=!torchOn; }
+};
+$('zoomRange').oninput=async e=>{
+  if(!videoTrack) return;
+  try{ await videoTrack.applyConstraints({ advanced:[{ zoom: Number(e.target.value) }] }); }catch(err){}
+};
 
-  $('cameraVideo').srcObject = null;
+function shot(){
+  const v=$('camVideo');
+  if(!v.videoWidth){ stat('Kamera belum siap'); return; }
+  if(btnState==='done') newDoc();
+  const c=document.createElement('canvas');
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0);
+  photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:c.toDataURL('image/jpeg',0.86), w:c.width, h:c.height, comp:null });
+  render();
+  $('camInfo').textContent='✓ '+photos.length+' foto. Jepret lagi atau Tutup.';
 }
 
-function closeCamera() {
-  stopCameraStream();
-  $('cameraModal').classList.remove('open');
+async function addFiles(list){
+  const files=[...list||[]].filter(f=>f.type.startsWith('image/')); if(!files.length) return;
+  if(btnState==='done') newDoc();
+  stat('Memuat '+files.length+' foto…');
+  for(const f of files){
+    try{
+      const du=await readDU(f), img=await loadImg(du);
+      photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:du, w:img.naturalWidth, h:img.naturalHeight, comp:null });
+      render();
+    }catch(e){}
+  }
+  stat(photos.length+' foto siap dikirim.');
 }
 
-function takeCameraPhoto() {
-  const video = $('cameraVideo');
-
-  if (!video.videoWidth || !video.videoHeight) {
-    showNotice('Kamera belum siap', 'error', 1500);
-    return;
-  }
-
-  if (buttonState === 'done') {
-    startNewDocument();
-  }
-
-  const canvas = document.createElement('canvas');
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  const context = canvas.getContext('2d');
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.86);
-
-  photos.push({
-    id: 'photo-' + Date.now() + '-' + Math.random(),
-    dataUrl,
-    width: canvas.width,
-    height: canvas.height,
-    compressed: null
-  });
-
-  renderPreview();
-
-  $('cameraInfo').textContent =
-    '✓ ' + photos.length +
-    ' foto diambil. Jepret lagi atau Tutup.';
+async function compress(p){
+  const img=await loadImg(p.dataUrl);
+  let w=img.naturalWidth, h=img.naturalHeight, mx=1600;
+  if(Math.max(w,h)>mx){ const r=mx/Math.max(w,h); w=Math.round(w*r); h=Math.round(h*r); }
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+  let q=0.67, du=c.toDataURL('image/jpeg',q), sz=Math.round(du.length*0.75);
+  while(sz>2*1048576 && q>0.3){ q-=0.07; du=c.toDataURL('image/jpeg',q); sz=Math.round(du.length*0.75); }
+  return { dataUrl:du, w, h };
 }
 
-/* ================= GALERI ================= */
+async function sendToDrive(){
+  if(busy||!photos.length) return;
+  const p=dest();
+  if(!destOk(p)){ stat('❌ Lengkapi Tahun, Bulan, Periode, Afdeling, dan Jenis'); return; }
+  if(!jsPDF){ stat('❌ Library PDF belum termuat'); return; }
 
-$('galleryInput').addEventListener('change', event => {
-  addFiles(event.target.files);
-  event.target.value = '';
-});
-
-$('cameraFallback').addEventListener('change', event => {
-  addFiles(event.target.files);
-  event.target.value = '';
-});
-
-async function addFiles(fileList) {
-  const files = Array.from(fileList || []).filter(file => {
-    return file.type.startsWith('image/');
-  });
-
-  if (!files.length) return;
-
-  if (buttonState === 'done') {
-    startNewDocument();
-  }
-
-  $('statusText').textContent =
-    'Memuat ' + files.length + ' foto...';
-
-  for (const file of files) {
-    try {
-      const dataUrl = await readFileAsDataURL(file);
-      const image = await loadImage(dataUrl);
-
-      photos.push({
-        id: 'photo-' + Date.now() + '-' + Math.random(),
-        dataUrl,
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-        compressed: null
-      });
-
-      renderPreview();
-    } catch (error) {
-      showNotice(
-        'Gagal membaca salah satu foto',
-        'error',
-        1800
-      );
+  busy=true; $('openWrap').style.display='none'; setBtn('sending','Menyiapkan…');
+  try{
+    for(let i=0;i<photos.length;i++){
+      setBtnLabel('Kompres '+(i+1)+'/'+photos.length);
+      stat('Kompres foto '+(i+1)+'/'+photos.length);
+      if(!photos[i].comp) photos[i].comp=await compress(photos[i]);
     }
-  }
-
-  $('statusText').textContent =
-    photos.length + ' foto siap dikirim.';
-}
-
-/* ================= KOMPRES ================= */
-
-async function compressPhoto(photo) {
-  const image = await loadImage(photo.dataUrl);
-
-  let width = image.naturalWidth;
-  let height = image.naturalHeight;
-
-  // Ringan dan cukup jelas untuk dokumen HP
-  const maxResolution = 1600;
-
-  if (Math.max(width, height) > maxResolution) {
-    const ratio = maxResolution / Math.max(width, height);
-
-    width = Math.round(width * ratio);
-    height = Math.round(height * ratio);
-  }
-
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  const context = canvas.getContext('2d');
-
-  context.fillStyle = '#fff';
-  context.fillRect(0, 0, width, height);
-  context.drawImage(image, 0, 0, width, height);
-
-  let quality = 0.67;
-  let dataUrl = canvas.toDataURL('image/jpeg', quality);
-  let estimatedSize = Math.round(dataUrl.length * 0.75);
-
-  while (estimatedSize > 2 * 1048576 && quality > 0.3) {
-    quality -= 0.07;
-    dataUrl = canvas.toDataURL('image/jpeg', quality);
-    estimatedSize = Math.round(dataUrl.length * 0.75);
-  }
-
-  return {
-    dataUrl,
-    width,
-    height,
-    size:estimatedSize
-  };
-}
-
-/* ================= BUAT PDF ================= */
-
-async function buildPdf() {
-  if (!jsPDF) {
-    throw new Error(
-      'Library PDF belum termuat. Periksa koneksi internet.'
-    );
-  }
-
-  for (let index = 0; index < photos.length; index++) {
-    const message =
-      'Menyiapkan foto ' +
-      (index + 1) +
-      ' dari ' +
-      photos.length +
-      '...';
-
-    showNotice(message, 'loading');
-    setButtonState('sending', message);
-
-    if (!photos[index].compressed) {
-      photos[index].compressed =
-        await compressPhoto(photos[index]);
+    let pdf=null;
+    for(let i=0;i<photos.length;i++){
+      setBtnLabel('Menyusun PDF '+(i+1)+'/'+photos.length);
+      const c=photos[i].comp, land=c.w>c.h;
+      /* Setiap halaman kertas A4 (210×297 mm / 297×210 mm) */
+      if(i===0) pdf=new jsPDF({orientation:land?'l':'p', unit:'mm', format:'a4'});
+      else pdf.addPage('a4', land?'l':'p');
+      const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
+      const margin=8;
+      const r=Math.min((PW-margin*2)/c.w, (PH-margin*2)/c.h);
+      const w=c.w*r, h=c.h*r;
+      pdf.addImage(c.dataUrl,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
+      await wait(4);
     }
-  }
+    const blob=pdf.output('blob');
+    if(blob.size>12*1048576) throw new Error('PDF '+fmt(blob.size)+' terlalu besar, kurangi foto');
+    setBtnLabel('Mengirim '+fmt(blob.size)+'…');
+    stat('☁️ Mengirim ke Google Drive…');
+    const b64=await toB64(blob), fn=fileName();
+    const res=await fetch(EP,{method:'POST', body:JSON.stringify({
+      name:fn, mimeType:'application/pdf', data:b64,
+      tahun:p.tahun, bulan:p.bulan, periode:p.periode, afdeling:p.afdeling, jenisDoc:p.jenisDoc
+    })});
+    const txt=await res.text();
+    let j; try{ j=JSON.parse(txt); }catch(e){ throw new Error('Server Apps Script error'); }
+    if(!j.ok) throw new Error(j.error||'Gagal menyimpan');
 
-  let pdf = null;
-
-  for (let index = 0; index < photos.length; index++) {
-    const message =
-      'Menyusun halaman ' +
-      (index + 1) +
-      ' dari ' +
-      photos.length +
-      '...';
-
-    showNotice(message, 'loading');
-    setButtonState('sending', message);
-
-    const photo = photos[index].compressed;
-    const landscape = photo.width > photo.height;
-
-    if (index === 0) {
-      pdf = new jsPDF({
-        orientation: landscape ? 'landscape' : 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-    } else {
-      pdf.addPage(
-        'a4',
-        landscape ? 'landscape' : 'portrait'
-      );
-    }
-
-    const pageWidth =
-      pdf.internal.pageSize.getWidth();
-
-    const pageHeight =
-      pdf.internal.pageSize.getHeight();
-
-    const ratio = Math.min(
-      pageWidth / photo.width,
-      pageHeight / photo.height
-    );
-
-    const imageWidth = photo.width * ratio;
-    const imageHeight = photo.height * ratio;
-
-    pdf.addImage(
-      photo.dataUrl,
-      'JPEG',
-      (pageWidth - imageWidth) / 2,
-      (pageHeight - imageHeight) / 2,
-      imageWidth,
-      imageHeight,
-      undefined,
-      'FAST'
-    );
-  }
-
-  return pdf;
-}
-
-/* ================= KIRIM DRIVE ================= */
-
-async function sendToDrive() {
-  if (busy || !photos.length) return;
-
-  const destination = getDestination();
-
-  if (!destinationIsComplete(destination)) {
-    showNotice(
-      'Lengkapi Tahun, Bulan, Periode, Afdeling, dan Jenis Dokumen',
-      'error',
-      2300
-    );
-    return;
-  }
-
-  busy = true;
-  setButtonState('sending', 'Menyiapkan dokumen...');
-  showNotice('Menyiapkan dokumen...', 'loading');
-
-  $('openFileWrap').style.display = 'none';
-
-  try {
-    const pdf = await buildPdf();
-    const blob = pdf.output('blob');
-
-    if (blob.size > 12 * 1048576) {
-      throw new Error(
-        'Ukuran PDF ' +
-        formatSize(blob.size) +
-        ' terlalu besar. Kurangi jumlah foto.'
-      );
-    }
-
-    const fileName = createFileName();
-
-    showNotice(
-      'Mengirim ' +
-      formatSize(blob.size) +
-      ' ke Google Drive...',
-      'loading'
-    );
-
-    setButtonState(
-      'sending',
-      'Mengirim ' + formatSize(blob.size) + '...'
-    );
-
-    const base64 = await blobToBase64(blob);
-
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      body: JSON.stringify({
-        name: fileName,
-        mimeType: 'application/pdf',
-        data: base64,
-        tahun: destination.tahun,
-        bulan: destination.bulan,
-        periode: destination.periode,
-        afdeling: destination.afdeling,
-        jenisDoc: destination.jenisDoc
-      })
-    });
-
-    const responseText = await response.text();
-
-    let result;
-
-    try {
-      result = JSON.parse(responseText);
-    } catch (error) {
-      throw new Error(
-        'Respons Apps Script tidak valid'
-      );
-    }
-
-    if (!result.ok) {
-      throw new Error(
-        result.error || 'Dokumen gagal disimpan'
-      );
-    }
-
-    /*
-      Pasang URL pada anchor biasa.
-      Ini lebih stabil di Chrome HP dibanding window.open().
-    */
-    if (result.url) {
-      $('openFileLink').href = result.url;
-      $('openFileWrap').style.display = 'block';
-    }
-
-    // Hilangkan foto setelah benar-benar berhasil
-    photos = [];
-    renderPreview();
-
-    busy = false;
-    $('statusText').textContent = 'Siap.';
-
-    setButtonState('done');
-
-    showNotice(
-      'Dokumen\nBerhasil Dikirim',
-      'success',
-      1800
-    );
-
-  } catch (error) {
-    busy = false;
-
-    $('statusText').textContent =
-      'Gagal: ' + error.message;
-
-    setButtonState('idle');
-
-    showNotice(
-      error.message || 'Gagal mengirim dokumen',
-      'error',
-      2800
-    );
+    if(j.url){ $('openLink').href=j.url; $('openWrap').style.display='block'; }
+    photos=[]; render();
+    busy=false; stat('Siap.'); setBtn('done'); showOk();
+  }catch(e){
+    busy=false; stat('❌ '+e.message); setBtn('idle');
   }
 }
 
-/* Berhentikan kamera jika halaman ditutup */
-window.addEventListener('pagehide', stopCameraStream);
-
-/* Mulai */
-initializeDropdowns();
-renderPreview();
-setButtonState('idle');
+window.addEventListener('pagehide', stopCam);
+render(); setBtn('idle');
 </script>
-
 </body>
 </html>
