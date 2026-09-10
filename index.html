@@ -2,2425 +2,319 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Dokumen 1KCB</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
-
 <style>
-:root{
-  --primary:#2563eb;
-  --primary-dark:#1d4ed8;
-  --border:#cbd5e1;
-  --text:#1f2937;
-  --muted:#6b7280;
-  --danger:#ef4444;
-  --success:#10b981;
-  --drive:#2563eb;
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  padding:6px;
-  background:#f1f5f9;
-  color:var(--text);
-  font-size:12px;
-  -webkit-tap-highlight-color:transparent;
-}
-
-.app{
-  max-width:520px;
-  margin:auto;
-  background:#fff;
-  border:2px solid var(--primary);
-  border-radius:13px;
-  overflow:hidden;
-}
-
-.head{
-  padding:11px 14px;
-  background:linear-gradient(135deg,#eff6ff,#dbeafe);
-  border-bottom:2px solid var(--primary);
-}
-
-.head h1{
-  font-size:16px;
-  color:var(--primary-dark);
-  font-weight:800;
-}
-
-.head small{
-  display:block;
-  margin-top:2px;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.body{
-  padding:10px;
-}
-
-.box{
-  padding:10px;
-  margin-bottom:10px;
-  background:#fffbeb;
-  border:1.5px solid #fbbf24;
-  border-radius:9px;
-}
-
-.label{
-  display:block;
-  margin:7px 0 3px;
-  color:var(--muted);
-  font-size:10px;
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-select{
-  width:100%;
-  padding:9px;
-  border:1.5px solid var(--border);
-  border-radius:6px;
-  background:#fff;
-  font-size:13px;
-  font-family:inherit;
-}
-
-select:disabled{
-  background:#f1f5f9;
-  color:#94a3b8;
-}
-
-/* Tombol foto */
-.photo-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:10px;
-}
-
-.photo-button{
-  position:relative;
-  min-height:88px;
-  padding:12px 7px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:#fff;
-  border:2px solid var(--border);
-  border-radius:10px;
-  cursor:pointer;
-  color:var(--text);
-}
-
-.photo-button:active{
-  transform:scale(.98);
-  background:#eff6ff;
-  border-color:var(--primary);
-}
-
-.photo-button .icon{
-  font-size:25px;
-  margin-bottom:3px;
-}
-
-.photo-button .title{
-  font-size:12px;
-  font-weight:800;
-}
-
-.photo-button .sub{
-  margin-top:2px;
-  color:var(--muted);
-  font-size:9px;
-}
-
-.photo-button input{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  font-size:80px;
-}
-
-/* Preview */
-.preview-box{
-  margin-bottom:10px;
-  padding:9px;
-  background:#fff;
-  border:1.5px solid #93c5fd;
-  border-radius:9px;
-}
-
-.preview-head{
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:8px;
-}
-
-.preview-head.show{
-  display:flex;
-}
-
-.photo-count{
-  color:var(--primary-dark);
-  font-size:13px;
-  font-weight:800;
-}
-
-.delete-all{
-  padding:7px 13px;
-  background:#fff;
-  border:1.5px solid var(--danger);
-  border-radius:6px;
-  color:var(--danger);
-  font-size:11px;
-  font-weight:700;
-}
-
-.preview-grid{
-  display:none;
-  grid-template-columns:repeat(auto-fill,minmax(72px,1fr));
-  gap:7px;
-  max-height:220px;
-  overflow-y:auto;
-}
-
-.preview-grid.show{
-  display:grid;
-}
-
-.thumb{
-  position:relative;
-  aspect-ratio:3/4;
-  overflow:hidden;
-  background:#e5e7eb;
-  border:1.5px solid var(--border);
-  border-radius:6px;
-}
-
-.thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.thumb-number{
-  position:absolute;
-  top:3px;
-  left:3px;
-  min-width:19px;
-  padding:2px 5px;
-  background:var(--primary);
-  border-radius:4px;
-  color:#fff;
-  font-size:9px;
-  font-weight:800;
-  text-align:center;
-}
-
-.thumb-delete{
-  position:absolute;
-  top:3px;
-  right:3px;
-  width:23px;
-  height:23px;
-  background:rgba(239,68,68,.94);
-  border:none;
-  border-radius:50%;
-  color:#fff;
-  font-size:13px;
-  font-weight:800;
-}
-
-.empty{
-  padding:16px 8px;
-  color:#9ca3af;
-  text-align:center;
-  font-size:11px;
-}
-
-/* Tombol kirim */
-.send-button{
-  width:100%;
-  min-height:51px;
-  padding:13px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  background:var(--drive);
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  font-size:14px;
-  font-weight:800;
-}
-
-.send-button:disabled{
-  background:#93c5fd;
-}
-
-.send-button.sending{
-  background:#1d4ed8;
-}
-
-.send-button.done{
-  background:var(--success);
-}
-
-.spin{
-  width:16px;
-  height:16px;
-  border:2.5px solid rgba(255,255,255,.35);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:rot .7s linear infinite;
-}
-
-@keyframes rot{
-  to{transform:rotate(360deg)}
-}
-
-.status{
-  min-height:15px;
-  margin-top:7px;
-  color:var(--muted);
-  font-size:10px;
-  text-align:center;
-}
-
-.open-file-wrap{
-  display:none;
-  margin-top:8px;
-  text-align:center;
-}
-
-.open-file{
-  display:inline-block;
-  padding:8px 16px;
-  color:var(--primary-dark);
-  font-size:13px;
-  font-weight:800;
-  text-decoration:none;
-}
-
-/* Notifikasi sukses */
-.notice{
-  position:fixed;
-  inset:0;
-  z-index:4000;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:rgba(37,99,235,.18);
-}
-
-.notice.show{
-  display:flex;
-}
-
-.notice-card{
-  min-width:210px;
-  padding:22px 24px;
-  background:#fff;
-  border:2.5px solid var(--primary);
-  border-radius:16px;
-  box-shadow:0 12px 32px rgba(37,99,235,.25);
-  text-align:center;
-}
-
-.notice-icon{
-  margin-bottom:8px;
-  color:var(--success);
-  font-size:32px;
-  font-weight:800;
-}
-
-.notice-text{
-  color:var(--primary-dark);
-  font-size:15px;
-  font-weight:800;
-  line-height:1.4;
-}
-
-/* Kamera fullscreen */
-.cam{
-  position:fixed;
-  inset:0;
-  z-index:3000;
-  display:none;
-  flex-direction:column;
-  width:100%;
-  height:100dvh;
-  overflow:hidden;
-  background:#000;
-}
-
-.cam.open{
-  display:flex;
-}
-
-.cam-stage{
-  position:relative;
-  flex:1 1 0;
-  min-height:0;
-  overflow:hidden;
-  background:#000;
-}
-
-.cam-stage video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  transform-origin:center center;
-}
-
-/* Frame A4 */
-.a4-frame{
-  position:absolute;
-  z-index:4;
-  border:3px solid #ff2b2b;
-  box-shadow:
-    0 0 0 200vmax rgba(0,0,0,.32),
-    inset 0 0 0 1px rgba(255,255,255,.25);
-  pointer-events:none;
-}
-
-.a4-label{
-  position:absolute;
-  top:7px;
-  left:50%;
-  transform:translateX(-50%);
-  padding:4px 9px;
-  border-radius:12px;
-  background:rgba(0,0,0,.55);
-  color:#fff;
-  font-size:10px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.corner{
-  position:absolute;
-  width:22px;
-  height:22px;
-}
-
-.corner.tl{
-  left:-3px;
-  top:-3px;
-  border-left:5px solid red;
-  border-top:5px solid red;
-}
-
-.corner.tr{
-  right:-3px;
-  top:-3px;
-  border-right:5px solid red;
-  border-top:5px solid red;
-}
-
-.corner.bl{
-  left:-3px;
-  bottom:-3px;
-  border-left:5px solid red;
-  border-bottom:5px solid red;
-}
-
-.corner.br{
-  right:-3px;
-  bottom:-3px;
-  border-right:5px solid red;
-  border-bottom:5px solid red;
-}
-
-.cam-bottom{
-  flex:0 0 auto;
-  padding:8px 16px calc(18px + env(safe-area-inset-bottom,0px));
-  background:#000;
-}
-
-.zoom-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:14px;
-}
-
-.zoom-row span{
-  min-width:28px;
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-}
-
-.zoom-row input{
-  flex:1;
-  accent-color:#60a5fa;
-}
-
-.cam-btns{
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
-  gap:8px;
-}
-
-.cam-circle{
-  position:relative;
-  width:52px;
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:none;
-  border-radius:50%;
-  font-size:22px;
-  font-weight:800;
-}
-
-.cam-ok{
-  background:#fff;
-  color:var(--primary);
-}
-
-.cam-x{
-  background:#fff;
-  color:#111;
-}
-
-.cam-shutter{
-  width:68px;
-  height:68px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:4px solid #fff;
-  border-radius:50%;
-  background:#22c55e;
-  color:#fff;
-  font-size:26px;
-}
-
-.cam-badge{
-  position:absolute;
-  top:-6px;
-  right:-6px;
-  min-width:20px;
-  height:20px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:0 5px;
-  background:var(--primary);
-  border-radius:10px;
-  color:#fff;
-  font-size:11px;
-}
-
-.cam-badge.show{
-  display:flex;
-}
-
-.cam-torch{
-  position:absolute;
-  top:12px;
-  right:12px;
-  z-index:5;
-  width:42px;
-  height:42px;
-  border:none;
-  border-radius:50%;
-  background:rgba(0,0,0,.45);
-  color:#fff;
-  font-size:18px;
-}
-
-.cam-torch.on{
-  background:#f59e0b;
-  color:#111;
-}
-
-.hidden{
-  display:none!important;
-}
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--border:#cbd5e1;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;--success:#10b981;--drive:#2563eb}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:6px;background:#f1f5f9;color:var(--text);font-size:12px;-webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:auto;background:#fff;border:2px solid var(--primary);border-radius:13px;overflow:hidden}
+.head{padding:11px 14px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid var(--primary)}
+.head h1{font-size:16px;color:var(--primary-dark);font-weight:800}
+.head small{display:block;margin-top:2px;color:var(--muted);font-size:10px}
+.body{padding:10px}
+.box{padding:10px;margin-bottom:10px;background:#fffbeb;border:1.5px solid #fbbf24;border-radius:9px}
+.label{display:block;margin:7px 0 3px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}
+select{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:13px;font-family:inherit}
+select:disabled{background:#f1f5f9;color:#94a3b8}
+.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.photo-button{position:relative;min-height:88px;padding:12px 7px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fff;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit;color:inherit}
+.photo-button:active{transform:scale(.98);background:#eff6ff;border-color:var(--primary)}
+.photo-button .icon{font-size:25px;margin-bottom:3px}
+.photo-button .title{font-size:12px;font-weight:800}
+.photo-button .sub{margin-top:2px;color:var(--muted);font-size:9px}
+.photo-button input{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:80px}
+.preview-box{margin-bottom:10px;padding:9px;background:#fff;border:1.5px solid #93c5fd;border-radius:9px}
+.preview-head{display:none;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.preview-head.show{display:flex}
+.photo-count{color:var(--primary-dark);font-size:13px;font-weight:800}
+.delete-all{padding:7px 13px;background:#fff;border:1.5px solid var(--danger);border-radius:6px;color:var(--danger);font-size:11px;font-weight:700}
+.preview-grid{display:none;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;max-height:220px;overflow-y:auto}
+.preview-grid.show{display:grid}
+.thumb{position:relative;aspect-ratio:3/4;overflow:hidden;background:#e5e7eb;border:1.5px solid var(--border);border-radius:6px}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-number{position:absolute;top:3px;left:3px;min-width:19px;padding:2px 5px;background:var(--primary);border-radius:4px;color:#fff;font-size:9px;font-weight:800;text-align:center}
+.thumb-delete{position:absolute;top:3px;right:3px;width:23px;height:23px;display:flex;align-items:center;justify-content:center;background:rgba(239,68,68,.94);border:none;border-radius:50%;color:#fff;font-size:13px;font-weight:800}
+.empty{padding:16px 8px;color:#9ca3af;text-align:center;font-size:11px}
+.send-button{width:100%;min-height:51px;padding:13px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--drive);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:800}
+.send-button:disabled{background:#93c5fd}
+.send-button.sending{background:#1d4ed8}
+.send-button.done{background:var(--success)}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;flex:0 0 auto}
+@keyframes rot{to{transform:rotate(360deg)}}
+.status{min-height:15px;margin-top:7px;color:var(--muted);font-size:10px;text-align:center}
+.open-file-wrap{display:none;margin-top:8px;text-align:center}
+.open-file{display:inline-block;padding:8px 16px;color:var(--primary-dark);font-size:13px;font-weight:800;text-decoration:none}
+.notice{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(37,99,235,.18)}
+.notice.show{display:flex}
+.notice-card{min-width:210px;max-width:280px;padding:22px 24px;background:#fff;border:2.5px solid var(--primary);border-radius:16px;box-shadow:0 12px 32px rgba(37,99,235,.25);text-align:center}
+.notice-icon{font-size:32px;color:var(--success);font-weight:800;margin-bottom:8px}
+.notice-text{color:var(--primary-dark);font-size:15px;font-weight:800;line-height:1.4}
+
+/* KAMERA */
+.cam{position:fixed;inset:0;z-index:3000;display:none;flex-direction:column;background:#000;width:100%;height:100%;height:100dvh;overflow:hidden}
+.cam.open{display:flex}
+.cam-stage{position:relative;flex:1 1 0;min-height:0;overflow:hidden;background:#000}
+.cam-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center center}
+.a4-frame{position:absolute;z-index:4;border:3px solid #ff2b2b;box-shadow:0 0 0 200vmax rgba(0,0,0,.32),inset 0 0 0 1px rgba(255,255,255,.25);pointer-events:none}
+.a4-label{position:absolute;top:7px;left:50%;transform:translateX(-50%);padding:4px 9px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:800;white-space:nowrap}
+.corner{position:absolute;width:22px;height:22px}
+.corner.tl{left:-3px;top:-3px;border-left:5px solid #ff0000;border-top:5px solid #ff0000}
+.corner.tr{right:-3px;top:-3px;border-right:5px solid #ff0000;border-top:5px solid #ff0000}
+.corner.bl{left:-3px;bottom:-3px;border-left:5px solid #ff0000;border-bottom:5px solid #ff0000}
+.corner.br{right:-3px;bottom:-3px;border-right:5px solid #ff0000;border-bottom:5px solid #ff0000}
+.cam-bottom{flex:0 0 auto;background:#000;padding:8px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.zoom-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.zoom-row span{color:#fff;font-size:12px;font-weight:700;min-width:28px}
+.zoom-row input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;background:#64748b;border-radius:4px;outline:none}
+.zoom-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#60a5fa;border:2px solid #fff}
+.cam-btns{display:flex;align-items:center;justify-content:space-around;gap:8px}
+.cam-circle{width:52px;height:52px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;cursor:pointer;position:relative}
+.cam-ok{background:#fff;color:var(--primary)}
+.cam-x{background:#fff;color:#111;font-size:20px}
+.cam-shutter{width:68px;height:68px;border-radius:50%;border:4px solid #fff;background:#22c55e;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center}
+.cam-shutter:active{transform:scale(.94)}
+.cam-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;background:var(--primary);color:#fff;border-radius:10px;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center}
+.cam-badge.show{display:flex}
+.cam-torch{position:absolute;top:12px;right:12px;z-index:5;width:42px;height:42px;border:none;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:18px}
+.cam-torch.on{background:#f59e0b;color:#111}
+.hidden{display:none!important}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-  <header class="head">
-    <h1>📁 Dokumen 1KCB</h1>
-    <small>Pilih tujuan → Foto → Kirim · PDF A4</small>
-  </header>
-
+  <header class="head"><h1>📁 Dokumen 1KCB</h1><small>Pilih tujuan → Foto → Kirim · PDF A4 penuh</small></header>
   <main class="body">
-
     <section class="box">
       <span class="label">📂 Tujuan Penyimpanan</span>
-
-      <span class="label">Tahun</span>
-      <select id="selTahun"></select>
-
-      <span class="label">Bulan</span>
-      <select id="selBulan"></select>
-
-      <span class="label">Periode</span>
-      <select id="selPeriode" disabled>
-        <option value="">-- Pilih bulan dulu --</option>
-      </select>
-
-      <span class="label">Afdeling</span>
-      <select id="selAfdeling"></select>
-
-      <span class="label">Jenis Dokumen</span>
-      <select id="selJenisDoc"></select>
+      <span class="label">Tahun</span><select id="selTahun"></select>
+      <span class="label">Bulan</span><select id="selBulan"></select>
+      <span class="label">Periode</span><select id="selPeriode" disabled><option value="">-- Pilih bulan dulu --</option></select>
+      <span class="label">Afdeling</span><select id="selAfdeling"></select>
+      <span class="label">Jenis Dokumen</span><select id="selJenisDoc"></select>
     </section>
-
     <section class="photo-actions">
-      <button type="button" class="photo-button" id="btnCam">
-        <span class="icon">📷</span>
-        <span class="title">Kamera</span>
-        <span class="sub">Ambil foto langsung</span>
-      </button>
-
-      <label class="photo-button">
-        <span class="icon">🖼️</span>
-        <span class="title">Galeri</span>
-        <span class="sub">Pilih foto</span>
-        <input type="file" id="galIn" accept="image/*" multiple>
-      </label>
+      <button type="button" class="photo-button" id="btnCam"><span class="icon">📷</span><span class="title">Kamera</span><span class="sub">Ambil foto langsung</span></button>
+      <label class="photo-button"><span class="icon">🖼️</span><span class="title">Galeri</span><span class="sub">Pilih foto</span><input type="file" id="galIn" accept="image/*" multiple></label>
     </section>
-
     <input type="file" id="camFallback" accept="image/*" capture="environment" hidden>
-
     <section class="preview-box">
-      <div class="preview-head" id="previewHead">
-        <div class="photo-count">
-          📷 <span id="photoCount">0</span> foto siap dikirim
-        </div>
-
-        <button type="button" class="delete-all" id="btnHapus">
-          Hapus
-        </button>
-      </div>
-
+      <div class="preview-head" id="previewHead"><div class="photo-count">📷 <span id="photoCount">0</span> foto siap dikirim</div><button type="button" class="delete-all" id="btnHapus">Hapus</button></div>
       <div class="preview-grid" id="grid"></div>
-
-      <div class="empty" id="emptyMsg">
-        Belum ada foto
-      </div>
+      <div class="empty" id="emptyMsg">Belum ada foto</div>
     </section>
-
-    <button type="button" class="send-button" id="btnSend" disabled>
-      ☁️ Kirim ke Drive
-    </button>
-
-    <div class="status" id="statusText">
-      Siap.
-    </div>
-
-    <div class="open-file-wrap" id="openWrap">
-      <a class="open-file" id="openLink" href="#" target="_blank" rel="noopener">
-        Buka file ↗
-      </a>
-    </div>
-
+    <button type="button" class="send-button" id="btnSend" disabled>☁️ Kirim ke Drive</button>
+    <div class="status" id="statusText">Siap.</div>
+    <div class="open-file-wrap" id="openWrap"><a class="open-file" id="openLink" href="#" target="_blank" rel="noopener">Buka file ↗</a></div>
   </main>
 </div>
 
-<!-- Kamera -->
 <div class="cam" id="cam">
   <div class="cam-stage" id="camStage">
-
     <video id="camVideo" autoplay playsinline muted></video>
-
-    <div class="a4-frame" id="a4Frame">
-      <div class="a4-label">AREA A4</div>
-      <span class="corner tl"></span>
-      <span class="corner tr"></span>
-      <span class="corner bl"></span>
-      <span class="corner br"></span>
-    </div>
-
-    <button type="button" class="cam-torch hidden" id="btnTorch">
-      🔦
-    </button>
-
+    <div class="a4-frame" id="a4Frame"><div class="a4-label">AREA A4</div><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div>
+    <button type="button" class="cam-torch hidden" id="btnTorch">🔦</button>
   </div>
-
   <div class="cam-bottom">
-
-    <div class="zoom-row">
-      <span id="zoomMin">1x</span>
-      <input type="range" id="zoomRange" min="1" max="10" step="0.1" value="1">
-      <span>10x</span>
-    </div>
-
+    <div class="zoom-row"><span id="zoomMin">1x</span><input type="range" id="zoomRange" min="1" max="10" step="0.1" value="1"><span>10x</span></div>
     <div class="cam-btns">
-      <button type="button" class="cam-circle cam-ok" id="btnCamDone">
-        ✓
-        <span class="cam-badge" id="camBadge">0</span>
-      </button>
-
-      <button type="button" class="cam-shutter" id="btnShot">
-        📷
-      </button>
-
-      <button type="button" class="cam-circle cam-x" id="btnCloseCam">
-        ✕
-      </button>
-    </div>
-
-  </div>
-</div>
-
-<!-- Notifikasi sukses -->
-<div class="notice" id="notice">
-  <div class="notice-card">
-    <div class="notice-icon">✓</div>
-    <div class="notice-text">
-      Dokumen<br>Berhasil Dikirim
+      <button type="button" class="cam-circle cam-ok" id="btnCamDone">✓<span class="cam-badge" id="camBadge">0</span></button>
+      <button type="button" class="cam-shutter" id="btnShot">📷</button>
+      <button type="button" class="cam-circle cam-x" id="btnCloseCam">✕</button>
     </div>
   </div>
 </div>
+
+<div class="notice" id="notice"><div class="notice-card"><div class="notice-icon">✓</div><div class="notice-text">Dokumen<br>Berhasil Dikirim</div></div></div>
 
 <script>
-const jsPDF =
-  window.jspdf && window.jspdf.jsPDF;
-
-const ENDPOINT =
-  'https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
-
-const MONTHS = [
-  'Januari','Februari','Maret','April','Mei','Juni',
-  'Juli','Agustus','September','Oktober','November','Desember'
-];
-
-const PERIODS = [
-  'Periode I',
-  'Periode II'
-];
-
-const AFDELINGS = [
-  'Afdeling I',
-  'Afdeling II',
-  'Afdeling III',
-  'Afdeling IV',
-  'Afdeling V',
-  'Afdeling VI'
-];
-
-const DOCUMENT_TYPES = [
-  'Peta Realisasi Pemeliharaan',
-  'Dokumentasi Pemeliharaan',
-  'Peta Realisasi Pemupukan',
-  'Dokumentasi Pemupukan',
-  'SP Angkutan Pupuk',
-  'Slip Mobilisasi Tenaga Pemupukan',
-  'Lampiran Angkutan TBS PKS I',
-  'Lampiran Angkutan TBS PKS II',
-  'Lampiran Serak Jangkos',
-  'SP Angkutan Jangkos',
-  'Lampiran Pok TBS',
-  'Dokumentasi Mobilisasi Pemeliharaan',
-  'Dokumentasi Mobilisasi Pemupukan',
-  'Slip Mobilisasi Tenaga Pemeliharaan'
-];
-
-let photos = [];
-let busy = false;
-let buttonState = 'idle';
-let stream = null;
-let videoTrack = null;
-let torchOn = false;
-let zoomValue = 1;
-let hardwareZoom = false;
-let cameraPhotoCount = 0;
-let noticeTimer = null;
-let scanning = false;
-
-const $ = id =>
-  document.getElementById(id);
-
-const pad = value =>
-  String(value).padStart(2,'0');
-
-const clean = value =>
-  String(value)
-    .replace(/[\\/:*?"<>|]+/g,'-')
-    .replace(/\s+/g,' ')
-    .trim();
-
-const formatSize = bytes =>
-  bytes >= 1048576
-    ? (bytes/1048576).toFixed(2)+' MB'
-    : Math.round(bytes/1024)+' KB';
-
-const loadImage = source =>
-  new Promise((resolve,reject)=>{
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Gambar rusak'));
-    image.src = source;
-  });
-
-const readDataURL = file =>
-  new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Gagal membaca foto'));
-    reader.readAsDataURL(file);
-  });
-
-const blobToBase64 = blob =>
-  new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.onload = () =>
-      resolve(String(reader.result).split(',')[1]);
-    reader.onerror = () =>
-      reject(new Error('Gagal menyiapkan PDF'));
-    reader.readAsDataURL(blob);
-  });
-
-function setStatus(message){
-  $('statusText').textContent = message;
-}
-
-function showSuccessNotice(){
-  clearTimeout(noticeTimer);
-  $('notice').classList.add('show');
-
-  noticeTimer = setTimeout(()=>{
-    $('notice').classList.remove('show');
-  },1800);
-}
-
-/* Dropdown */
-function fillSelect(element, values, placeholder){
-  element.innerHTML =
-    '<option value="">'+placeholder+'</option>';
-
-  values.forEach(value=>{
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = value;
-    element.appendChild(option);
-  });
-}
-
-(function initializeDropdowns(){
-
-  const now = new Date();
-  const year = now.getFullYear();
-  const yearSelect = $('selTahun');
-
-  for(let i=year+1;i>=year-5;i--){
-    const option = document.createElement('option');
-    option.value = String(i);
-    option.textContent = String(i);
-    yearSelect.appendChild(option);
-  }
-
-  yearSelect.value = String(year);
-
-  fillSelect(
-    $('selBulan'),
-    MONTHS,
-    '-- Pilih bulan --'
-  );
-
-  $('selBulan').value =
-    MONTHS[now.getMonth()];
-
-  fillSelect(
-    $('selAfdeling'),
-    AFDELINGS,
-    '-- Pilih afdeling --'
-  );
-
-  fillSelect(
-    $('selJenisDoc'),
-    DOCUMENT_TYPES,
-    '-- Pilih jenis dokumen --'
-  );
-
-  $('selBulan').addEventListener(
-    'change',
-    updatePeriod
-  );
-
-  updatePeriod();
-
+const jsPDF = window.jspdf && window.jspdf.jsPDF;
+const EP = 'https://script.google.com/macros/s/AKfycbzNnRc0Cs4nYoLCA5QwUuwyg_3ELfLEd9CoIJoUcjrgTor5uHpBnXbYnO7bW9ucRuE4FQ/exec';
+const MO = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const PE = ['Periode I','Periode II'];
+const AF = ['Afdeling I','Afdeling II','Afdeling III','Afdeling IV','Afdeling V','Afdeling VI'];
+const JD = ['Peta Realisasi Pemeliharaan','Dokumentasi Pemeliharaan','Peta Realisasi Pemupukan','Dokumentasi Pemupukan','SP Angkutan Pupuk','Slip Mobilisasi Tenaga Pemupukan','Lampiran Angkutan TBS PKS I','Lampiran Angkutan TBS PKS II','Lampiran Serak Jangkos','SP Angkutan Jangkos','Lampiran Pok TBS','Dokumentasi Mobilisasi Pemeliharaan','Dokumentasi Mobilisasi Pemupukan','Slip Mobilisasi Tenaga Pemeliharaan'];
+let photos=[], busy=false, btnState='idle', stream=null, videoTrack=null, torchOn=false, zoomVal=1, hwZoom=false, camShotCount=0, noticeT=null;
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+const clean = s => String(s).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim();
+const fmt = b => b>=1048576 ? (b/1048576).toFixed(2)+' MB' : Math.round(b/1024)+' KB';
+const loadImg = src => new Promise((y,n)=>{ const i=new Image(); i.onload=()=>y(i); i.onerror=()=>n(new Error('rusak')); i.src=src; });
+const readDU = f => new Promise((y,n)=>{ const r=new FileReader(); r.onload=()=>y(r.result); r.onerror=()=>n(); r.readAsDataURL(f); });
+const toB64 = b => new Promise((y,n)=>{ const r=new FileReader(); r.onload=()=>y(String(r.result).split(',')[1]); r.onerror=()=>n(); r.readAsDataURL(b); });
+function stat(m){ $('statusText').textContent=m; }
+function showOk(){ clearTimeout(noticeT); $('notice').classList.add('show'); noticeT=setTimeout(()=>$('notice').classList.remove('show'),1800); }
+function fill(el,arr,ph){ el.innerHTML='<option value="">'+ph+'</option>'; arr.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o); }); }
+(function(){
+  const d=new Date(), y=d.getFullYear(), sT=$('selTahun');
+  for(let i=y+1;i>=y-5;i--){ const o=document.createElement('option'); o.value=i; o.textContent=i; sT.appendChild(o); }
+  sT.value=String(y);
+  fill($('selBulan'),MO,'-- Pilih bulan --'); $('selBulan').value=MO[d.getMonth()];
+  fill($('selAfdeling'),AF,'-- Pilih afdeling --');
+  fill($('selJenisDoc'),JD,'-- Pilih jenis dokumen --');
+  $('selBulan').onchange=onBulan; onBulan();
 })();
-
-function updatePeriod(){
-
-  const period = $('selPeriode');
-
-  if(!$('selBulan').value){
-    period.disabled = true;
-    period.innerHTML =
-      '<option value="">-- Pilih bulan dulu --</option>';
-    return;
-  }
-
-  period.disabled = false;
-
-  fillSelect(
-    period,
-    PERIODS,
-    '-- Pilih periode --'
-  );
-}
-
-function getDestination(){
-  return {
-    tahun:$('selTahun').value,
-    bulan:$('selBulan').value,
-    periode:$('selPeriode').value,
-    afdeling:$('selAfdeling').value,
-    jenisDoc:$('selJenisDoc').value
-  };
-}
-
-function destinationComplete(data){
-  return Boolean(
-    data.tahun &&
-    data.bulan &&
-    data.periode &&
-    data.afdeling &&
-    data.jenisDoc
-  );
-}
-
-function makeFileName(){
-
-  const data = getDestination();
-  const now = new Date();
-  const monthNumber =
-    MONTHS.indexOf(data.bulan)+1;
-
-  const date =
-    data.tahun +
-    pad(monthNumber || now.getMonth()+1) +
-    pad(now.getDate());
-
-  const name = [
-    data.jenisDoc,
-    data.afdeling,
-    data.periode
-  ].filter(Boolean).join(' - ') || 'Dokumen';
-
-  return clean(name)+' - '+date+'.pdf';
-}
-
-/* Preview */
-function renderPreview(){
-
-  const grid = $('grid');
-  const count = photos.length;
-
-  $('previewHead').classList.toggle(
-    'show',
-    count > 0
-  );
-
-  grid.classList.toggle(
-    'show',
-    count > 0
-  );
-
-  $('emptyMsg').style.display =
-    count ? 'none' : 'block';
-
-  $('photoCount').textContent = count;
-  grid.innerHTML = '';
-
-  photos.forEach((photo,index)=>{
-
-    const item =
-      document.createElement('div');
-
-    item.className = 'thumb';
-
-    item.innerHTML =
-      '<img src="'+photo.dataUrl+'">'+
-      '<span class="thumb-number">'+
-      (index+1)+
-      '</span>'+
-      '<button type="button" class="thumb-delete">×</button>';
-
-    item.querySelector(
-      '.thumb-delete'
-    ).onclick = ()=>{
-
-      if(busy) return;
-
-      photos = photos.filter(
-        itemPhoto => itemPhoto.id !== photo.id
-      );
-
-      renderPreview();
-    };
-
-    grid.appendChild(item);
+function onBulan(){ const s=$('selPeriode'); if(!$('selBulan').value){ s.disabled=true; s.innerHTML='<option value="">-- Pilih bulan dulu --</option>'; } else { s.disabled=false; fill(s,PE,'-- Pilih periode --'); } }
+function dest(){ return {tahun:$('selTahun').value,bulan:$('selBulan').value,periode:$('selPeriode').value,afdeling:$('selAfdeling').value,jenisDoc:$('selJenisDoc').value}; }
+function destOk(p){ return !!(p.tahun&&p.bulan&&p.periode&&p.afdeling&&p.jenisDoc); }
+function fileName(){ const p=dest(), d=new Date(), m=MO.indexOf(p.bulan)+1; return clean([p.jenisDoc,p.afdeling,p.periode].filter(Boolean).join(' - ')||'Dokumen')+' - '+p.tahun+pad(m||d.getMonth()+1)+pad(d.getDate())+'.pdf'; }
+function render(){
+  const g=$('grid'), n=photos.length;
+  $('previewHead').classList.toggle('show', n>0);
+  g.classList.toggle('show', n>0);
+  $('emptyMsg').style.display = n ? 'none' : 'block';
+  $('photoCount').textContent = n;
+  g.innerHTML='';
+  photos.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='thumb';
+    d.innerHTML='<img src="'+p.dataUrl+'" alt=""><span class="thumb-number">'+(i+1)+'</span><button type="button" class="thumb-delete">×</button>';
+    d.querySelector('.thumb-delete').onclick=()=>{ if(busy)return; photos=photos.filter(x=>x.id!==p.id); render(); };
+    g.appendChild(d);
   });
-
-  updateSendButton();
+  updateBtn();
 }
-
-function updateSendButton(){
-
-  if(buttonState === 'idle'){
-    $('btnSend').disabled =
-      busy || photos.length === 0;
-  }
+function setBtn(state,label){
+  const b=$('btnSend'); btnState=state;
+  if(state==='idle'){ b.className='send-button'; b.disabled=!photos.length||busy; b.innerHTML='☁️ Kirim ke Drive'; b.onclick=sendToDrive; }
+  else if(state==='sending'){ b.className='send-button sending'; b.disabled=true; b.innerHTML='<span class="spin"></span><span>'+(label||'Mengirim…')+'</span>'; }
+  else { b.className='send-button done'; b.disabled=false; b.innerHTML='🆕 Dokumen Baru'; b.onclick=newDoc; }
 }
+function setBtnLabel(t){ if(btnState==='sending'){ const s=$('btnSend').querySelector('span:last-child'); if(s)s.textContent=t; } }
+function updateBtn(){ if(btnState==='idle') $('btnSend').disabled=!photos.length||busy; }
+function newDoc(){ photos=[]; $('openWrap').style.display='none'; $('openLink').removeAttribute('href'); stat('Siap.'); render(); setBtn('idle'); window.scrollTo({top:0,behavior:'smooth'}); }
+$('btnHapus').onclick=()=>{ if(busy)return; photos=[]; render(); stat('Foto dihapus.'); };
 
-function setButtonState(state,label){
-
-  const button = $('btnSend');
-  buttonState = state;
-
-  if(state === 'idle'){
-
-    button.className = 'send-button';
-    button.disabled =
-      busy || photos.length === 0;
-
-    button.innerHTML =
-      '☁️ Kirim ke Drive';
-
-    button.onclick = sendToDrive;
-  }
-
-  if(state === 'sending'){
-
-    button.className =
-      'send-button sending';
-
-    button.disabled = true;
-
-    button.innerHTML =
-      '<span class="spin"></span>'+
-      '<span>'+(label || 'Mengirim...')+'</span>';
-
-    button.onclick = null;
-  }
-
-  if(state === 'done'){
-
-    button.className =
-      'send-button done';
-
-    button.disabled = false;
-
-    button.innerHTML =
-      '🆕 Dokumen Baru';
-
-    button.onclick = newDocument;
-  }
-}
-
-function updateButtonLabel(label){
-
-  if(buttonState !== 'sending'){
-    return;
-  }
-
-  const span =
-    $('btnSend').querySelector(
-      'span:last-child'
-    );
-
-  if(span){
-    span.textContent = label;
-  }
-}
-
-function newDocument(){
-
-  photos = [];
-
-  $('openWrap').style.display =
-    'none';
-
-  $('openLink').removeAttribute(
-    'href'
-  );
-
-  setStatus('Siap.');
-  renderPreview();
-  setButtonState('idle');
-
-  window.scrollTo({
-    top:0,
-    behavior:'smooth'
-  });
-}
-
-$('btnHapus').onclick = ()=>{
-
-  if(busy) return;
-
-  photos = [];
-  renderPreview();
-  setStatus('Foto dihapus.');
-};
-
-/* Kamera */
-$('btnCam').onclick = openCamera;
-$('btnCloseCam').onclick = closeCamera;
-$('btnCamDone').onclick = closeCamera;
-$('btnShot').onclick = takePhoto;
-
-$('galIn').onchange = event=>{
-  addFiles(event.target.files);
-  event.target.value = '';
-};
-
-$('camFallback').onchange = event=>{
-  addFiles(event.target.files);
-  event.target.value = '';
-};
-
-function stopCameraStream(){
-
-  if(stream){
-    stream.getTracks().forEach(
-      track => track.stop()
-    );
-
-    stream = null;
-  }
-
-  videoTrack = null;
-  torchOn = false;
-  zoomValue = 1;
-  hardwareZoom = false;
-
-  $('camVideo').srcObject = null;
-  $('camVideo').style.transform = 'none';
-
-  if(document.fullscreenElement){
-    document.exitFullscreen().catch(()=>{});
-  }
-}
-
-function closeCamera(){
-
-  stopCameraStream();
-  $('cam').classList.remove('open');
-}
-
-function updateCameraBadge(){
-
-  const badge = $('camBadge');
-
-  if(cameraPhotoCount > 0){
-    badge.textContent = cameraPhotoCount;
-    badge.classList.add('show');
-  }else{
-    badge.classList.remove('show');
-  }
-}
-
+/* KAMERA + FRAME A4 */
+$('btnCam').onclick=openCam;
+$('btnCloseCam').onclick=closeCam;
+$('btnCamDone').onclick=closeCam;
+$('btnShot').onclick=shot;
+$('galIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
+$('camFallback').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
+function stopCam(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } videoTrack=null; torchOn=false; zoomVal=1; hwZoom=false; $('camVideo').srcObject=null; $('camVideo').style.transform='none'; if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }
+function closeCam(){ stopCam(); $('cam').classList.remove('open'); }
+function updateCamBadge(){ const b=$('camBadge'); if(camShotCount>0){ b.textContent=camShotCount; b.classList.add('show'); } else b.classList.remove('show'); }
 function updateA4Frame(){
-
-  const stage = $('camStage');
-  const frame = $('a4Frame');
-
-  if(!stage || !frame){
-    return;
-  }
-
-  const stageWidth =
-    stage.clientWidth;
-
-  const stageHeight =
-    stage.clientHeight;
-
-  if(!stageWidth || !stageHeight){
-    return;
-  }
-
-  const portrait =
-    stageHeight >= stageWidth;
-
-  const ratio =
-    portrait ? 210/297 : 297/210;
-
-  const padding = 14;
-
-  let width =
-    stageWidth - padding*2;
-
-  let height =
-    width / ratio;
-
-  if(height > stageHeight-padding*2){
-    height =
-      stageHeight-padding*2;
-
-    width =
-      height*ratio;
-  }
-
-  frame.style.width =
-    width+'px';
-
-  frame.style.height =
-    height+'px';
-
-  frame.style.left =
-    ((stageWidth-width)/2)+'px';
-
-  frame.style.top =
-    ((stageHeight-height)/2)+'px';
-
-  frame.dataset.orientation =
-    portrait ? 'portrait' : 'landscape';
+  const stage=$('camStage'), frame=$('a4Frame');
+  if(!stage||!frame) return;
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  if(!sw||!sh) return;
+  const portrait = sh>=sw;
+  const ratio = portrait ? 210/297 : 297/210;
+  const padM=14;
+  let w = sw-padM*2, h = w/ratio;
+  if(h>sh-padM*2){ h=sh-padM*2; w=h*ratio; }
+  frame.style.width=w+'px'; frame.style.height=h+'px';
+  frame.style.left=((sw-w)/2)+'px'; frame.style.top=((sh-h)/2)+'px';
+  frame.dataset.orientation = portrait?'portrait':'landscape';
 }
-
-window.addEventListener(
-  'resize',
-  updateA4Frame
-);
-
-window.addEventListener(
-  'orientationchange',
-  ()=>{
-    setTimeout(updateA4Frame,300);
-  }
-);
-
-async function openCamera(){
-
-  if(busy){
-    return;
-  }
-
-  if(
-    !navigator.mediaDevices ||
-    !navigator.mediaDevices.getUserMedia
-  ){
-    $('camFallback').click();
-    return;
-  }
-
+window.addEventListener('resize',updateA4Frame);
+window.addEventListener('orientationchange',()=>setTimeout(updateA4Frame,300));
+async function openCam(){
+  if(busy) return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ $('camFallback').click(); return; }
   try{
-
-    stream =
-      await navigator.mediaDevices.getUserMedia({
-        audio:false,
-        video:{
-          facingMode:{ideal:'environment'},
-          width:{ideal:1920},
-          height:{ideal:1080}
-        }
-      });
-
-    videoTrack =
-      stream.getVideoTracks()[0];
-
-    const video =
-      $('camVideo');
-
-    video.srcObject = stream;
-
-    await video.play().catch(()=>{});
-
-    cameraPhotoCount = 0;
-    updateCameraBadge();
-
-    $('zoomRange').value = 1;
-    zoomValue = 1;
-
+    stream = await navigator.mediaDevices.getUserMedia({ audio:false, video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} } });
+    videoTrack = stream.getVideoTracks()[0];
+    const v=$('camVideo'); v.srcObject=stream; await v.play().catch(()=>{});
+    camShotCount=0; updateCamBadge();
+    $('zoomRange').value=1; zoomVal=1; v.style.transform='none';
     $('cam').classList.add('open');
-
-    setupZoomAndTorch();
-
-    requestAnimationFrame(
-      updateA4Frame
-    );
-
-    setTimeout(
-      updateA4Frame,
-      300
-    );
-
-    if($('cam').requestFullscreen){
-      $('cam').requestFullscreen().catch(()=>{});
-    }
-
-  }catch(error){
-
-    stopCameraStream();
-    $('camFallback').click();
-  }
+    setupZoomTorch();
+    requestAnimationFrame(updateA4Frame); setTimeout(updateA4Frame,300);
+    if($('cam').requestFullscreen) $('cam').requestFullscreen().catch(()=>{});
+  }catch(e){ stopCam(); $('camFallback').click(); }
 }
-
-function setupZoomAndTorch(){
-
-  const torchButton =
-    $('btnTorch');
-
-  torchButton.classList.add('hidden');
-  torchButton.classList.remove('on');
-
-  torchOn = false;
-  hardwareZoom = false;
-
-  if(
-    !videoTrack ||
-    !videoTrack.getCapabilities
-  ){
-    return;
-  }
-
-  const capabilities =
-    videoTrack.getCapabilities();
-
-  if(capabilities.torch){
-    torchButton.classList.remove(
-      'hidden'
-    );
-  }
-
-  if(
-    capabilities.zoom &&
-    capabilities.zoom.max >
-    capabilities.zoom.min
-  ){
-
-    hardwareZoom = true;
-
-    const range =
-      $('zoomRange');
-
-    range.min =
-      capabilities.zoom.min || 1;
-
-    range.max =
-      Math.min(
-        capabilities.zoom.max,
-        10
-      );
-
-    range.step =
-      capabilities.zoom.step || .1;
-
-    range.value =
-      videoTrack.getSettings().zoom ||
-      capabilities.zoom.min ||
-      1;
-
-    zoomValue =
-      Number(range.value);
-  }
+function setupZoomTorch(){
+  const tb=$('btnTorch'); tb.classList.add('hidden'); tb.classList.remove('on'); torchOn=false; hwZoom=false;
+  if(!videoTrack||!videoTrack.getCapabilities) return;
+  const cap=videoTrack.getCapabilities()||{};
+  if(cap.torch) tb.classList.remove('hidden');
+  if(cap.zoom && cap.zoom.max>cap.zoom.min){
+    hwZoom=true; const z=$('zoomRange');
+    z.min=cap.zoom.min||1; z.max=Math.min(cap.zoom.max,10); z.step=cap.zoom.step||0.1;
+    z.value=videoTrack.getSettings().zoom||cap.zoom.min||1; zoomVal=Number(z.value);
+  } else { const z=$('zoomRange'); z.min=1; z.max=10; z.step=0.1; z.value=1; }
 }
-
-$('btnTorch').onclick = async ()=>{
-
-  if(!videoTrack){
-    return;
-  }
-
-  torchOn = !torchOn;
-
-  try{
-
-    await videoTrack.applyConstraints({
-      advanced:[
-        {
-          torch:torchOn
-        }
-      ]
-    });
-
-    $('btnTorch').classList.toggle(
-      'on',
-      torchOn
-    );
-
-  }catch(error){
-
-    torchOn = !torchOn;
-  }
+$('btnTorch').onclick=async ()=>{ if(!videoTrack) return; torchOn=!torchOn; try{ await videoTrack.applyConstraints({advanced:[{torch:torchOn}]}); $('btnTorch').classList.toggle('on',torchOn); }catch(e){ torchOn=!torchOn; } };
+$('zoomRange').oninput=async e=>{
+  zoomVal=Number(e.target.value)||1;
+  $('zoomMin').textContent=Math.round(zoomVal)+'x';
+  if(hwZoom&&videoTrack){ try{ await videoTrack.applyConstraints({advanced:[{zoom:zoomVal}]}); $('camVideo').style.transform='none'; return; }catch(err){} }
+  $('camVideo').style.transform='scale('+zoomVal+')';
 };
-
-$('zoomRange').oninput = async event=>{
-
-  zoomValue =
-    Number(event.target.value) || 1;
-
-  $('zoomMin').textContent =
-    Math.round(zoomValue)+'x';
-
-  if(
-    hardwareZoom &&
-    videoTrack
-  ){
-
-    try{
-
-      await videoTrack.applyConstraints({
-        advanced:[
-          {
-            zoom:zoomValue
-          }
-        ]
-      });
-
-      $('camVideo').style.transform =
-        'none';
-
-      return;
-
-    }catch(error){}
+function shot(){
+  const v=$('camVideo'), stage=$('camStage'), frame=$('a4Frame');
+  if(!v.videoWidth) return;
+  if(btnState==='done') newDoc();
+  const vw=v.videoWidth, vh=v.videoHeight, sw=stage.clientWidth, sh=stage.clientHeight;
+  const fx=frame.offsetLeft, fy=frame.offsetTop, fw=frame.offsetWidth, fh=frame.offsetHeight;
+  const s0=Math.max(sw/vw, sh/vh);
+  let sx,sy,sW,sH;
+  if(!hwZoom){
+    const z=Math.max(1,zoomVal||1), eff=s0*z;
+    const offX=(vw*eff-sw)/2, offY=(vh*eff-sh)/2;
+    sx=(fx+offX)/eff; sy=(fy+offY)/eff; sW=fw/eff; sH=fh/eff;
+  } else {
+    const offX=(vw*s0-sw)/2, offY=(vh*s0-sh)/2;
+    sx=(fx+offX)/s0; sy=(fy+offY)/s0; sW=fw/s0; sH=fh/s0;
   }
-
-  $('camVideo').style.transform =
-    'scale('+zoomValue+')';
-};
-
-/* Ambil tampilan kamera */
-function captureCameraView(){
-
-  const video =
-    $('camVideo');
-
-  const stage =
-    $('camStage');
-
-  const videoWidth =
-    video.videoWidth;
-
-  const videoHeight =
-    video.videoHeight;
-
-  const stageWidth =
-    stage.clientWidth;
-
-  const stageHeight =
-    stage.clientHeight;
-
-  if(
-    !videoWidth ||
-    !videoHeight ||
-    !stageWidth ||
-    !stageHeight
-  ){
-    return null;
-  }
-
-  const scale =
-    Math.max(
-      stageWidth/videoWidth,
-      stageHeight/videoHeight
-    );
-
-  let sourceWidth =
-    stageWidth/scale;
-
-  let sourceHeight =
-    stageHeight/scale;
-
-  let sourceX =
-    (videoWidth-sourceWidth)/2;
-
-  let sourceY =
-    (videoHeight-sourceHeight)/2;
-
-  if(!hardwareZoom){
-
-    const zoom =
-      Math.max(1,zoomValue);
-
-    sourceWidth /=
-      zoom;
-
-    sourceHeight /=
-      zoom;
-
-    sourceX =
-      (videoWidth-sourceWidth)/2;
-
-    sourceY =
-      (videoHeight-sourceHeight)/2;
-  }
-
-  const outputScale =
-    Math.min(
-      1,
-      1800/Math.max(
-        sourceWidth,
-        sourceHeight
-      )
-    );
-
-  const canvas =
-    document.createElement('canvas');
-
-  canvas.width =
-    Math.round(sourceWidth*outputScale);
-
-  canvas.height =
-    Math.round(sourceHeight*outputScale);
-
-  canvas.getContext('2d').drawImage(
-    video,
-    sourceX,
-    sourceY,
-    sourceWidth,
-    sourceHeight,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  return canvas;
+  sx=Math.max(0,sx); sy=Math.max(0,sy);
+  sW=Math.min(sW,vw-sx); sH=Math.min(sH,vh-sy);
+  const land=frame.dataset.orientation==='landscape';
+  const c=document.createElement('canvas');
+  if(land){ c.width=2376; c.height=1680; } else { c.width=1680; c.height=2376; }
+  c.getContext('2d').drawImage(v,sx,sy,sW,sH,0,0,c.width,c.height);
+  photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:c.toDataURL('image/jpeg',0.88), w:c.width, h:c.height, comp:null });
+  camShotCount++; updateCamBadge(); render();
+  frame.style.borderColor='#fff'; setTimeout(()=>frame.style.borderColor='#ff2b2b',120);
 }
-
-/* Crop berdasarkan frame jika auto-scan gagal */
-function cropFrameToA4(sourceCanvas){
-
-  const stage =
-    $('camStage');
-
-  const frame =
-    $('a4Frame');
-
-  const stageWidth =
-    stage.clientWidth;
-
-  const stageHeight =
-    stage.clientHeight;
-
-  const x =
-    frame.offsetLeft/stageWidth*
-    sourceCanvas.width;
-
-  const y =
-    frame.offsetTop/stageHeight*
-    sourceCanvas.height;
-
-  const width =
-    frame.offsetWidth/stageWidth*
-    sourceCanvas.width;
-
-  const height =
-    frame.offsetHeight/stageHeight*
-    sourceCanvas.height;
-
-  const landscape =
-    frame.dataset.orientation ===
-    'landscape';
-
-  const output =
-    document.createElement('canvas');
-
-  output.width =
-    landscape ? 2376 : 1680;
-
-  output.height =
-    landscape ? 1680 : 2376;
-
-  output.getContext('2d').drawImage(
-    sourceCanvas,
-    x,
-    y,
-    width,
-    height,
-    0,
-    0,
-    output.width,
-    output.height
-  );
-
-  return output;
-}
-
-/* OpenCV */
-function waitForOpenCV(timeout=6000){
-
-  return new Promise(resolve=>{
-
-    const started =
-      Date.now();
-
-    function check(){
-
-      if(
-        window.cv &&
-        typeof cv.imread === 'function' &&
-        typeof cv.Mat === 'function'
-      ){
-        resolve(true);
-        return;
-      }
-
-      if(Date.now()-started >= timeout){
-        resolve(false);
-        return;
-      }
-
-      setTimeout(check,100);
-    }
-
-    check();
-  });
-}
-
-function distancePoint(a,b){
-
-  return Math.sqrt(
-    Math.pow(a.x-b.x,2)+
-    Math.pow(a.y-b.y,2)
-  );
-}
-
-function orderPoints(points){
-
-  const sum =
-    point => point.x+point.y;
-
-  const diff =
-    point => point.x-point.y;
-
-  const topLeft =
-    points.reduce((a,b)=>
-      sum(a)<sum(b)?a:b
-    );
-
-  const bottomRight =
-    points.reduce((a,b)=>
-      sum(a)>sum(b)?a:b
-    );
-
-  const topRight =
-    points.reduce((a,b)=>
-      diff(a)>diff(b)?a:b
-    );
-
-  const bottomLeft =
-    points.reduce((a,b)=>
-      diff(a)<diff(b)?a:b
-    );
-
-  return [
-    topLeft,
-    topRight,
-    bottomRight,
-    bottomLeft
-  ];
-}
-
-async function autoScanA4(canvas){
-
-  const ready =
-    await waitForOpenCV();
-
-  if(!ready){
-    return null;
-  }
-
-  let src=null;
-  let small=null;
-  let gray=null;
-  let blur=null;
-  let edges=null;
-  let dilated=null;
-  let closed=null;
-  let kernel=null;
-  let contours=null;
-  let hierarchy=null;
-
-  try{
-
-    src =
-      cv.imread(canvas);
-
-    const maxSide =
-      1000;
-
-    const scale =
-      Math.min(
-        1,
-        maxSide/
-        Math.max(
-          src.cols,
-          src.rows
-        )
-      );
-
-    small =
-      new cv.Mat();
-
-    cv.resize(
-      src,
-      small,
-      new cv.Size(
-        Math.round(src.cols*scale),
-        Math.round(src.rows*scale)
-      ),
-      0,
-      0,
-      cv.INTER_AREA
-    );
-
-    gray =
-      new cv.Mat();
-
-    blur =
-      new cv.Mat();
-
-    edges =
-      new cv.Mat();
-
-    dilated =
-      new cv.Mat();
-
-    closed =
-      new cv.Mat();
-
-    cv.cvtColor(
-      small,
-      gray,
-      cv.COLOR_RGBA2GRAY
-    );
-
-    cv.GaussianBlur(
-      gray,
-      blur,
-      new cv.Size(5,5),
-      0,
-      0,
-      cv.BORDER_DEFAULT
-    );
-
-    cv.Canny(
-      blur,
-      edges,
-      40,
-      140
-    );
-
-    kernel =
-      cv.getStructuringElement(
-        cv.MORPH_RECT,
-        new cv.Size(5,5)
-      );
-
-    cv.dilate(
-      edges,
-      dilated,
-      kernel
-    );
-
-    cv.morphologyEx(
-      dilated,
-      closed,
-      cv.MORPH_CLOSE,
-      kernel
-    );
-
-    contours =
-      new cv.MatVector();
-
-    hierarchy =
-      new cv.Mat();
-
-    cv.findContours(
-      closed,
-      contours,
-      hierarchy,
-      cv.RETR_LIST,
-      cv.CHAIN_APPROX_SIMPLE
-    );
-
-    let bestPoints=null;
-    let bestArea=0;
-
-    const imageArea =
-      small.cols*small.rows;
-
-    for(
-      let i=0;
-      i<contours.size();
-      i++
-    ){
-
-      const contour =
-        contours.get(i);
-
-      const area =
-        Math.abs(
-          cv.contourArea(contour)
-        );
-
-      if(area<imageArea*.12){
-        contour.delete();
-        continue;
-      }
-
-      const perimeter =
-        cv.arcLength(
-          contour,
-          true
-        );
-
-      const approx =
-        new cv.Mat();
-
-      cv.approxPolyDP(
-        contour,
-        approx,
-        .02*perimeter,
-        true
-      );
-
-      if(
-        approx.rows===4 &&
-        cv.isContourConvex(approx) &&
-        area>bestArea
-      ){
-
-        const data =
-          approx.data32S;
-
-        bestPoints=[];
-
-        for(
-          let p=0;
-          p<8;
-          p+=2
-        ){
-
-          bestPoints.push({
-            x:data[p]/scale,
-            y:data[p+1]/scale
-          });
-        }
-
-        bestArea=area;
-      }
-
-      approx.delete();
-      contour.delete();
-    }
-
-    if(!bestPoints){
-      return null;
-    }
-
-    const points =
-      orderPoints(bestPoints);
-
-    const widthTop =
-      distancePoint(
-        points[0],
-        points[1]
-      );
-
-    const widthBottom =
-      distancePoint(
-        points[3],
-        points[2]
-      );
-
-    const heightLeft =
-      distancePoint(
-        points[0],
-        points[3]
-      );
-
-    const heightRight =
-      distancePoint(
-        points[1],
-        points[2]
-      );
-
-    const averageWidth =
-      (widthTop+widthBottom)/2;
-
-    const averageHeight =
-      (heightLeft+heightRight)/2;
-
-    const landscape =
-      averageWidth>averageHeight;
-
-    const outputWidth =
-      landscape?2376:1680;
-
-    const outputHeight =
-      landscape?1680:2376;
-
-    const sourcePoints =
-      cv.matFromArray(
-        4,
-        1,
-        cv.CV_32FC2,
-        [
-          points[0].x,points[0].y,
-          points[1].x,points[1].y,
-          points[2].x,points[2].y,
-          points[3].x,points[3].y
-        ]
-      );
-
-    const targetPoints =
-      cv.matFromArray(
-        4,
-        1,
-        cv.CV_32FC2,
-        [
-          0,0,
-          outputWidth,0,
-          outputWidth,outputHeight,
-          0,outputHeight
-        ]
-      );
-
-    const matrix =
-      cv.getPerspectiveTransform(
-        sourcePoints,
-        targetPoints
-      );
-
-    const warped =
-      new cv.Mat();
-
-    cv.warpPerspective(
-      src,
-      warped,
-      matrix,
-      new cv.Size(
-        outputWidth,
-        outputHeight
-      ),
-      cv.INTER_LANCZOS4,
-      cv.BORDER_CONSTANT,
-      new cv.Scalar(
-        255,255,255,255
-      )
-    );
-
-    const output =
-      document.createElement('canvas');
-
-    output.width =
-      outputWidth;
-
-    output.height =
-      outputHeight;
-
-    cv.imshow(
-      output,
-      warped
-    );
-
-    sourcePoints.delete();
-    targetPoints.delete();
-    matrix.delete();
-    warped.delete();
-
-    return output;
-
-  }catch(error){
-
-    console.error(
-      'Auto scan error:',
-      error
-    );
-
-    return null;
-
-  }finally{
-
-    if(src)src.delete();
-    if(small)small.delete();
-    if(gray)gray.delete();
-    if(blur)blur.delete();
-    if(edges)edges.delete();
-    if(dilated)dilated.delete();
-    if(closed)closed.delete();
-    if(kernel)kernel.delete();
-    if(contours)contours.delete();
-    if(hierarchy)hierarchy.delete();
-  }
-}
-
-/* Ambil foto dari kamera */
-async function takePhoto(){
-
-  if(scanning){
-    return;
-  }
-
-  const video =
-    $('camVideo');
-
-  if(!video.videoWidth){
-    setStatus('Kamera belum siap');
-    return;
-  }
-
-  scanning=true;
-
-  try{
-
-    setStatus('Mencari tepi kertas...');
-
-    const cameraView =
-      captureCameraView();
-
-    if(!cameraView){
-      throw new Error(
-        'Kamera belum siap'
-      );
-    }
-
-    let result =
-      await autoScanA4(cameraView);
-
-    if(!result){
-
-      result =
-        cropFrameToA4(
-          cameraView
-        );
-
-      setStatus(
-        'Frame A4 digunakan'
-      );
-
-    }else{
-
-      setStatus(
-        'Kertas terdeteksi otomatis'
-      );
-    }
-
-    const dataUrl =
-      result.toDataURL(
-        'image/jpeg',
-        .90
-      );
-
-    photos.push({
-      id:
-        'p'+Date.now()+
-        Math.random(),
-
-      dataUrl:dataUrl,
-      w:result.width,
-      h:result.height,
-      comp:null
-    });
-
-    cameraPhotoCount++;
-    updateCameraBadge();
-    renderPreview();
-
-    const frame =
-      $('a4Frame');
-
-    frame.style.borderColor='#fff';
-
-    setTimeout(()=>{
-      frame.style.borderColor='#ff2b2b';
-    },120);
-
-  }catch(error){
-
-    console.error(error);
-    setStatus(
-      'Gagal memotret'
-    );
-
-  }
-
-  scanning=false;
-}
-
-/* Galeri */
-$('galIn').onchange = event=>{
-  addFiles(event.target.files);
-  event.target.value='';
-};
-
-$('camFallback').onchange = event=>{
-  addFiles(event.target.files);
-  event.target.value='';
-};
-
 async function addFiles(list){
-
-  const files =
-    [...list||[]].filter(
-      file=>file.type.startsWith('image/')
-    );
-
-  if(!files.length){
-    return;
+  const files=[...list||[]].filter(f=>f.type.startsWith('image/')); if(!files.length) return;
+  if(btnState==='done') newDoc();
+  for(const f of files){
+    try{ const du=await readDU(f), img=await loadImg(du); photos.push({ id:'p'+Date.now()+Math.random(), dataUrl:du, w:img.naturalWidth, h:img.naturalHeight, comp:null }); render(); }catch(e){}
   }
-
-  for(const file of files){
-
-    try{
-
-      const dataUrl =
-        await readDataURL(file);
-
-      const image =
-        await loadImage(dataUrl);
-
-      photos.push({
-        id:
-          'p'+Date.now()+
-          Math.random(),
-
-        dataUrl:dataUrl,
-        w:image.naturalWidth,
-        h:image.naturalHeight,
-        comp:null
-      });
-
-      renderPreview();
-
-    }catch(error){}
-  }
-
-  setStatus(
-    photos.length+' foto siap dikirim.'
-  );
 }
-
-/* Kompresi */
-async function compressPhoto(photo){
-
-  const image =
-    await loadImage(photo.dataUrl);
-
-  let width =
-    image.naturalWidth;
-
-  let height =
-    image.naturalHeight;
-
-  const maxResolution =
-    2400;
-
-  if(
-    Math.max(width,height)>
-    maxResolution
-  ){
-
-    const ratio =
-      maxResolution/
-      Math.max(width,height);
-
-    width =
-      Math.round(width*ratio);
-
-    height =
-      Math.round(height*ratio);
-  }
-
-  const canvas =
-    document.createElement('canvas');
-
-  canvas.width=width;
-  canvas.height=height;
-
-  const context =
-    canvas.getContext('2d');
-
-  context.fillStyle='#fff';
-  context.fillRect(
-    0,
-    0,
-    width,
-    height
-  );
-
-  context.drawImage(
-    image,
-    0,
-    0,
-    width,
-    height
-  );
-
-  const dataUrl =
-    canvas.toDataURL(
-      'image/jpeg',
-      .85
-    );
-
-  return {
-    dataUrl:dataUrl,
-    width:width,
-    height:height
-  };
+async function compress(p){
+  const img=await loadImg(p.dataUrl);
+  let w=img.naturalWidth, h=img.naturalHeight, mx=2400;
+  if(Math.max(w,h)>mx){ const r=mx/Math.max(w,h); w=Math.round(w*r); h=Math.round(h*r); }
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+  let q=0.85, du=c.toDataURL('image/jpeg',q);
+  return { dataUrl:du, w, h };
 }
-
-/* Kirim PDF */
 async function sendToDrive(){
-
-  if(
-    busy ||
-    !photos.length
-  ){
-    return;
-  }
-
-  const destination =
-    getDestination();
-
-  if(
-    !destinationComplete(
-      destination
-    )
-  ){
-
-    setStatus(
-      '❌ Lengkapi semua pilihan'
-    );
-
-    return;
-  }
-
-  if(!jsPDF){
-
-    setStatus(
-      '❌ Library PDF belum siap'
-    );
-
-    return;
-  }
-
-  busy=true;
-
-  $('openWrap').style.display=
-    'none';
-
-  setButtonState(
-    'sending',
-    'Menyiapkan...'
-  );
-
+  if(busy||!photos.length) return;
+  const p=dest();
+  if(!destOk(p)){ stat('❌ Lengkapi Tahun, Bulan, Periode, Afdeling, dan Jenis'); return; }
+  busy=true; $('openWrap').style.display='none'; setBtn('sending','Menyiapkan…');
   try{
-
-    for(
-      let i=0;
-      i<photos.length;
-      i++
-    ){
-
-      updateButtonLabel(
-        'Kompres '+(i+1)+'/'+photos.length
-      );
-
-      if(!photos[i].comp){
-        photos[i].comp =
-          await compressPhoto(
-            photos[i]
-          );
-      }
-    }
-
+    for(let i=0;i<photos.length;i++){ setBtnLabel('Kompres '+(i+1)+'/'+photos.length); if(!photos[i].comp) photos[i].comp=await compress(photos[i]); }
     let pdf=null;
-
-    for(
-      let i=0;
-      i<photos.length;
-      i++
-    ){
-
-      updateButtonLabel(
-        'Menyusun PDF '+(i+1)+'/'+photos.length
-      );
-
-      const photo =
-        photos[i].comp;
-
-      const landscape =
-        photo.width>photo.height;
-
-      if(i===0){
-
-        pdf =
-          new jsPDF({
-            orientation:
-              landscape?'l':'p',
-            unit:'mm',
-            format:'a4'
-          });
-
-      }else{
-
-        pdf.addPage(
-          'a4',
-          landscape?'l':'p'
-        );
-      }
-
-      const pageWidth =
-        pdf.internal.pageSize.getWidth();
-
-      const pageHeight =
-        pdf.internal.pageSize.getHeight();
-
-      /*
-        Foto hasil kamera sudah rasio A4.
-        Foto galeri tetap dipertahankan
-        rasionya agar tidak gepeng.
-      */
-
-      const ratio =
-        Math.min(
-          pageWidth/photo.width,
-          pageHeight/photo.height
-        );
-
-      const imageWidth =
-        photo.width*ratio;
-
-      const imageHeight =
-        photo.height*ratio;
-
-      pdf.addImage(
-        photo.dataUrl,
-        'JPEG',
-        (pageWidth-imageWidth)/2,
-        (pageHeight-imageHeight)/2,
-        imageWidth,
-        imageHeight,
-        undefined,
-        'FAST'
-      );
+    for(let i=0;i<photos.length;i++){
+      setBtnLabel('Menyusun PDF '+(i+1)+'/'+photos.length);
+      const c=photos[i].comp, land=c.w>c.h;
+      if(i===0) pdf=new jsPDF({orientation:land?'l':'p', unit:'mm', format:'a4'});
+      else pdf.addPage('a4', land?'l':'p');
+      const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
+      const r=Math.min(PW/c.w,PH/c.h), w=c.w*r, h=c.h*r;
+      pdf.addImage(c.dataUrl,'JPEG',(PW-w)/2,(PH-h)/2,w,h,undefined,'FAST');
     }
-
-    const blob =
-      pdf.output('blob');
-
-    updateButtonLabel(
-      'Mengirim '+formatSize(blob.size)+'...'
-    );
-
-    const base64 =
-      await blobToBase64(blob);
-
-    const fileName =
-      makeFileName();
-
-    const response =
-      await fetch(
-        ENDPOINT,
-        {
-          method:'POST',
-          body:JSON.stringify({
-            name:fileName,
-            mimeType:'application/pdf',
-            data:base64,
-            tahun:destination.tahun,
-            bulan:destination.bulan,
-            periode:destination.periode,
-            afdeling:destination.afdeling,
-            jenisDoc:destination.jenisDoc
-          })
-        }
-      );
-
-    const text =
-      await response.text();
-
-    let result;
-
-    try{
-      result=JSON.parse(text);
-    }catch(error){
-      throw new Error(
-        'Server Apps Script error'
-      );
-    }
-
-    if(!result.ok){
-      throw new Error(
-        result.error ||
-        'Gagal menyimpan dokumen'
-      );
-    }
-
-    if(result.url){
-
-      $('openLink').href =
-        result.url;
-
-      $('openWrap').style.display =
-        'block';
-    }
-
-    photos=[];
-    renderPreview();
-
-    busy=false;
-
-    setStatus('Siap.');
-
-    setButtonState(
-      'done'
-    );
-
-    showSuccessNotice();
-
-  }catch(error){
-
-    busy=false;
-
-    setStatus(
-      '❌ '+error.message
-    );
-
-    setButtonState(
-      'idle'
-    );
-  }
+    const blob=pdf.output('blob');
+    setBtnLabel('Mengirim '+fmt(blob.size)+'…');
+    const b64=await toB64(blob), fn=fileName();
+    const res=await fetch(EP,{method:'POST', body:JSON.stringify({name:fn, mimeType:'application/pdf', data:b64, tahun:p.tahun, bulan:p.bulan, periode:p.periode, afdeling:p.afdeling, jenisDoc:p.jenisDoc})});
+    const txt=await res.text();
+    let j; try{ j=JSON.parse(txt); }catch(e){ throw new Error('Server Apps Script error'); }
+    if(!j.ok) throw new Error(j.error||'Gagal');
+    if(j.url){ $('openLink').href=j.url; $('openWrap').style.display='block'; }
+    photos=[]; render(); busy=false; stat('Siap.'); setBtn('done'); showOk();
+  }catch(e){ busy=false; stat('❌ '+e.message); setBtn('idle'); }
 }
-
-window.addEventListener(
-  'pagehide',
-  stopCameraStream
-);
-
-/* Mulai aplikasi */
-renderPreview();
-setButtonState('idle');
-
-/* Mulai memuat OpenCV lebih awal */
-waitForOpenCV(10000);
+render(); setBtn('idle');
 </script>
-
 </body>
 </html>
